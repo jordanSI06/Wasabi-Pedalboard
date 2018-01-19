@@ -29,7 +29,7 @@
         </div>
 
         <div class="row">
-          <div class="column">
+          <div class="column" id="columnSlider">
             <webaudio-slider midilearn="true" src="./img/switches/threepositionslider.png" knobsrc="./img/switches/buttonforslider.png"
               direction="horz" value="2" min="1" max="3" id="slider1" knobwidth="40" width="128" height="30" data-role="mode"></webaudio-slider>
             <span class="knob-label" id="switch-label">Clip - Frequency - Oscillator</span>
@@ -78,10 +78,11 @@
         super.ready();
         //disable the pedal drag when you change position
 
-        this.$["slider1"].$["wac-body"].addEventListener("mousemove", function(event){
-        event.stopPropagation();
-        event.preventDefault();
+       
+        this.$["columnSlider"].addEventListener("mousedown", function(event){
+          event.stopPropagation();
         },false);
+
         this.createAllInternNodes();
         this.connectInternNodes();
         this.resetKnobs();
@@ -104,7 +105,10 @@
       }
 
       setKnobsListeners() {
-        this.$.slider1.addEventListener('change', (e) => this.setMode(e.target.value));
+        this.$.slider1.addEventListener('change', (e) => {
+          e.stopPropagation(); 
+          this.setMode(e.target.value);
+        });
       }
 
       setMode(numMode) {

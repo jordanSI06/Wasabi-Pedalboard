@@ -2313,6 +2313,8 @@
                 this.values = v;
                 this.sendevent();
                 this.redraw();
+                e.stopPropagation();
+                console.log("tttt")
             }
             pointerup(e) {
                 document.body.removeEventListener('touchstart', this.preventScroll, false);
