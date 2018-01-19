@@ -1,4 +1,4 @@
-<script>
+
 
 
 
@@ -115,11 +115,12 @@
    class PongPingDelay extends EffectTemplate {
     constructor(ctx) {
       super(ctx);
+      console.log("delay construction");
       var mix, time, feedback;
-
     }
 
     setup() {
+      console.log("delay setup");
       super.setup();
       if (this.params == null) this.params = this.getSetupParamsDefault();
       this.createNodes();
@@ -127,8 +128,8 @@
       this.linktoParams();
     }
 
-
     createNodes() {
+      console.log("here");
       super.createNodes();
       this.delayNodeLeft = this.context.createDelay();
       this.delayNodeRight = this.context.createDelay();
@@ -271,7 +272,6 @@
     }
 
   }
-  //export default class{PingPongDelay}
 
   /*  ################################## Chorus ########################################@  */
 
@@ -653,4 +653,3 @@
 
 
 
-</script>

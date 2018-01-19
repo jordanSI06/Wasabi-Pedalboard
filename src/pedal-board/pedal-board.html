@@ -1,24 +1,26 @@
-<link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
-
+<link rel="import" href="https://wasabi.i3s.unice.fr/plugins/delay-plugin/WebAudioPluginBank/bower_components/polymer/polymer-element.html">
+<link rel="import" href="https://wasabi.i3s.unice.fr/plugins/delay-plugin/WebAudioPluginBank/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="https://wasabi.i3s.unice.fr/plugins/delay-plugin/WebAudioPluginBank/bower_components/polymer/polymer.html">
 <link rel="import" href="./pedals/css/shared-styles.html">
+<script src="https://wasabi.i3s.unice.fr/plugins/delay-plugin/WebAudioPluginBank/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+
+<!-- <link rel="import" href="./pedals/css/shared-styles.html"> -->
 <link rel="import" href="./pedals/pedal-in.html">
 <link rel="import" href="./pedals/pedal-out.html">
 <link rel="import" href="./pedals/pedal-delay.html">
-<link rel="import" href="./pedals/pedal-chorus.html">
+<!-- <link rel="import" href="./pedals/pedal-chorus.html">
 <link rel="import" href="./pedals/pedal-overdrive.html">
 <link rel="import" href="./pedals/pedal-analyse.html">
 <link rel="import" href="./pedals/pedal-alike-dx7.html">
-<link rel="import" href="./pedals/pedal-alike-obx.html">
+<link rel="import" href="./pedals/pedal-alike-obx.html"> -->
 <!-- <link rel="import" href="./pedals/pedal-alike-dexed.html"> -->
 <!-- <link rel="import" href="./pedals/pedal-flanger.html">
 <link rel="import" href="./pedals/pedal-lowpass.html">
 <link rel="import" href="./pedals/pedal-quadrafuzz.html">-->
-<link rel="import" href="./pedals/pedal-faust.html">
-<link rel="import" href="./amp-sim/amp-sim.html">
+<!-- <link rel="import" href="./pedals/pedal-faust.html">
+<link rel="import" href="./amp-sim/amp-sim.html"> -->
 <link rel="import" href="./pedals/js/GlobalContext.html">
 <script src="./pedals/js/volume-meter.js"></script>
-<link rel="import" href="./pedals/js/EffectLib.html">
 <link rel="import" href="./pedals/js/freqAnalyser.html">
 <script src="./amp-sim/src/js/Visualization.class.js"></script>
 <script scr="./pedals/js/oscilloscope.js"></script>
@@ -212,11 +214,11 @@
       }
 
 
-      #alike-obx {
+      /* #alike-dexed {
         width: 325px;
         height: 50px;
         background-image: url("../../img/obx.png");
-      }
+      } */
 
 
       #zita_rev {
@@ -468,7 +470,7 @@
           <option value="Muse2Rythm.mp3">Muse rythm</option>
           <option value="11">Multi feeq sin wave</option>
         </select>
-        <audio src="./audio/BasketCase Greenday riff DI.mp3" id="soundSample" controls loop crossorigin="anonymous"></audio>
+        <audio src="./audio/Basket Case Greenday riff DI.mp3" id="soundSample" controls loop crossorigin="anonymous"></audio>
       </div>
       <div>
         <span>MICRO</span>
@@ -555,10 +557,10 @@
               <div id="alike-obx" class="pedal" draggable="true"></div>
               <span>alike-obx</span>
             </div>
-            <div class="pedals">
+            <!-- <div class="pedals">
               <div id="alike-dexed" class="pedal" draggable="true"></div>
               <span>alike-dexed</span>
-            </div>
+            </div> -->
           </div>
 
           <div id="content-6">
@@ -708,10 +710,10 @@
         p0.setPosition(450, 200);
         this.addPedal(p0);*/
 
-        /* let p0 = document.createElement("pedal-delay");
+         let p0 = document.createElement("pedal-delay");
          p0.setPosition(100, 250);
          this.addPedal(p0);
-         console.log(this.nbPedalsAdded);
+         /*console.log(this.nbPedalsAdded);
  
          let p1 = document.createElement("pedal-chorus");
          p1.setPosition(230, 250);
@@ -1544,7 +1546,7 @@
         let id = e.dataTransfer.getData("pedalId");
         let _id;
         // Generate a unique id for the pedal, handle case for multiple instances of the same pedal
-        if (id == "delay" || id == "chorus" || id == "overdrive" || id == "analyse" || id == "alike-dx7" || id == "alike-obx"|| id == "zita_rev") {
+        if (id == "delay" || id == "chorus" || id == "overdrive" || id == "analyse" || id == "alike-dx7" || id == "alike-obx"/*|| id == "alike-dexed"*/|| id == "zita_rev") {
           _id = "pedal-" + id;
         } else if (id == "ampsim") {
           _id = "amp-sim";

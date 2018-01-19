@@ -120,6 +120,7 @@
           console.log("zitarev créée et connectée à la soundNodeOut");
           let jsonDesc = this.effect.getJSON();
           var params = this.effect.getParams();
+          console.log(jsonDesc);
           this.$.knob1.addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/Input/In_Delay", e.target.value));
           this.$.knob2.addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/Decay_Times_in_Bands_(see_tooltips)/LF_X", e.target.value));
           this.$.knob3.addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/Decay_Times_in_Bands_(see_tooltips)/Low_RT60", e.target.value));

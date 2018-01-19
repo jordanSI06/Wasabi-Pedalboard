@@ -133,31 +133,31 @@
       /**
       Set a listener to the switch to bypass/reactivate the pedal when it is clicked
       **/
-      setSwitchListener() {
-        this.$.switch1.addEventListener('change',(e)=>{
-          if (this.isOn) this.bypass();
-          else this.reactivate();
+      // setSwitchListener() {
+      //   this.$.switch1.addEventListener('change',(e)=>{
+      //     if (this.isOn) this.bypass();
+      //     else this.reactivate();
 
-          this.isOn = !this.isOn;
-        });
-      }
+      //     this.isOn = !this.isOn;
+      //   });
+      // }
 
       /**
       *  Set the pedal to an active or bypassed state
       *  @param active : a Boolean indicating whether the pedal sould be active or not
       *  if active if undefined, it is considered false
       **/
-      setPedalActive(active) {
-        if (active == undefined || active == false) {
-          this.isOn = false;
-          this.bypass();
-          this.$.switch1.value = 0;
-        } else if (active) {
-          this.isOn = true;
-          this.reactivate();
-          this.$.switch1.value = 1;
-        }
-      }
+      // setPedalActive(active) {
+      //   if (active == undefined || active == false) {
+      //     this.isOn = false;
+      //     this.bypass();
+      //     this.$.switch1.value = 0;
+      //   } else if (active) {
+      //     this.isOn = true;
+      //     this.reactivate();
+      //     this.$.switch1.value = 1;
+      //   }
+      // }
       
       /**
       * Set values to the knobs
