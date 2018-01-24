@@ -143,14 +143,14 @@
             let sensitivity = document.createElement("input");
             sensitivity.setAttribute("id", "sensivityOsc1")
             sensitivity.setAttribute("type", "range");
-            sensitivity.setAttribute("min", "1");
+            sensitivity.setAttribute("min", "-100");
             sensitivity.setAttribute("max", "100");
-            sensitivity.setAttribute("value", "27");
+            sensitivity.setAttribute("value", "20");
             sensitivity.setAttribute("width", "190");
+            sensitivity.setAttribute("style","width: inherit");
             let labelOsc = document.createElement("label");
             labelOsc.setAttribute("id", "labelOsc");
             labelOsc.setAttribute("for", "sensivityOsc1");
-            labelOsc.setAttribute("align", "center");
             this.analyseWrapper.appendChild(this.oscilloWrapper);
             this.analyseWrapper.appendChild(sensitivity);
             this.analyseWrapper.appendChild(labelOsc);

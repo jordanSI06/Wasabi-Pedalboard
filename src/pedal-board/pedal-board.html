@@ -22,11 +22,8 @@
 <link rel="import" href="./pedals/js/GlobalContext.html">
 <script src="./pedals/js/volume-meter.js"></script>
 <link rel="import" href="./pedals/js/freqAnalyser.html">
-<script src="./amp-sim/src/js/Visualization.class.js"></script>
+<!--<script src="./amp-sim/src/js/Visualization.class.js"></script>-->
 <script scr="./pedals/js/oscilloscope.js"></script>
-
-
-
 
 <dom-module id="pedal-board">
   <template>
@@ -94,6 +91,10 @@
 
         font-family: 'Quicksand', cursive;
         text-decoration: none;
+      }
+
+      #version, #date{
+        font-size: 10px;
       }
 
       header div {
@@ -454,7 +455,9 @@
 
     <header>
       <div>
-        <a href="https://github.com/dl100463/TER-Pedalboard-creation/tree/newBranchEK">PedalBoard 2017</a>
+        <a href="https://github.com/dl100463/TER-Pedalboard-creation/tree/newBranchEK">PedalBoard</a>
+        <span id="version">V. 1.3 Centralised</span>
+        <span id="date">24/01/18</span>
       </div>
       <div class="div_audio">
         <select id="select_audio">
@@ -615,6 +618,10 @@
           soundSample: {
             type: Object,
             value: ""
+          },
+          version:{
+            number:1.3,
+            dateLastChange:"24/01/2018"
           }
         };
       }
@@ -656,6 +663,7 @@
         this.wO = 0;
         this.hO = 0;
 
+        
         // ===== ===== SOUND ===== ===== 
         this.sound = {
           context: null,
@@ -681,9 +689,14 @@
         this.h = this.offsetHeight;
         this.hO = this.h;
 
-
         this.pIn = this.$["pedalIn"];
         this.pOut = this.$["pedalOut"];
+
+        this.version = this.$["version"];
+        //console.log(this.is);
+        //this.version.innerHTML(this.properties);
+        // this.date = document.querySelector("#date");
+
 
         // create SVG canvas
         this.svgcanvas = PedalBoard.createSVGcanvas(this.w, this.h);
@@ -1706,7 +1719,7 @@
           // Jack ends are images (embout) 
           this.end = this.makeSVG('image', {
             class: 'map-tile',
-            'xlink:href': 'http://img4.hostingpics.net/pics/146380rightJack.png',
+            'xlink:href': '../img/rightJack.png',
             width: '100px',
             height: '20px',
             id: _id + "_4"
