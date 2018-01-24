@@ -19,6 +19,7 @@
         width: 200px;
         border: 5px solid grey;
         border-radius: 15px;
+        text-align: center
       }
     </style>
     <div class="laPedale">
@@ -78,10 +79,10 @@
         super.ready();
         //disable the pedal drag when you change position
 
-       
-        this.$["columnSlider"].addEventListener("mousedown", function(event){
+
+        this.$["columnSlider"].addEventListener("mousedown", function (event) {
           event.stopPropagation();
-        },false);
+        }, false);
 
         this.createAllInternNodes();
         this.connectInternNodes();
@@ -99,14 +100,14 @@
       }
 
       connectInternNodes() {
-      this.soundNodeIn.connect(this.soundNodeOut);
-      this.soundNodeIn.connect(this.visualNode);
+        this.soundNodeIn.connect(this.soundNodeOut);
+        this.soundNodeIn.connect(this.visualNode);
 
       }
 
       setKnobsListeners() {
         this.$.slider1.addEventListener('change', (e) => {
-          e.stopPropagation(); 
+          e.stopPropagation();
           this.setMode(e.target.value);
         });
       }
@@ -140,21 +141,25 @@
             this.oscilloWrapper = document.createElement("div");
             this.oscilloWrapper.setAttribute("id", "oscilloscope");
             let sensitivity = document.createElement("input");
-            sensitivity.setAttribute("id","sensivityOsc1")
+            sensitivity.setAttribute("id", "sensivityOsc1")
             sensitivity.setAttribute("type", "range");
             sensitivity.setAttribute("min", "1");
             sensitivity.setAttribute("max", "100");
             sensitivity.setAttribute("value", "27");
             sensitivity.setAttribute("width", "190");
             let labelOsc = document.createElement("label");
-            labelOsc.setAttribute("id","labelOsc");
-            labelOsc.setAttribute("for","sensivityOsc1");
+            labelOsc.setAttribute("id", "labelOsc");
+            labelOsc.setAttribute("for", "sensivityOsc1");
+            labelOsc.setAttribute("align", "center");
             this.analyseWrapper.appendChild(this.oscilloWrapper);
             this.analyseWrapper.appendChild(sensitivity);
             this.analyseWrapper.appendChild(labelOsc);
 
-            this.visualiser = new Oscilloscope(GlobalContext.context, this.oscilloWrapper,"Oscilloscope");
+            this.visualiser = new Oscilloscope(GlobalContext.context, this.oscilloWrapper, "Oscilloscope");
             sensitivity.addEventListener('input', (e) => this.visualiser.sensitivity = sensitivity.value);
+            sensitivity.addEventListener("mousedown", function (event) {
+              event.stopPropagation();
+            }, false);
             break;
         }
         //this.soundNodeIn.connect(this.visualiser);
@@ -175,7 +180,7 @@
               this.clipWrapper.fillStyle = "white";
             this.clipWrapper.fillRect(10, 150, 180, -this.visualiser.volume * 100 * 3);
             break;
-          case 3: this.visualiser.update(); 
+          case 3: this.visualiser.update();
             break;
         }
         requestAnimationFrame(this.visualize.bind(this));

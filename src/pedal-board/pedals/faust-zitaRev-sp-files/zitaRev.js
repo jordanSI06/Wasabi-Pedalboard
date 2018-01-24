@@ -525,7 +525,8 @@ faust.createzitaRev = function(context, buffer_size, callback)
         }
     };
 
-    fetch('./src/pedal-board/pedals/zitaRev.wasm')
+    // HERE WE NEED TO UNDERSTAND WHY "./zitaRev.wasm" DOES NOT WORK !!!
+    fetch('./src/pedal-board/pedals/faust-zitaRev-sp-files/zitaRev.wasm')
     .then(dsp_file => dsp_file.arrayBuffer())
     .then(dsp_bytes => WebAssembly.instantiate(dsp_bytes, importObject))
     .then(dsp_module => callback(faust.zitaRev(dsp_module.instance, context, buffer_size)))
