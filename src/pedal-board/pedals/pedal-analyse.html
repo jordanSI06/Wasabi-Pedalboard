@@ -10,7 +10,8 @@
   <template>
     <style include="shared-styles">
       :host {
-        background: linear-gradient(rgb(207, 200, 201), rgb(134, 177, 241));
+        /* background: linear-gradient(rgb(207, 200, 201), rgb(134, 177, 241)); */
+        background: linear-gradient(#2196F3,#3F51B5);
       }
 
       #analyseWrapper {
@@ -36,15 +37,15 @@
             <span class="knob-label" id="switch-label">Clip - Frequency - Oscillator</span>
           </div>
         </div>
-        <div class="row">
-          <div class="column">
-            <webaudio-switch midilearn="true" src="./img/switches/switch_1.png" class="switch" id="switch1"  width="32" height="20"></webaudio-switch>
-          </div>
-        </div>
 
         <div class="row">
           <div class="column">
             <span class="pedalLabel">Sound Checker</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <webaudio-switch midilearn="true" src="./img/switches/switch_1.png" class="switch" id="switch1"  width="32" height="20"></webaudio-switch>
           </div>
         </div>
       </div>

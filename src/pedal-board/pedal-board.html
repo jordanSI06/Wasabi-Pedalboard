@@ -192,132 +192,68 @@
         color: #888;
       }
 
-      .pedals:hover {
-        background: rgba(255, 255, 255, 0.2);
-      }
-
+      /* pedals from bottom menu */
       .pedals {
+        margin: 10px;
+        padding: 3px;
+
+        position: relative;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
         cursor: pointer;
-
-        padding: 10px;
-        border-radius: 4px;
       }
 
       .pedals .pedal {
-        height: 160px;
+        border: 4px solid transparent;
+        /* border-radius: 5px; */
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        left: 0px;
+        right: 0px;
+
+        transition: 0.2s;
+        border-radius: 8px;
+      }
+
+      /* .pedals:hover {
+        background: rgba(0, 0, 0, 0.7);
+      } */
+
+      .pedals:hover>.pedal {
+        border: 4px solid #aaa;
+        background: rgba(0, 0, 0, 0.7);
+      }
+
+      .pedals:hover>span {
+        display: inline;
+      }
+
+      .pedals img {
+        box-shadow: 0px 3px 5px #000;
+        border:1px solid #777;
+
+        /* border-radius: 8px; */
+        height: 130px;
       }
 
       .pedals span {
-        display: none;
-        color: #eee;
+        color: #ccc;
 
-        font-size: 14px;
-        padding-top: 10px;
+        position: absolute;
+        top: 65px;
+
+        font-size: 12px;
+        font-weight: 300;
 
         font-family: 'Quicksand', cursive;
-      }
-
-      #delay {
-        width: 109px;
-        height: 159px;
-        background-image: url("../../img/delay.png");
-      }
-
-      #quadrafuzz {
-        width: 90px;
-        height: 160px;
-        background-image: url("../../img/quadra_fuzz.png");
-      }
-
-      #lowpass {
-        width: 85px;
-        height: 162px;
-        background-image: url("../../img/low_pass.png");
-      }
-
-      #flanger {
-        width: 150px;
-        height: 162px;
-        background-image: url("../../img/flanger.png");
-      }
-
-      #chorus {
-        width: 162px;
-        height: 162px;
-        background-image: url("../../img/chorus.png");
-      }
-
-      #alike-dx7 {
-        width: 513px;
-        height: 158px;
-        background-image: url("../../img/dx7.png");
-      }
-
-      #alike-obx {
-        width: 293px;
-        height: 158px;
-        background-image: url("../../img/obx.png");
-      }
-
-
-      #alike-dexed {
-        width: 197px;
-        height: 158px;
-        background-image: url("../../img/dexed.png");
-      }
-
-      #alike-noisemaker {
-        width: 139px;
-        height: 158px;
-        background-image: url("../../img/noisemaker.png");
-      }
-
-      #webaudiotinysynthetizer {
-        width: 380px;
-        height: 130px;
-        background-image: url("../../img/tinysynth.png");
-        background-size: cover;
-      }
-
-      #zita_rev {
-        width: 260px;
-        height: 170px;
-        background-image: url("../../img/faust.png");
-        background-size: cover;
-      }
-
-      #overdrive {
-        width: 185px;
-        height: 165px;
-        background-image: url("../../img/overdrive.png");
-      }
-
-      #analyse {
-        width: 115px;
-        height: 155px;
-        background-image: url("../../img/soundChecker.png");
-      }
-
-      #ampsim {
-        width: 420px;
-        height: 100px;
-        background-image: url("../../img/ampsim.png");
-        background-size: cover;
-      }
-
-      #ampsim img {
-        width: 100%;
+        text-transform: uppercase;
+        display: none;
       }
 
       /***** div_app_tabs *****/
-
-      .bottomTabs {
-        bottom: -210px !important;
-      }
 
       .div_app_tabs {
         position: absolute;
@@ -361,9 +297,13 @@
         transition: 0.2s;
       }
 
+
+      .bottomTabs {
+        bottom: -160px !important;
+      }
       .div_app_tabs .div_container {
         /* box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 4px 5px 0 rgba(0, 0, 0, 0.06), 0 1px 10px 0 rgba(0, 0, 0, 0.08); */
-        height: 210px;
+        height: 160px;
         padding: 1px;
 
         display: flex;
@@ -634,7 +574,8 @@
 
         cursor: pointer;
       }
-      .bt_pinViewTabs > iron-icon {
+
+      .bt_pinViewTabs>iron-icon {
         color: #ccc;
 
         height: 28px;
@@ -750,12 +691,16 @@
         <input id="tab-7" type="radio" name="input-tab">
         <label for="tab-7">FAUST</label>
 
-        <button on-click="viewTabs" class="bt_pinViewTabs"><iron-icon id="icon_view" icon="icons:expand-less"></iron-icon></button>
+        <button on-click="viewTabs" class="bt_pinViewTabs">
+          <iron-icon id="icon_view" icon="icons:expand-less"></iron-icon>
+        </button>
+
         <div class="div_container">
 
           <div id="content-1">
             <div class="pedals">
               <div id="delay" class="pedal" draggable="true"></div>
+              <img src="../../img/delay.png">
               <span>delay</span>
             </div>
           </div>
@@ -763,6 +708,7 @@
           <div id="content-2">
             <div class="pedals">
               <div id="chorus" class="pedal" draggable="true"></div>
+              <img src="../../img/chorus.png">
               <span>chorus</span>
             </div>
           </div>
@@ -770,6 +716,7 @@
           <div id="content-3">
             <div class="pedals">
               <div id="overdrive" class="pedal" draggable="true"></div>
+              <img src="../../img/overdrive.png">
               <span>overdrive</span>
             </div>
           </div>
@@ -777,6 +724,7 @@
           <div id="content-4">
             <div class="pedals">
               <div id="analyse" class="pedal" draggable="true"></div>
+              <img src="../../img/soundChecker.png">
               <span>analyse</span>
             </div>
           </div>
@@ -784,22 +732,27 @@
           <div id="content-5">
             <div class="pedals">
               <div id="alike-dx7" class="pedal" draggable="true"></div>
+              <img src="../../img/dx7.png">
               <span>alike-dx7</span>
             </div>
             <div class="pedals">
               <div id="alike-obx" class="pedal" draggable="true"></div>
+              <img src="../../img/obx.png">
               <span>alike-obx</span>
             </div>
             <div class="pedals">
               <div id="alike-dexed" class="pedal" draggable="true"></div>
+              <img src="../../img/dexed.png">
               <span>alike-dexed</span>
             </div>
             <div class="pedals">
               <div id="alike-noisemaker" class="pedal" draggable="true"></div>
+              <img src="../../img/noisemaker.png">
               <span>alike-noisemaker</span>
             </div>
             <div class="pedals">
               <div id="webaudiotinysynthetizer" class="pedal" draggable="true"></div>
+              <img src="../../img/tinysynth.png">
               <span>webaudiotinysynthetizer</span>
             </div>
 
@@ -807,17 +760,17 @@
 
           <div id="content-6">
             <div class="pedals">
-              <div id="ampsim" class="pedal" draggable="true">
-              </div>
+              <div id="ampsim" class="pedal" draggable="true"></div>
+              <img src="../../img/ampsim.png">
               <span>ampsim</span>
             </div>
           </div>
 
           <div id="content-7">
             <div class="pedals">
-              <div id="zita_rev" class="pedal" draggable="true">
-              </div>
-              <span>ZitaRev</span>
+              <div id="zita_rev" class="pedal" draggable="true"></div>
+              <img src="../../img/faust.png">
+              <span>faust ZitaRev</span>
             </div>
           </div>
 
@@ -1722,7 +1675,7 @@
 
       addNewPedalListeners() {
         var newPedals = this.root.querySelectorAll(".pedal");
-
+        console.log(newPedals);
         newPedals.forEach((p) => {
           p.addEventListener('dragstart', this.pedalDragStart, false);
         });
@@ -2031,6 +1984,8 @@
       dropPedalHandler(e) {
         console.log(e);
         let id = e.dataTransfer.getData("pedalId");
+        console.log(e.dataTransfer);
+        console.log("id", id);
         let _id;
         // Generate a unique id for the pedal, handle case for multiple instances of the same pedal
         if (id == "delay" || id == "chorus" || id == "overdrive" || id == "analyse" || id == "alike-dx7" || id == "alike-obx" || id == "alike-dexed" || id == "alike-noisemaker" || id == "zita_rev") {
@@ -2054,10 +2009,10 @@
         //clearTimeout(this.tabsAnimation);
         if (this.$.div_app_tabs.classList.contains("bottomTabs")) {
           this.$.div_app_tabs.classList.remove("bottomTabs");
-          this.$.icon_view.setAttribute("icon","icons:expand-more");
+          this.$.icon_view.setAttribute("icon", "icons:expand-more");
         } else {
           this.$.div_app_tabs.classList.add("bottomTabs");
-          this.$.icon_view.setAttribute("icon","icons:expand-less");
+          this.$.icon_view.setAttribute("icon", "icons:expand-less");
         }
       }
 
