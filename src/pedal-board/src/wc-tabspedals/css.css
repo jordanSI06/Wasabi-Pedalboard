@@ -1,0 +1,152 @@
+* {
+  padding: 0px;
+  border: 0px;
+  margin: 0px;
+
+  border-collapse: collapse;
+  box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
+  vertical-align: top;
+  font-weight: 300;
+}
+
+*:focus {
+  outline: 0;
+}
+
+#div_app {
+  background: #333;
+  position: absolute;
+  right: 0px;
+  left: 0px;
+  bottom: 0px;
+  transition: 0.5s;
+}
+
+.div_app_tabs input[type=radio] {
+  display: none;
+}
+
+.div_app_tabs input:hover+label {
+  background: #000;
+  border-top: 5px solid orange;
+}
+
+.div_app_tabs input:checked+label {
+  background: #111;
+  border-top: 5px solid tomato;
+}
+
+.div_app_tabs label {
+  background: #333;
+  border-top: 5px solid transparent;
+  color: #eee;
+
+  padding: 5px 10px;
+  font-size: 12px;
+  transition: 0.2s;
+
+  display: inline-block;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.content {
+  border: 1px solid #333;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.bottomTabs {
+  bottom: -160px !important;
+}
+
+#div_container {
+  height: 160px;
+  padding: 1px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow-x: scroll;
+}
+
+.pedals {
+  margin: 10px;
+  padding: 3px;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  cursor: pointer;
+}
+
+.pedals .pedal {
+  border: 4px solid transparent;
+
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+
+  transition: 0.2s;
+  border-radius: 8px;
+}
+
+.pedals:hover>.pedal {
+  background: rgba(0, 0, 0, 0.7);
+  border: 4px solid #aaa;
+}
+
+.pedals:hover>span {
+  display: inline;
+}
+
+.pedals img {
+  box-shadow: 0px 3px 5px #000;
+  border: 1px solid #777;
+
+  height: 130px;
+}
+
+.pedals span {
+  color: #ccc;
+
+  position: absolute;
+  top: 65px;
+
+  font-size: 12px;
+  font-weight: 300;
+
+  text-transform: uppercase;
+  display: none;
+}
+
+#bt_pinViewTabs {
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+
+  font-size: 16px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  cursor: pointer;
+}
+
+.bt_pinViewTabs > iron-icon {
+  color: #ccc;
+
+  height: 28px;
+  width: 40px;
+  vertical-align: middle;
+  font-weight: bold;
+}
+.hidden {
+  display: none;
+}

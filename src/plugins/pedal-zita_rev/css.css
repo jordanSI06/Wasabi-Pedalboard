@@ -1,0 +1,7 @@
+:host {
+  background-color: #333;
+  /* background: linear-gradient(rgb(253, 253, 253), rgb(146, 142, 146)); */
+  background: linear-gradient(#333,#777);
+  
+  box-shadow: 4px 5px 6px rgba(0, 0, 0, 0.7), inset -2px -2px 5px 0px rgba(0, 0, 0, 0.2), inset 3px 1px 1px 4px rgba(255, 255, 255, 0.2), 1px 0px 1px 0px rgba(0, 0, 0, 0.9), 0 2px 1px 0 rgba(0, 0, 0, 0.9), 1px 1px 1px 0px rgba(0, 0, 0, 0.9);
+}

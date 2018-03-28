@@ -1,0 +1,15 @@
+<template>
+  <link rel="stylesheet" href="./src/pedal-board/src/wc-audio/css.css">
+
+  <div id="div_app">
+    <div class="div_app_audio">
+      <label id="label-input-file" for="input-file">
+        <iron-icon icon="icons:file-upload"></iron-icon>
+      </label>
+      <select id="select_audio"></select>
+      <input id="input-file" type="file" style="display:none">
+      <audio id="soundSample" controls loop crossorigin="anonymous" controlsList="nodownload"></audio>
+    </div>
+  </div>
+</template>
+<script src="./js.js"></script>

@@ -1,0 +1,270 @@
+<template id="amp-sim">
+  <link rel="stylesheet" charset="UTF-8" href="./src/plugins/amp-sim/src/css/translateelement.css">
+  <link rel="stylesheet" charset="UTF-8" href="./src/plugins/amp-sim/src/css/amp.css">
+  <link rel="stylesheet" charset="UTF-8" href="./src/plugins/amp-sim/css.css">
+  <link rel="stylesheet" href="./src/plugins/_utils/css/shared-styles.css">
+
+  <div class="laPedale">
+    <article style="display: flex; flex-direction: row; width:100%">
+
+      <section hidden$="{{!showPreamp}}" style="flex: 1;display:none">
+        <div class="eq">
+          <h2>Advanced settings</h2>
+          <p>Preamp internals</p>
+          <div class="controls">
+            <label>lowShelf1 Freq</label>
+            <input id="lowShelf1FreqSlider" type="range" value="720" step="1" min="500" max="1000" />
+            <output id="lowShelf1Freq">720 Hz</output>
+          </div>
+          <div class="controls">
+            <label>lowShelf1 Gain</label>
+            <input id="lowShelf1GainSlider" type="range" value="-6" step="0.1" min="-10" max="0" />
+            <output id="lowShelf1Gain">-6 dB</output>
+          </div>
+          <div class="controls">
+            <label>lowShelf2 Freq</label>
+            <input id="lowShelf2FreqSlider" type="range" value="320" step="1" min="300" max="400" />
+            <output id="lowShelf2Freq">320 Hz</output>
+          </div>
+          <div class="controls">
+            <label>lowShelf2 Gain</label>
+            <input id="lowShelf2GainSlider" type="range" value="-6" step="0.1" min="-12" max="10" />
+            <output id="lowShelf2Gain">-5 dB</output>
+          </div>
+          <div class="controls">
+            <label>Stage 1 Gain</label>
+            <input id="preampStage1GainSlider" type="range" value="0.1" step="0.01" min="0" max="10" />
+            <output id="preampStage1Gain">1</output>
+          </div>
+          <div class="controls">
+            <label>HighPass1 freq</label>
+            <input id="highPass1FreqSlider" type="range" value="6" step="1" min="5" max="7" />
+            <output id="highPass1Freq">6 Hz</output>
+          </div>
+          <div class="controls">
+            <label>HighPass1 Q</label>
+            <input id="highPass1QSlider" type="range" value="0.7071" step="0.001" min="0" max="5" />
+            <output id="highPass1Q">0.7071</output>
+          </div>
+          <div class="controls">
+            <label>lowShelf3 Freq</label>
+            <input id="lowShelf3FreqSlider" type="range" value="720" step="1" min="300" max="1000" />
+            <output id="lowShelf3Freq">720 Hz</output>
+          </div>
+          <div class="controls">
+            <label>lowShelf3 Gain</label>
+            <input id="lowShelf3GainSlider" type="range" value="-6" step="0.1" min="-10" max="0" />
+            <output id="lowShelf3Gain">-6 dB</output>
+          </div>
+          <div class="controls">
+            <label>Stage 2 Gain</label>
+            <input id="preampStage2GainSlider" type="range" value="1" step="0.01" min="0" max="10" />
+            <output id="preampStage2Gain">1</output>
+          </div>
+
+          <p>DRIVE : distorsion levels</p>
+          <div class="controls">
+            <label>K1</label>
+            <input id="K1slider" type="range" value="4" step="0.1" min="0" max="10" data-disto=0 />
+            <output id="k0">4</output>
+          </div>
+          <div class="controls">
+            <label>K2</label>
+            <input id="K2slider" type="range" value="4" step="0.1" min="0" max="10" data-disto=1 />
+            <output id="k1">4</output>
+          </div>
+          <div class="onoffswitch">
+            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" />
+            <label class="onoffswitch-label" for="myonoffswitch">
+              <span class="onoffswitch-inner"></span>
+              <span class="onoffswitch-switch"></span>
+            </label>
+          </div>
+          <div>
+            <label for="convolverCabinetSlider">Cabinet Simulator (Dry/Wet)</label>
+            <input type="range" min="0" max="10" step="0.1" value="7.5" id="convolverCabinetSlider" />
+            <output id="cabinetGainOutput">2</output>
+          </div>
+          <div>
+            <label for="cabinetImpulses">Cabinet Impulse:</label>
+            <br>
+            <select id="cabinetImpulses">
+              <template is="dom-repeat" items="{{cabinetImpulses}}" as="cabinetImpulse" index-as="index">
+                <option value="{{index}}">{{cabinetImpulse.name}}</option>
+              </template>
+            </select>
+          </div>
+          <div>
+            <label for="reverbImpulses">Reverb Impulse:</label>
+            <br>
+            <select id="reverbImpulses">
+              <template is="dom-repeat" items="{{reverbImpulses}}" as="reverbImpulse" index-as="index">
+                <option value="{{index}}">{{reverbImpulse.name}}</option>
+              </template>
+            </select>
+          </div>
+          <!--CurveDrawer-->
+          <div>
+            <select id="distorsionMenu1">
+              <template is="dom-repeat" items="{{_toArray(wsFactory)}}" as="distorsionCurves1">
+                <option value="{{distorsionCurves1}}">{{distorsionCurves1}}</option>
+              </template>
+            </select>
+            <div>
+              <canvas id="distoDrawerCanvas1" style="margin-right:10px;margin-left:10px;" width="100" height="100"></canvas>
+              <canvas id="signalDrawerCanvas1" width="100" height="100"></canvas>
+            </div>
+            <select id="distorsionMenu2">
+              <template is="dom-repeat" items="{{_toArray(wsFactory)}}" as="distorsionCurves2">
+                <option value="{{distorsionCurves2}}">{{distorsionCurves2}}</option>
+              </template>
+            </select>
+            <div>
+              <canvas id="distoDrawerCanvas2" style="margin-right:10px;margin-left:10px;" width="100" height="100"></canvas>
+              <canvas id="signalDrawerCanvas2" width="100" height="100"></canvas>
+            </div>
+          </div>
+          <div>
+            <br>
+            <button id="toggleGuitarIn" class="pulse" type="button">Guitar input:
+              <span style='color:red;'>NOT ACTIVATED</span>, click to toggle on/off!</button>
+
+            <br>
+            <div>Input Gain:</div>
+            <webaudio-knob id="Knob9" midilearn src="{{knobSrc}}" value="1" default="1" min="0" max="10" step="0.1" diameter="49" sprites="99"
+              tooltip="InputGain"></webaudio-knob>
+            <canvas id="inputSignalCanvas" width=150 height=50></canvas>
+            <div>Output Gain:</div>
+            <webaudio-knob id="Knob10" midilearn src="{{knobSrc}}" value="5" default="5" min="0" max="10" step="0.1" diameter="49" sprites="99"
+              tooltip="OutputGain"></webaudio-knob>
+            <canvas id="outputSignalCanvas" width=150 height=50></canvas>
+          </div>
+        </div>
+      </section>
+      <!-- end amp jsbin -->
+
+
+      <section>
+
+        <div class="ampGUI">
+          <div id="mainAmp">
+            <span class="knobWrapper">
+              <webaudio-knob id="Knob1" midilearn step="0.1" src="./src/plugins/amp-sim/src/img/Prophet.png" value="7" min="0" max="10"
+                diameter="69" sprites="99" tooltip="Volume"></webaudio-knob>
+              Volume
+            </span>
+            <span class="knobWrapper">
+              <webaudio-knob id="Knob2" midilearn step="0.1" src="./src/plugins/amp-sim/src/img/Prophet.png" value="2" min="0" max="10"
+                diameter="69" sprites="99" tooltip="Master"></webaudio-knob>
+              Master
+            </span>
+            <span class="knobWrapper">
+              <webaudio-knob id="Knob3" midilearn="true" src="./src/plugins/amp-sim/src/img/Prophet.png" value="0" step="0.1" min="0" max="10"
+                diameter="69" sprites="99" tooltip="Drive"></webaudio-knob>
+              Drive
+            </span>
+            <span class="knobWrapper">
+              <webaudio-knob id="Knob4" midilearn src="./src/plugins/amp-sim/src/img/Prophet.png" value="5" min="0" max="10" step="0.1"
+                diameter="69" sprites="99" tooltip="Bass"></webaudio-knob>
+              Bass
+            </span>
+            <span class="knobWrapper">
+              <webaudio-knob id="Knob5" midilearn src="./src/plugins/amp-sim/src/img/Prophet.png" value="5" min="0" max="10" step="0.1"
+                diameter="69" sprites="99" tooltip="Midlle"></webaudio-knob>
+              Midlle
+            </span>
+            <span class="knobWrapper">
+              <webaudio-knob id="Knob6" midilearn src="./src/plugins/amp-sim/src/img/Prophet.png" value="5" min="0" max="10" step="0.1"
+                diameter="69" sprites="99" tooltip="Treble"></webaudio-knob>
+              Treble
+            </span>
+            <span class="knobWrapper">
+              <webaudio-knob id="Knob7" midilearn src="./src/plugins/amp-sim/src/img/Prophet.png" value="2" min="0" max="10" step="0.1"
+                diameter="69" sprites="99" tooltip="Reverb"></webaudio-knob>
+              Reverb
+            </span>
+            <span class="knobWrapper">
+              <webaudio-knob id="Knob8" midilearn src="./src/plugins/amp-sim/src/img/Prophet.png" value="5" min="0" max="10" step="0.1"
+                diameter="69" sprites="99" tooltip="Presence"></webaudio-knob>
+              Presence
+            </span>
+            <span class="knobWrapper">
+              <webaudio-switch midilearn id="toggleBoost" value="0" src="./src/plugins/amp-sim/src/img/boostSwitch.png" tooltip="Toggle clean/disto channel"></webaudio-switch>
+              Clean / Disto
+            </span>
+            <div id="divPresetAmp">
+              <select id="QFPresetMenu2">
+                <!-- <template is="dom-repeat" items="{{presets}}" as="preset" index-as="index">
+                  <option value="{{index}}">{{preset.name}}</option>
+                </template> -->
+              </select>
+            </div>
+            <div id="divSwitch">
+              <webaudio-switch id="switch1" midilearn src="./src/plugins/amp-sim/src/img/switch_toggle.png" value="0" height="45" width="45"
+                tooltip="Switch-A Tooltip text test"></webaudio-switch>
+              <webaudio-switch id="led" src="./src/plugins/amp-sim/src/img/led_23_red.png" value="1" height="23" width="23" tooltip="Switch-B"></webaudio-switch>
+              <webaudio-switch id="switch2" midilearn src="./src/plugins/amp-sim/src/img/switch_toggle.png" value="0" height="45" width="45"
+                tooltip="Switch-B"></webaudio-switch>
+            </div>
+          </div>
+
+
+          <div id="divEqualizer" hidden$="{{!showEqualizer}}" style="display:none">
+            <webaudio-slider id="slider1" midilearn units="Db" src="{{sliderBackgroundSrc}}" knobsrc="{{sliderKnobSrc}}" min="-30" max="30"
+              tooltip="Slider1"></webaudio-slider>
+            <webaudio-slider id="slider2" midilearn units="Db" src="{{sliderBackgroundSrc}}" knobsrc="{{sliderKnobSrc}}" min="-30" max="30"
+              tooltip="Slider2"></webaudio-slider>
+            <webaudio-slider id="slider3" midilearn units="Db" src="{{sliderBackgroundSrc}}" knobsrc="{{sliderKnobSrc}}" min="-30" max="30"
+              tooltip="Slider3"></webaudio-slider>
+            <webaudio-slider id="slider4" midilearn units="Db" src="{{sliderBackgroundSrc}}" knobsrc="{{sliderKnobSrc}}" min="-30" max="30"
+              tooltip="Slider4"></webaudio-slider>
+            <webaudio-slider id="slider5" midilearn units="Db" src="{{sliderBackgroundSrc}}" knobsrc="{{sliderKnobSrc}}" min="-30" max="30"
+              tooltip="Slider5"></webaudio-slider>
+            <webaudio-slider id="slider6" midilearn units="Db" src="{{sliderBackgroundSrc}}" knobsrc="{{sliderKnobSrc}}" min="-30" max="30"
+              tooltip="Slider6"></webaudio-slider>
+          </div>
+
+        </div>
+
+
+        <!-- 
+        <div id="divAudioPlayer" >
+          <audio id="player" controls loop>
+            <source src="{{resolveUrl('src/assets/audio/BasketCase Greenday riff DI.mp3')}}">
+            <source src="{{resolveUrl('src/assets/audio/BasketCase Greenday riff DI.ogg')}}"> Your browser does not support the audio tag.
+          </audio>
+          <div id="demoSample" title="Choose a demo sample">
+            <select id="demoSampleMenu" on-change="changeDemoSample">
+                <option value="0">Metal riff 1</option>
+                <option value="1">Metal riff 2</option>
+                <option value="2">Blues solo 1</option>
+                <option value="3">Cool rythm</option>
+                <option value="4">Trash metal</option>
+                <option value="5">Black Sabbath Rythm</option>
+                <option value="6">Black Sabbath Solo</option>
+                <option value="7">Basketcase Riff</option>
+                <option value="8">In Bloom riff</option>
+                <option value="9">Muse solo</option>
+                <option value="10">Muse rythm</option>
+                <option value="11">Simple guitar riff</option>
+              </select>
+          </div>
+        </div>
+         -->
+      </section>
+      <!--      
+      <div class="events" id="events" style="background:rgba(128,128,255,0.5);overflow:scroll"></div>
+      -->
+    </article>
+  </div>
+</template>
+<script src="../_utils/js/pedal-behavior.js"></script>
+<script src="./src/js/adapter.js"></script>
+<script src="./src/js/Booster.class.js"></script>
+<script src="./src/js/Convolver.class.js"></script>
+<script src="./src/js/CurveDrawer.class.js"></script>
+<script src="./src/js/Equalizer.class.js"></script>
+<script src="./src/js/Utils.class.js"></script>
+<script src="./src/js/AmpVisualization.class.js"></script>
+<script src="./src/js/WaveShapers.class.js"></script>
+<script src="./js.js"></script>

@@ -1,0 +1,267 @@
+:host{
+  background-color: #eee;
+
+  padding: 0px;
+  border: 0px;
+  margin: 0px;
+  font-weight: 300;
+
+  border-collapse: collapse;
+  box-sizing: border-box;
+  vertical-align: top;
+
+  transform: scale(1, 1);
+  font-family: 'Quicksand', cursive;
+
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+  bottom: 0px;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  user-select: none;
+  overflow: hidden
+}
+/***** header *****/
+
+header {
+  background: rgba(0, 0, 0, 0.7);
+
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-content: center;
+  align-items: stretch;
+}
+
+header audio,
+header select,
+header span,
+header a {
+  color: #ccc;
+
+  font-size: 16px;
+
+  text-decoration: none;
+}
+
+header a.a_title {
+  color: #fff;
+
+  font-size: 18px;
+  padding: 0px 10px;
+}
+
+header div {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-content: center;
+  align-items: center;
+  text-align: center;
+
+  flex: 1;
+}
+
+header div:last-child {
+  justify-content: flex-end;
+}
+
+header #version,
+header #date {
+  color: #ccc;
+
+  padding: 0px 2px;
+  font-size: 10px;
+}
+
+header .div_audio {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-content: center;
+}
+
+header select {
+  background: rgba(0, 0, 0, 0.5);
+  color: rgb(154, 181, 209);
+
+  border: 0px;
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+header select option {
+  background: #222;
+  color: #eee;
+}
+
+header div.column {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  padding: 5px;
+}
+
+header .span_gainLevel {
+  color: #ccc;
+
+  font-size: 12px;
+
+  text-align: left;
+}
+
+/***** https://stackoverflow.com/questions/4126708/is-it-possible-to-style-html5-audio-tag *****/
+
+audio::-webkit-media-controls-panel,
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+  background: transparent;
+  color: #888;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  background: #ccc;
+  height: 2px;
+  width: 50px;
+  border-radius: 8px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: dodgerblue;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  cursor: ew-resize;
+}
+
+/* devices midi learn */
+
+#divSoundIn {
+  background: #222;
+
+  position: absolute;
+  top: 44px;
+  right: 0px;
+  padding: 10px 50px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-content: center;
+  align-items: stretch;
+}
+
+#divSoundIn span.span_tuto {
+  color: #777;
+
+  font-size: 12px;
+  padding: 10px;
+}
+
+#divSoundIn span#span_time {
+  color: tomato;
+}
+
+#microDevices:hover {
+  background: #222;
+}
+
+#microDevices {
+  padding: 10px;
+
+  cursor: pointer;
+}
+
+.select_devices {
+  border: 1px solid #555;
+
+  padding: 5px;
+  margin-bottom: 5px;
+
+  display: flex;
+  flex-direction: row;
+}
+
+#bt_learn:hover {
+  background: #B71C1C;
+}
+
+#bt_learn {
+  background: #841919;
+  color: #eee;
+
+  border-radius: 50px;
+  width: 40px;
+  margin: 0px 10px;
+
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.mic_open {
+  background: #222;
+}
+
+
+canvas {
+  background: #000;
+}
+
+.hidden {
+  display: none ! important;
+}
+
+footer {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  z-index: 10;
+}
+
+@keyframes zoomeffect {
+  0% {
+    filter: blur(0px);
+    transform: scale(1, 1);
+  }
+  50% {
+    filter: blur(3px);
+  }
+  100% {
+    filter: blur(0px);
+    transform: scale(2, 2);
+  }
+}
+
+@keyframes dezoomeffect {
+  0% {
+    filter: blur(0px);
+    transform: scale(2, 2);
+  }
+  50% {
+    filter: blur(3px);
+  }
+  100% {
+    filter: blur(0px);
+    transform: scale(1, 1);
+  }
+}
