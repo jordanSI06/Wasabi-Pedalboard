@@ -817,18 +817,18 @@ class PedalBoard extends HTMLElement {
     } else {
       console.log('not imported - we create import dynamically');
 
-      this.addImportLink(`./src/plugins/${id}`,id,this,e,event);
+      this.addImportLink(`./src/plugins/${id}`, id, this, e, event);
     }
 
   }
 
   // from https://www.html5rocks.com/en/tutorials/webcomponents/imports/
   // A PLACER DANS LE ADD PEDAL : addImportLink => addPedal
-  addImportLink(url,id,_this,_e,_event) {
+  addImportLink(url, id, _this, _e, _event) {
     var link = document.createElement('link');
     link.rel = 'import';
     link.href = url;
-    link.onload = function(e) {
+    link.onload = function (e) {
       // var post = this.import.createElement(id);
       // let el=post.cloneNode(true);
       // _this.appendChild(el);
@@ -882,13 +882,19 @@ class PedalBoard extends HTMLElement {
     this.sound.mediaSource = this.sound.context.createMediaElementSource(this.soundSample);
     this.sound.audioDestination = this.sound.context.destination;
 
+    //connexion (reste le midi à faire !)
     this.sound.mediaSource.connect(this.sound.gainNodeIn);
     this.sound.mediaSource.connect(this.sound.gainNodeInMid);
 
+    //this.monoMediaSourceM.connect(this.sound.gainNodeIn);
     this.sound.gainNodeOut.connect(this.sound.audioDestination);
-
+    //
     this.sound.gainNodeIn.connect(this.meter1);
     this.sound.gainNodeInMid.connect(this.meter3);
+    // this.sound.mediaSource.connect(this.meter1);
+    // this.sound.mediaSource.connect(this.meter3);
+
+    //console.log(this.nbPedalsAdded);
 
     if (navigator.mediaDevices.getUserMedia) {
       var constraints = {
@@ -898,7 +904,7 @@ class PedalBoard extends HTMLElement {
           mozAutoGainControl: false
         }
       };
-
+      console.log("1 : navigator.mediaDevices", navigator.mediaDevices);
       navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
         window.stream = stream;
         this.sound.mediaSourceM = this.sound.context.createMediaStreamSource(stream);
@@ -906,21 +912,23 @@ class PedalBoard extends HTMLElement {
         this.splitter = this.sound.context.createChannelSplitter(2);
         this.sound.mediaSourceM.connect(this.splitter);
 
-        this.sound.monoMediaSourceM = this.sound.context.createChannelMerger(2);
+        this.monoMediaSourceM = this.sound.context.createChannelMerger(2);
 
+        //connexion monoMediaSourceM Midi
         this.sound.mediaSourceM.connect(this.sound.gainNodeInMid);
         //this.sound.gainNodeInMid.connect(this.splitter);
-        this.splitter.connect(this.sound.monoMediaSourceM, 0, 0);
-        this.splitter.connect(this.sound.monoMediaSourceM, 0, 1);
+        this.splitter.connect(this.monoMediaSourceM, 0, 0);
+        this.splitter.connect(this.monoMediaSourceM, 0, 1);
         //this.monoMediaSourceM.connect(GlobalContext.context.destination)
-        this.splitter.connect(this.sound.monoMediaSourceM, 1, 0);
-        this.splitter.connect(this.sound.monoMediaSourceM, 1, 1);
-        this.sound.monoMediaSourceM.connect(this.sound.gainNodeInMid);
+        this.splitter.connect(this.monoMediaSourceM, 1, 0);
+        this.splitter.connect(this.monoMediaSourceM, 1, 1);
+        this.monoMediaSourceM.connect(this.sound.gainNodeInMid);
       }).catch(function (err) {
         // handle the error
         console.log(err.name + ": " + err.message);
       });
     }
+
 
     // link to clip detector
     this.drawLoop();
@@ -1018,7 +1026,7 @@ class PedalBoard extends HTMLElement {
 
     navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
       this.sound.mediaSourceM = this.sound.context.createMediaStreamSource(stream);
-      this.sound.mediaSourceM.connect(this.sound.gainNodeInMid);
+      this.sound.mediaSourceM.connect(this.splitter);
       //alert("changed input stream in graph");
       window.stream = stream;
     });
@@ -1027,23 +1035,34 @@ class PedalBoard extends HTMLElement {
   soundNodeConnection(p1, p2) {
     if (p1.id == "pedalIn" && p2.id == "pedalOut") {
       if (this.sound.state == 0) {
+        //this.sound.mediaSource.connect(this.sound.gainNodeIn);
         this.sound.gainNodeIn.connect(this.sound.gainNodeOut);
         this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
+
+        //this.sound.gainNodeOut.connect(this.sound.audioDestination);
       } else {
+        //this.monoMediaSourceM.connect(this.sound.gainNodeIn);
         this.sound.gainNodeInMid.connect(this.sound.gainNodeOut);
         this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
+
+        //this.sound.gainNodeOut.connect(this.sound.audioDestination);
       }
     } else if (p1.id == "pedalIn") {
       if (this.sound.state == 0) {
-        console.log("this.sound.gainNodeIn", this.sound.gainNodeIn);
-        console.log("p2.soundNodeIn", p2.soundNodeIn);
+        //this.sound.mediaSource.connect(this.sound.gainNodeIn);
         this.sound.gainNodeIn.connect(p2.soundNodeIn);
+        // console.log(p2.elem.soundNodeIn);
+        // console.log(p2.soundNodeIn);
       } else {
+        //his.monoMediaSourceM.connect(this.sound.gainNodeIn);
         this.sound.gainNodeInMid.connect(p2.soundNodeIn);
       }
     } else if (p2.id == "pedalOut") {
+      //console.log("p1.elem.soundNodeOut : ", p1.elem.soundNodeOut);
+      //p1.soundNodeOut.connect(this.meter2);
       p1.soundNodeOut.connect(this.sound.gainNodeOut);
       this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
+      //this.sound.gainNodeOut.connect(this.sound.audioDestination);
     } else {
       p1.soundNodeOut.connect(p2.soundNodeIn);
     }
@@ -1052,20 +1071,29 @@ class PedalBoard extends HTMLElement {
   soundNodeDisconnection(p1, p2) {
     if (p1.id == "pedalIn" && p2.id == "pedalOut") {
       if (this.sound.state == 0) {
+        //this.sound.mediaSource.disconnect(this.sound.gainNodeIn);
         this.sound.gainNodeIn.disconnect(this.sound.gainNodeOut);
+        //this.sound.gainNodeOut.disconnect(this.sound.audioDestination);
       } else {
+        //this.sound.mediaSourceM.disconnect(this.sound.audioDestination);
+
         this.sound.gainNodeInMid.disconnect(this.sound.gainNodeOut);
+        // this.monoMediaSourceM.disconnect(this.sound.gainNodeIn);
+        // this.sound.gainNodeIn.disconnect(this.sound.gainNodeOut);
+        // this.sound.gainNodeOut.disconnect(this.sound.audioDestination);
       }
     } else if (p1.id == "pedalIn") {
-      console.log("this.sound.gainNodeIn", this.sound.gainNodeIn);
-      console.log("p2.soundNodeIn", p2.soundNodeIn);
       if (this.sound.state == 0) {
+        //this.sound.mediaSource.disconnect(this.sound.gainNodeIn);
         this.sound.gainNodeIn.disconnect(p2.soundNodeIn);
       } else {
+        //this.sound.mediaSourceM.disconnect(p2.elem.soundNodeIn);
+        //this.monoMediaSourceM.disconnect(this.sound.gainNodeIn);
         this.sound.gainNodeInMid.disconnect(p2.soundNodeIn);
       }
     } else if (p2.id == "pedalOut") {
       p1.soundNodeOut.disconnect(this.sound.gainNodeOut);
+      //this.sound.gainNodeOut.disconnect(this.sound.audioDestination);
     } else {
       p1.soundNodeOut.disconnect(p2.soundNodeIn);
     }
