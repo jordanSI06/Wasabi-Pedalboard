@@ -19,12 +19,12 @@
           contents: ["pedal-delay"]
         },
         cat2: {
-          label: "chorus",
-          contents: ["pedal-chorus"]
+          label: "Modulation",
+          contents: ["pedal-chorus","pedal-weirdphaser","pedal-thruzeroflanger","pedal-dualpitchshifter","pedal-stereofreqshifter","pedal-blipper"]
         },
         cat3: {
           label: "overdrive",
-          contents: ["pedal-overdrive"]
+          contents: ["pedal-overdrive","pedal-quadra"]
         },
         cat4: {
           label: "analyse",

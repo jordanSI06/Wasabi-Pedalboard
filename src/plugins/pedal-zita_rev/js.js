@@ -50,55 +50,22 @@
       const template = _currentDoc.querySelector(`template`);
       const instance = template.content.cloneNode(true);
       shadowRoot.appendChild(instance);
-
       this.runBehaviorMethods();
-
       this.createAllInternNodes();
-      this.createAllInternNodes();
-      this.resetKnobs();
-      this.setKnobsListeners();
-      this.setSwitchListener();
     }
 
     // ----- METHODS: CUSTOM -----
     createAllInternNodes() {
-      this.fst = faust.createzitaRev(GlobalContext.context, ((dsp) => {
-        console.log("GOT ZITA REV WA!!!");
-        this.effect = dsp;
-        this.soundNodeIn.connect(this.effect);
-        this.effect.connect(this.soundNodeOut);
-        console.log("zitarev créée et connectée à la soundNodeOut");
-        let jsonDesc = this.effect.getJSON();
-        var params = this.effect.getParams();
-        this.shadowRoot.querySelector('#knob1').addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/Input/In_Delay", e.target.value));
-        this.shadowRoot.querySelector('#knob2').addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/Decay_Times_in_Bands_(see_tooltips)/LF_X", e.target.value));
-        this.shadowRoot.querySelector('#knob3').addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/Decay_Times_in_Bands_(see_tooltips)/Low_RT60", e.target.value));
-        this.shadowRoot.querySelector('#knob4').addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/Decay_Times_in_Bands_(see_tooltips)/Mid_RT60", e.target.value));
-        this.shadowRoot.querySelector('#knob5').addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/Decay_Times_in_Bands_(see_tooltips)/HF_Damping", e.target.value));
-        this.shadowRoot.querySelector('#knob6').addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/RM_Peaking_Equalizer_1/Eq1_Freq", e.target.value));
-        this.shadowRoot.querySelector('#knob7').addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/RM_Peaking_Equalizer_1/Eq1_Level", e.target.value));
-        this.shadowRoot.querySelector('#knob8').addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/RM_Peaking_Equalizer_2/Eq2_Freq", e.target.value));
-        this.shadowRoot.querySelector('#knob9').addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/RM_Peaking_Equalizer_2/Eq2_Level", e.target.value));
-        this.shadowRoot.querySelector('#knob10').addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/Output/Dry/Wet_Mix", e.target.value));
-        this.shadowRoot.querySelector('#knob11').addEventListener('change', (e) => this.effect.setParamValue("/Zita_Rev1/Output/Level", e.target.value));
+      var zita = this;
+      var host = this.shadowRoot.querySelector("#zita");
+      host.context = GlobalContext.context;
+      host.load("https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRev/FaustZitaRev.html").then(function (node) {
+        // zita.w = node._gui.properties.dataWidth.value;
+        // zita.h = node._gui.properties.dataHeight.value;
+        zita.soundNodeIn.connect(node);
+        node.connect(zita.soundNodeOut);
+      });
 
-      }));
     }
-
-    bypass() {
-      this.soundNodeIn.disconnect(this.effect);
-      this.soundNodeIn.connect(this.soundNodeOut);
-    }
-
-    reactivate() {
-      this.soundNodeIn.connect(this.effect);
-      try {
-        this.soundNodeIn.disconnect(this.soundNodeOut);
-      }
-      catch(error){
-        console.log("plugin was not connected");
-      }
-    }
-
   });
 })();

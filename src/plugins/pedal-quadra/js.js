@@ -4,7 +4,7 @@
   const _currentDoc = document.currentScript.ownerDocument;
 
   // Register the x-custom element with the browser
-  customElements.define(`pedal-delay`, class extends PBPlugin(HTMLElement) {
+  customElements.define(`pedal-quadra`, class extends PBPlugin(HTMLElement) {
 
     // ----- METHODS: DEFAULT -----
     // is called when an instance of the element is created
@@ -57,14 +57,14 @@
 
     // ----- METHODS: CUSTOM -----
     createAllInternNodes() {
-        var ppd = this;
-        var host = this.shadowRoot.querySelector("#PPD");
+        var qdr = this;
+        var host = this.shadowRoot.querySelector("#QDR");
         host.context = GlobalContext.context;
-        host.load("https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/PingPongDelay/PingPongDelay.html").then(function (node) {
-        ppd.w = node._gui.properties.dataWidth.value;
-        ppd.h = node._gui.properties.dataHeight.value;  
-        ppd.soundNodeIn.connect(node.getInput(0));
-          node.connect(ppd.soundNodeOut);
+        host.load("https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz/QuadraFuzz.html").then(function (node) {
+          qdr.w = node._gui.properties.dataWidth.value;
+          qdr.h = node._gui.properties.dataHeight.value;  
+          qdr.soundNodeIn.connect(node.getInput(0));
+          node.connect(qdr.soundNodeOut);
         });
       }
   });

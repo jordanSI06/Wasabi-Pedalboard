@@ -4,7 +4,7 @@
   const _currentDoc = document.currentScript.ownerDocument;
 
   // Register the x-custom element with the browser
-  customElements.define(`pedal-delay`, class extends PBPlugin(HTMLElement) {
+  customElements.define(`pedal-blipper`, class extends PBPlugin(HTMLElement) {
 
     // ----- METHODS: DEFAULT -----
     // is called when an instance of the element is created
@@ -13,8 +13,8 @@
       super();
 
       // Ecrire la fonctionnalité de l'élément ici
-      this.w = "";
-      this.h = "";
+      this.w = 120;
+      this.h = 50;
 
       this.nbNodeIn = 1;
       this.nbNodeOut = 1;
@@ -57,14 +57,14 @@
 
     // ----- METHODS: CUSTOM -----
     createAllInternNodes() {
-        var ppd = this;
-        var host = this.shadowRoot.querySelector("#PPD");
+        var blp = this;
+        var host = this.shadowRoot.querySelector("#BLP");
         host.context = GlobalContext.context;
-        host.load("https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/PingPongDelay/PingPongDelay.html").then(function (node) {
-        ppd.w = node._gui.properties.dataWidth.value;
-        ppd.h = node._gui.properties.dataHeight.value;  
-        ppd.soundNodeIn.connect(node.getInput(0));
-          node.connect(ppd.soundNodeOut);
+        host.load("https://wasabi.i3s.unice.fr/WebAudioPluginBank/Oliver-Larkin/Blipper/FaustBlipper.html").then(function (node) {
+        // ppd.w = node._gui.properties.dataWidth.value;
+        // ppd.h = node._gui.properties.dataHeight.value;  
+        blp.soundNodeIn.connect(node);
+        node.connect(blp.soundNodeOut);
         });
       }
   });
