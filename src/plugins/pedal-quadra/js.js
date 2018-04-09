@@ -13,8 +13,8 @@
       super();
 
       // Ecrire la fonctionnalité de l'élément ici
-      this.w = "";
-      this.h = "";
+      this.w = 140;
+      this.h = 180;
 
       this.nbNodeIn = 1;
       this.nbNodeOut = 1;
@@ -57,15 +57,17 @@
 
     // ----- METHODS: CUSTOM -----
     createAllInternNodes() {
-        var qdr = this;
-        var host = this.shadowRoot.querySelector("#QDR");
-        host.context = GlobalContext.context;
-        host.load("https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz/QuadraFuzz.html").then(function (node) {
-          qdr.w = node._gui.properties.dataWidth.value;
-          qdr.h = node._gui.properties.dataHeight.value;  
-          qdr.soundNodeIn.connect(node.getInput(0));
-          node.connect(qdr.soundNodeOut);
+      var quadra = this;
+      var wrapper = this.shadowRoot.querySelector("#quadraContainer");
+      var pluginURL = "https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2/";
+      var plugin = new WAPlugin.WasabiQuadraFuzz(GlobalContext.context, pluginURL);
+      plugin.load().then((node)=>{
+        plugin.loadGui().then((elem)=>{
+          wrapper.appendChild(elem);
         });
+        quadra.soundNodeIn.connect(node.getInput(0));
+        node.connect(quadra.soundNodeOut);
+      });
       }
   });
 })();

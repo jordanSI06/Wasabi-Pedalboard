@@ -57,15 +57,16 @@
     // ----- METHODS: CUSTOM -----
     createAllInternNodes() {
       var zita = this;
-      var host = this.shadowRoot.querySelector("#zita");
-      host.context = GlobalContext.context;
-      host.load("https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRev/FaustZitaRev.html").then(function (node) {
-        // zita.w = node._gui.properties.dataWidth.value;
-        // zita.h = node._gui.properties.dataHeight.value;
+      var wrapper = this.shadowRoot.querySelector("#zitaContainer");
+      var pluginURL = "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3";
+      var plugin = new WAPlugin.FaustZitaRev2(GlobalContext.context, pluginURL);
+      plugin.load().then((node)=>{
+        plugin.loadGui().then((elem)=>{
+          wrapper.appendChild(elem);
+        });
         zita.soundNodeIn.connect(node);
         node.connect(zita.soundNodeOut);
       });
-
     }
   });
 })();
