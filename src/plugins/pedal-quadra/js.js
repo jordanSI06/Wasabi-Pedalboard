@@ -57,16 +57,16 @@
 
     // ----- METHODS: CUSTOM -----
     createAllInternNodes() {
-      var quadra = this;
-      var wrapper = this.shadowRoot.querySelector("#quadraContainer");
+      var pedal = this;
+      var wrapper = this.shadowRoot.querySelector(".laPedale");
       var pluginURL = "https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2/";
       var plugin = new WAPlugin.WasabiQuadraFuzz(GlobalContext.context, pluginURL);
       plugin.load().then((node)=>{
         plugin.loadGui().then((elem)=>{
           wrapper.appendChild(elem);
         });
-        quadra.soundNodeIn.connect(node.getInput(0));
-        node.connect(quadra.soundNodeOut);
+        pedal.soundNodeIn.connect(node.getInput(0));
+        node.connect(pedal.soundNodeOut);
       });
       }
   });

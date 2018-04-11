@@ -56,16 +56,16 @@
 
     // ----- METHODS: CUSTOM -----
     createAllInternNodes() {
-      var zita = this;
-      var wrapper = this.shadowRoot.querySelector("#zitaContainer");
+      var pedal = this;
+      var wrapper = this.shadowRoot.querySelector(".laPedale");
       var pluginURL = "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3";
       var plugin = new WAPlugin.FaustZitaRev2(GlobalContext.context, pluginURL);
       plugin.load().then((node)=>{
         plugin.loadGui().then((elem)=>{
           wrapper.appendChild(elem);
         });
-        zita.soundNodeIn.connect(node);
-        node.connect(zita.soundNodeOut);
+        pedal.soundNodeIn.connect(node);
+        node.connect(pedal.soundNodeOut);
       });
     }
   });

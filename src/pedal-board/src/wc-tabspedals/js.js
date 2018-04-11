@@ -13,51 +13,75 @@
       super();
 
       // Ecrire la fonctionnalité de l'élément ici
-      const _pedalesDefault = {
-        cat1: {
-          label: "delay",
-          contents: ["pedal-delay"]
-        },
-        cat2: {
-          label: "Modulation",
-          contents: ["pedal-chorus","pedal-weirdphaser","pedal-thruzeroflanger","pedal-dualpitchshifter","pedal-stereofreqshifter","pedal-blipper"]
-        },
-        cat3: {
-          label: "overdrive",
-          contents: ["pedal-overdrive","pedal-quadra"]
-        },
-        cat4: {
-          label: "analyse",
-          contents: ["pedal-analyse"]
-        },
-        cat5: {
-          label: "synths",
-          contents: ["pedal-alike-dx7", "pedal-alike-obx", "pedal-alike-dexed", "pedal-alike-noisemaker", "webaudio-tinysynthetizer"]
-        },
-        cat6: {
-          label: "ampsim",
-          contents: ["amp-sim"]
-        },
-        cat7: {
-          label: "faust",
-          contents: ["pedal-zita_rev"]
-        }
-      };
+      this._pedalList = "";//JSON.parse(this.getAttribute('data-pedallist'));
+      //var _pedalList = {
+        // cat1: {
+        //   label: "delay",
+        //   contents: ["pedal-delay"]
+        // },
+        // cat2: {
+        //   label: "Modulation",
+        //   contents: ["pedal-chorus","pedal-weirdphaser","pedal-thruzeroflanger","pedal-dualpitchshifter","pedal-stereofreqshifter","pedal-blipper"]
+        // },
+        // cat3: {
+        //   label: "overdrive",
+        //   contents: ["pedal-overdrive","pedal-quadra"]
+        // },
+        // cat4: {
+        //   label: "analyse",
+        //   contents: ["pedal-analyse"]
+        // },
+        // cat5: {
+        //   label: "synths",
+        //   contents: ["pedal-alike-dx7", "pedal-alike-obx", "pedal-alike-dexed", "pedal-alike-noisemaker", "webaudio-tinysynthetizer"]
+        // },
+        // cat6: {
+        //   label: "ampsim",
+        //   contents: ["amp-sim"]
+        // },
+        // cat7: {
+        //   label: "faust",
+        //   contents: ["pedal-zita_rev"]
+        // }
+      //};
 
       this.currentOpenedTab = {};
       this.params = {
-        pedalesDefault: this.getAttribute('pedalesDefault') || _pedalesDefault
+        pedalesDefault: this.getAttribute('data-pedallist') || this._pedalList
       }
     }
 
     get is() { return this.nodeName.toLowerCase(); }
 
     // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
-    static get observedAttributes() { return ['pedalesDefault']; }
+    static get observedAttributes() { return ['data-pedallist']; }
 
     // appelé lorsque l'un des attributs de l'élément personnalisé est ajouté, supprimé ou modifié.
     attributeChangedCallback() {
       console.log(`Custom element ${this.is} attributes changed.`);
+      try {
+        this._pedalList = JSON.parse(this.getAttribute('data-pedallist'));
+        console.log(this._pedalList);
+
+        // Fetch the data from the API and call the render method 
+        Object.keys(this._pedalList).map(
+          (el, index) => {
+            this.render(this._pedalList[el]);
+          }
+        )
+        
+      } catch (error) {
+        console.log(error);
+        
+      }
+      try {
+        this.listeners();
+      } catch (error) {
+        console.log(error);
+        
+      }
+     
+     
     }
 
     // appelé lorsque l'élément personnalisé est déplacé vers un nouveau document
@@ -82,12 +106,12 @@
       shadowRoot.appendChild(instance);
 
       // Extract the attribute from our element. 
-      const _pedalesDefault = this.params.pedalesDefault;
+      this._pedalList = this.params.pedalesDefault;
 
       // Fetch the data from the API and call the render method 
-      Object.keys(_pedalesDefault).map(
+      Object.keys(this._pedalList).map(
         (el, index) => {
-          this.render(_pedalesDefault[el]);
+          this.render(this._pedalList[el]);
         }
       )
 
@@ -98,7 +122,6 @@
     // ----- METHODS: CUSTOM -----
     render(_data) {
       let div_container = this.shadowRoot.querySelector('#div_container');
-      console.log(document.querySelector('head'));
       console.log(_data);
       if (div_container.querySelector(`#content-${_data.label}`) == null) {
         // create New Tab
@@ -107,7 +130,7 @@
         div_container.insertAdjacentHTML('beforeEnd', `<div id='content-${_data.label}' class='content hidden'></div>`);
       }
       for (let i = 0; i < _data.contents.length; i++) {
-        div_container.querySelector(`#content-${_data.label}`).insertAdjacentHTML('beforeEnd', `<div class='pedals'><div id='${_data.contents[i]}' class='pedal' draggable='true'></div><img src='../../img/${_data.contents[i]}.png'><span>${_data.contents[i]}</span></div>`);
+        div_container.querySelector(`#content-${_data.label}`).insertAdjacentHTML('beforeEnd', `<div class='pedals'><div id='${_data.contents[i].id}' class='pedal' draggable='true'></div><img src='${_data.contents[i].Thumbnail}'><span>${_data.contents[i].id}</span></div>`);
       }
     }
 
@@ -183,12 +206,14 @@
     }
 
     viewTabs(_idTab) {
+      console.log("here");
       this.shadowRoot.querySelectorAll('.content').forEach((e) => {
         if (e.id == `content-${_idTab}`) {
           if (e.classList.contains('hidden')) {
             e.classList.remove('hidden');
           }
-        } else {
+        } 
+        else {
           if (!e.classList.contains('hidden')) {
             e.classList.add('hidden');
           }

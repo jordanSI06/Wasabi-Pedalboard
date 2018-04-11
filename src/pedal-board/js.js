@@ -42,6 +42,10 @@ class PedalBoard extends HTMLElement {
     this.wO = 0;
     this.hO = 0;
 
+    // factory
+    this.factory = new factory();
+    this.repo;
+
     // ===== ===== SOUND ===== ===== 
     this.sound = {
       context: null,
@@ -64,6 +68,8 @@ class PedalBoard extends HTMLElement {
   // appelé lorsque l'un des attributs de l'élément personnalisé est ajouté, supprimé ou modifié.
   attributeChangedCallback() {
     console.log(`Custom element ${this.is} attributes changed.`);
+
+
   }
 
   // appelé lorsque l'élément personnalisé est déplacé vers un nouveau document
@@ -150,10 +156,115 @@ class PedalBoard extends HTMLElement {
 
     // customListeners
     this.listeners();
+
+    /* ############################################################################################################################################ */
+    
+    this._pedalList = {
+      cat1: {
+        label: "Reverb",
+        contents: [
+          // {
+          //   id: "pedal-zita_rev",
+          //   classname: "FaustZitaRev2",
+          //   BaseUrl: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3",
+          //   Thumbnail: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3/FaustZitaRev.png"
+          // },
+          // {
+          //   id: "pedal-quadra",
+          //   classname: "WasabiQuadraFuzz",
+          //   BaseUrl: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2",
+          //   Thumbnail: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2/WasabiQuadraFuzz.png"
+          // }
+        ]
+      },
+      cat2: {
+        label: "Distortion",
+        contents: [
+          // {
+          //   id: "pedal-quadra",
+          //   classname: "WasabiQuadraFuzz",
+          //   BaseUrl: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2",
+          //   Thumbnail: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2/WasabiQuadraFuzz.png"
+          // }
+          // , {
+          //   id: "pedal-zita_rev",
+          //   classname: "FaustZitaRev2",
+          //   BaseUrl: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3",
+          //   Thumbnail: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3/FaustZitaRev.png"
+          // }
+
+        ]
+      }
+    }
+
+
+    const request = async () => {
+      const response = await fetch('https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json');
+      this.repo = await response.json();
+      return this.repo;
+  }
+  
+    //var repo =
+    // {
+    //   "name": "Wasabi first repo",
+    //   "root": "optional_abs_url",
+    //   "plugs": {
+    //     "zitaRev": "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3", // THERE SHOULD NOT BE TWICE THE SAME URL, as the same class would ne imported twice. MUST PREVENT THIS
+    //     "quadrafuzz":"https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2",
+    //   }
+    // }
+  ;
+
+    request().then((repo) => Object.keys(repo.plugs).map((key) => {
+
+      console.log("execution");
+      var baseURL = repo.plugs[key];
+      let MetadataFileURL = baseURL + "/main.json";
+      let scriptURL = baseURL + "/main.js";
+      // get the main.json for this plugin
+      let metadata;
+  
+      fetch(MetadataFileURL)
+        .then(responseJSON => {
+          return responseJSON.json();
+        }).then(metadata => {
+          let className = metadata.vendor + metadata.name;
+          let tagName = `pedal-`+metadata.name
+          let thumbnail = baseURL +'/'+metadata.thumbnail
+          this.appendToPedalList(metadata.categorie,tagName,className,baseURL,thumbnail);
+        }).catch((e) => {
+          console.log(e);
+        });
+    }));
+    
+  }
+  /* ############################################################################################################################################ */
+
+  // ----- METHODS: CUSTOM -----
+
+  appendToPedalList(categorie, tagName, className, URL, thumbnail){
+    for (var cat in this._pedalList) {
+      if (this._pedalList.hasOwnProperty(cat)) {
+        let added = this._pedalList[cat].label == categorie;
+        if (this._pedalList[cat].label == categorie){
+          console.log("hey");
+          this._pedalList[cat].contents.push({ 
+            id: `${tagName.toLowerCase()}`,
+            classname: `${className}`,
+            BaseUrl: `${URL}`,
+            Thumbnail: `${thumbnail}`
+          })
+        }
+      }
+      // else {
+      //   _pedalList
+      // }
+    }
+    this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
+
   }
 
 
-  // ----- METHODS: CUSTOM -----
 
   listeners() {
     // For pedals to be draggable
@@ -798,15 +909,41 @@ class PedalBoard extends HTMLElement {
     return false;
   }
 
+
+
+
   dropPedalHandler(e) {
+    var liste
     console.log("dropPedalHandler");
     GlobalContext.context.resume();
     // Generate a unique id for the pedal, handle case for multiple instances of the same pedal
     let id = e.dataTransfer.getData("pedalId");
+    var all = JSON.parse(this.shadowRoot.querySelector('wc-tabspedals').getAttribute('data-pedallist'));
+    var target = {
+      baseUrl: "",
+      Thumbnail: "",
+      classname: ""
+    };
     console.log(`id = ${id}`);
 
+    
+    for (var cat in all) {
+      if (all.hasOwnProperty(cat)) {
+        const categories = all[cat];
+        for (var content in categories.contents) {
+          if (categories.contents.hasOwnProperty(content)) {
+            if (id == categories.contents[content].id) {
+              target.baseUrl = categories.contents[content].BaseUrl;
+              target.Thumbnail = categories.contents[content].Thumbnail;
+              target.classname = categories.contents[content].classname;
+            }
+          }
+        }
+      }
+    }
+
     // check if plugin was already imported or not
-    let isImported = document.querySelector(`link[href='./src/plugins/${id}']`);
+    let isImported = document.querySelector(`script[src="${target.baseUrl}/main.js"]`);
     if (isImported) {
       console.log(isImported);
 
@@ -817,29 +954,24 @@ class PedalBoard extends HTMLElement {
     } else {
       console.log('not imported - we create import dynamically');
 
-      this.addImportLink(`./src/plugins/${id}`, id, this, e, event);
+      this.addImportLink(target.baseUrl, id, this, e, event,target);
     }
 
   }
 
+
   // from https://www.html5rocks.com/en/tutorials/webcomponents/imports/
   // A PLACER DANS LE ADD PEDAL : addImportLink => addPedal
-  addImportLink(url, id, _this, _e, _event) {
-    var link = document.createElement('link');
-    link.rel = 'import';
-    link.href = url;
-    link.onload = function (e) {
-      // var post = this.import.createElement(id);
-      // let el=post.cloneNode(true);
-      // _this.appendChild(el);
-      // el.setPosition(_e.clientX - 30, _event.clientY - 10);
-      // _this.addPedal(el);
-
+  addImportLink(url, id, _this, _e, _event,target) {
+    var script = document.createElement('script');
+    script.src = url + `/main.js`;
+    script.onload = (e) => {
+      this.factory.createPedal(id, target.classname, url);
       let p = document.createElement(id);
       p.setPosition(_e.clientX - 30, _event.clientY - 10);
       _this.addPedal(p);
     };
-    document.head.appendChild(link);
+    document.head.appendChild(script);
   }
 
 
@@ -1100,4 +1232,7 @@ class PedalBoard extends HTMLElement {
   }
 }
 customElements.define(`pedal-board`, PedalBoard);
+
+
+
 // })();
