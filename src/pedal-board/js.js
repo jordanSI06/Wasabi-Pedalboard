@@ -204,16 +204,6 @@ class PedalBoard extends HTMLElement {
       return this.repo;
   }
   
-    //var repo =
-    // {
-    //   "name": "Wasabi first repo",
-    //   "root": "optional_abs_url",
-    //   "plugs": {
-    //     "zitaRev": "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3", // THERE SHOULD NOT BE TWICE THE SAME URL, as the same class would ne imported twice. MUST PREVENT THIS
-    //     "quadrafuzz":"https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2",
-    //   }
-    // }
-  ;
 
     request().then((repo) => Object.keys(repo.plugs).map((key) => {
 
