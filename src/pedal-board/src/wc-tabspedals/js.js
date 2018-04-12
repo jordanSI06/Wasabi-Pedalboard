@@ -106,17 +106,17 @@
       shadowRoot.appendChild(instance);
 
       // Extract the attribute from our element. 
-      this._pedalList = this.params.pedalesDefault;
+     // this._pedalList = this.params.pedalesDefault;
 
       // Fetch the data from the API and call the render method 
-      Object.keys(this._pedalList).map(
-        (el, index) => {
-          this.render(this._pedalList[el]);
-        }
-      )
+      // Object.keys(this._pedalList).map(
+      //   (el, index) => {
+      //     this.render(this._pedalList[el]);
+      //   }
+      // )
 
       // customListeners
-      this.listeners();
+      //this.listeners();
     }
 
     // ----- METHODS: CUSTOM -----

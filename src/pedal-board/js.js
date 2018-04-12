@@ -158,101 +158,148 @@ class PedalBoard extends HTMLElement {
     this.listeners();
 
     /* ############################################################################################################################################ */
-    
-    this._pedalList = {
-      cat1: {
-        label: "Reverb",
-        contents: [
-          // {
-          //   id: "pedal-zita_rev",
-          //   classname: "FaustZitaRev2",
-          //   BaseUrl: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3",
-          //   Thumbnail: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3/FaustZitaRev.png"
-          // },
-          // {
-          //   id: "pedal-quadra",
-          //   classname: "WasabiQuadraFuzz",
-          //   BaseUrl: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2",
-          //   Thumbnail: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2/WasabiQuadraFuzz.png"
-          // }
-        ]
-      },
-      cat2: {
-        label: "Distortion",
-        contents: [
-          // {
-          //   id: "pedal-quadra",
-          //   classname: "WasabiQuadraFuzz",
-          //   BaseUrl: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2",
-          //   Thumbnail: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/WASABI/QuadraFuzz2/WasabiQuadraFuzz.png"
-          // }
-          // , {
-          //   id: "pedal-zita_rev",
-          //   classname: "FaustZitaRev2",
-          //   BaseUrl: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3",
-          //   Thumbnail: "https://wasabi.i3s.unice.fr/WebAudioPluginBank/Faust/ZitaRevV3/FaustZitaRev.png"
-          // }
 
-        ]
-      }
-    }
+    this._pedalList = null;
 
 
     const request = async () => {
       const response = await fetch('https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json');
       this.repo = await response.json();
       return this.repo;
-  }
-  
+    }
+
 
     request().then((repo) => Object.keys(repo.plugs).map((key) => {
-
-      console.log("execution");
       var baseURL = repo.plugs[key];
       let MetadataFileURL = baseURL + "/main.json";
       let scriptURL = baseURL + "/main.js";
       // get the main.json for this plugin
       let metadata;
-  
+
       fetch(MetadataFileURL)
         .then(responseJSON => {
           return responseJSON.json();
         }).then(metadata => {
           let className = metadata.vendor + metadata.name;
-          let tagName = `pedal-`+metadata.name
-          let thumbnail = baseURL +'/'+metadata.thumbnail
-          this.appendToPedalList(metadata.categorie,tagName,className,baseURL,thumbnail);
+          let tagName = `pedal-` + metadata.name
+          let thumbnail = baseURL + '/' + metadata.thumbnail
+          this.appendToPedalList(metadata.categorie, tagName, className, baseURL, thumbnail);
+          this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
         }).catch((e) => {
           console.log(e);
         });
+
     }));
-    
+
+
   }
   /* ############################################################################################################################################ */
 
   // ----- METHODS: CUSTOM -----
 
-  appendToPedalList(categorie, tagName, className, URL, thumbnail){
-    for (var cat in this._pedalList) {
-      if (this._pedalList.hasOwnProperty(cat)) {
-        let added = this._pedalList[cat].label == categorie;
-        if (this._pedalList[cat].label == categorie){
-          console.log("hey");
-          this._pedalList[cat].contents.push({ 
-            id: `${tagName.toLowerCase()}`,
-            classname: `${className}`,
-            BaseUrl: `${URL}`,
-            Thumbnail: `${thumbnail}`
-          })
+  appendToPedalList(categorie, tagName, className, URL, thumbnail) {
+    var nbrcat = 0;
+    var currentCat = "cat" + nbrcat;
+    if (this._pedalList === null) {
+      console.log("first categorie : ", "cat" + nbrcat)
+      var tempMeta = {
+        ["cat" + nbrcat]: {
+          label: `${categorie}`,
+          contents: [
+            {
+              id: `${tagName.toLowerCase()}`,
+              classname: `${className}`,
+              BaseUrl: `${URL}`,
+              Thumbnail: `${thumbnail}`
+            }]
         }
       }
-      // else {
-      //   _pedalList
-      // }
-    }
-    this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
+      this._pedalList = Object.assign(tempMeta, this._pedalList);
+      nbrcat++;
+    } else {
+      for (var cat in this._pedalList) {
+        nbrcat++;
+        if (this._pedalList.hasOwnProperty(cat)) {
+          if (this._pedalList[cat].label == categorie) {
+            this._pedalList[cat].contents.push({
+              id: `${tagName.toLowerCase()}`,
+              classname: `${className}`,
+              BaseUrl: `${URL}`,
+              Thumbnail: `${thumbnail}`
+            })
+          } else {
+            console.log("add categories : ", "cat" + nbrcat)
+            var tempMeta = {
+              ["cat" + nbrcat]: {
+                label: `${categorie}`,
+                contents: [
+                  {
+                    id: `${tagName.toLowerCase()}`,
+                    classname: `${className}`,
+                    BaseUrl: `${URL}`,
+                    Thumbnail: `${thumbnail}`
+                  }]
+              }
+            }
+            this._pedalList = Object.assign(tempMeta, this._pedalList);
+            nbrcat++
+          }
+        }
+      }
 
+    }
   }
+  //   var nbrcat = 0;
+  //   var currentCat = "cat" + nbrcat;
+  //   if(this._pedalList !== null){
+  //   for (var cat in this._pedalList) {
+  //     nbrcat++;
+  //     if (this._pedalList.hasOwnProperty(cat)) {
+  //       if (this._pedalList[cat].label == categorie) {
+  //         this._pedalList[cat].contents.push({
+  //           id: `${tagName.toLowerCase()}`,
+  //           classname: `${className}`,
+  //           BaseUrl: `${URL}`,
+  //           Thumbnail: `${thumbnail}`
+  //         })
+  //       } else {
+  //         console.log("add categories : ", currentCat)
+  //         var tempMeta = {
+  //           [currentCat]: {
+  //             label: `${JSON.stringify(categorie)}`,
+  //             contents: [
+  //               {
+  //                 id: `${tagName.toLowerCase()}`,
+  //                 classname: `${className}`,
+  //                 BaseUrl: `${URL}`,
+  //                 Thumbnail: `${thumbnail}`
+  //               }]
+  //           }
+  //         }
+  //         this._pedalList = Object.assign(tempMeta, this._pedalList);
+  //       }
+  //     }
+  //   }
+  // } else{
+  //   console.log("first categorie : ", currentCat)
+  //   var tempMeta = {
+  //     [currentCat]: {
+  //       contents: [
+  //         {
+  //           id: `${tagName.toLowerCase()}`,
+  //           classname: `${className}`,
+  //           BaseUrl: `${URL}`,
+  //           Thumbnail: `${thumbnail}`
+  //         }]
+  //     }
+  //   }
+  //   this._pedalList = Object.assign(tempMeta, this._pedalList);
+
+  // }
+  // this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
+
+
+
 
 
 
@@ -916,7 +963,7 @@ class PedalBoard extends HTMLElement {
     };
     console.log(`id = ${id}`);
 
-    
+
     for (var cat in all) {
       if (all.hasOwnProperty(cat)) {
         const categories = all[cat];
@@ -944,7 +991,7 @@ class PedalBoard extends HTMLElement {
     } else {
       console.log('not imported - we create import dynamically');
 
-      this.addImportLink(target.baseUrl, id, this, e, event,target);
+      this.addImportLink(target.baseUrl, id, this, e, event, target);
     }
 
   }
@@ -952,7 +999,7 @@ class PedalBoard extends HTMLElement {
 
   // from https://www.html5rocks.com/en/tutorials/webcomponents/imports/
   // A PLACER DANS LE ADD PEDAL : addImportLink => addPedal
-  addImportLink(url, id, _this, _e, _event,target) {
+  addImportLink(url, id, _this, _e, _event, target) {
     var script = document.createElement('script');
     script.src = url + `/main.js`;
     script.onload = (e) => {

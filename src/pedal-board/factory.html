@@ -34,6 +34,7 @@
 
           this.nbNodeIn = 1;
           this.nbNodeOut = 1;
+          this.plugin;
         }
 
         get is() { return this.nodeName.toLowerCase(); }
@@ -54,6 +55,12 @@
         // appelé lorsque l'élément personnalisé est déconnecté du DOM du document 
         disconnectedCallback() {
           console.log(`Custom element ${this.is} removed from page.`);
+          console.log(this.plugin.plug);
+          if(this.plugin.plug instanceof AudioWorkletNode) this.soundNodeIn.disconnect(this.plugin.plug);
+          else this.soundNodeIn.disconnect(this.plugin.plug.getInput(0));
+          this.plugin.plug.disconnect(this.soundNodeOut);
+          delete this.plugin;
+
         }
 
         // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
@@ -66,10 +73,8 @@
           const shadowRoot = this.attachShadow({ mode: `open` });
           const instance = template.content.cloneNode(true);
           shadowRoot.appendChild(instance);
-          //shadowRoot.appendChild(script);
           this.runBehaviorMethods();
           this.createAllInternNodes();
-          // this.appendTag();
         }
 
         // ----- METHODS: CUSTOM -----
@@ -78,9 +83,9 @@
           var wrapper = this.shadowRoot.querySelector(".laPedale");
           var pluginURL = _pluginUrl;
          // script.onload = () => {
-            var plugin = new WAPlugin[_pluginName](GlobalContext.context, pluginURL);
-            plugin.load().then((node) => {
-              plugin.loadGui().then((elem) => {
+            this.plugin = new WAPlugin[_pluginName](GlobalContext.context, pluginURL);
+            this.plugin.load().then((node) => {
+              this.plugin.loadGui().then((elem) => {
                 this.w = elem.properties.dataWidth.value;
                 this.h = elem.properties.dataHeight.value;
                 wrapper.appendChild(elem);
@@ -89,17 +94,7 @@
               else pedal.soundNodeIn.connect(node.getInput(0));
               node.connect(pedal.soundNodeOut);
             });
-
-         // };
-
         }
-
-        // appendTag(){
-        //   var tag = document.createElement(`pedal-`+_tagName);
-        //   document.body.appendChild(tag);
-        // }
-
-
       });
     }
 
