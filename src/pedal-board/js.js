@@ -159,6 +159,8 @@ class PedalBoard extends HTMLElement {
 
     /* ############################################################################################################################################ */
 
+    // Dynamic loading PART
+
     this._pedalList = null;
 
 
@@ -183,7 +185,7 @@ class PedalBoard extends HTMLElement {
           let className = metadata.vendor + metadata.name;
           let tagName = `pedal-` + metadata.name
           let thumbnail = baseURL + '/' + metadata.thumbnail
-          this.appendToPedalList(metadata.categorie, tagName, className, baseURL, thumbnail);
+          this.appendToPedalList(metadata.category, tagName, className, baseURL, thumbnail);
           this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
         }).catch((e) => {
           console.log(e);
@@ -193,7 +195,7 @@ class PedalBoard extends HTMLElement {
 
 
   }
-  /* ############################################################################################################################################ */
+  
 
   // ----- METHODS: CUSTOM -----
 
@@ -249,58 +251,10 @@ class PedalBoard extends HTMLElement {
 
     }
   }
-  //   var nbrcat = 0;
-  //   var currentCat = "cat" + nbrcat;
-  //   if(this._pedalList !== null){
-  //   for (var cat in this._pedalList) {
-  //     nbrcat++;
-  //     if (this._pedalList.hasOwnProperty(cat)) {
-  //       if (this._pedalList[cat].label == categorie) {
-  //         this._pedalList[cat].contents.push({
-  //           id: `${tagName.toLowerCase()}`,
-  //           classname: `${className}`,
-  //           BaseUrl: `${URL}`,
-  //           Thumbnail: `${thumbnail}`
-  //         })
-  //       } else {
-  //         console.log("add categories : ", currentCat)
-  //         var tempMeta = {
-  //           [currentCat]: {
-  //             label: `${JSON.stringify(categorie)}`,
-  //             contents: [
-  //               {
-  //                 id: `${tagName.toLowerCase()}`,
-  //                 classname: `${className}`,
-  //                 BaseUrl: `${URL}`,
-  //                 Thumbnail: `${thumbnail}`
-  //               }]
-  //           }
-  //         }
-  //         this._pedalList = Object.assign(tempMeta, this._pedalList);
-  //       }
-  //     }
-  //   }
-  // } else{
-  //   console.log("first categorie : ", currentCat)
-  //   var tempMeta = {
-  //     [currentCat]: {
-  //       contents: [
-  //         {
-  //           id: `${tagName.toLowerCase()}`,
-  //           classname: `${className}`,
-  //           BaseUrl: `${URL}`,
-  //           Thumbnail: `${thumbnail}`
-  //         }]
-  //     }
-  //   }
-  //   this._pedalList = Object.assign(tempMeta, this._pedalList);
-
-  // }
-  // this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
 
 
 
-
+/* ############################################################################################################################################ */
 
 
   listeners() {
