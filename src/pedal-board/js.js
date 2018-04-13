@@ -162,6 +162,7 @@ class PedalBoard extends HTMLElement {
     // Dynamic loading PART
 
     this._pedalList = null;
+    this.nbrcat=0;
     var count =0;
 
 
@@ -201,12 +202,21 @@ class PedalBoard extends HTMLElement {
   // ----- METHODS: CUSTOM -----
 
   appendToPedalList(categorie, tagName, className, URL, thumbnail) {
-    var nbrcat = 0;
-    var currentCat = "cat" + nbrcat;
+    var catExist;
+    var catMatchRank;
+    console.log("append to pedalist", categorie, tagName);
+
+    for (var cat in this._pedalList) {
+         if (this._pedalList[cat].label == categorie) {
+           catExist = true;
+           catMatchRank = cat;
+         }}
+
+    var currentCat = "cat" + this.nbrcat;
     if (this._pedalList === null) {
-      console.log("first categorie : ", "cat" + nbrcat)
+      console.log("first categorie : ", "cat" + this.nbrcat)
       var tempMeta = {
-        ["cat" + nbrcat]: {
+        ["cat" + this.nbrcat]: {
           label: `${categorie}`,
           contents: [
             {
@@ -217,23 +227,21 @@ class PedalBoard extends HTMLElement {
             }]
         }
       }
+      this.nbrcat++;
       this._pedalList = Object.assign(tempMeta, this._pedalList);
-      nbrcat++;
     } else {
-      for (var cat in this._pedalList) {
-        nbrcat++;
-        if (this._pedalList.hasOwnProperty(cat)) {
-          if (this._pedalList[cat].label == categorie) {
-            this._pedalList[cat].contents.push({
+          if (catExist) {
+            console.log("add pedal in categorie : ", "cat" + this.nbrcat)
+            this._pedalList[catMatchRank].contents.push({
               id: `${tagName.toLowerCase()}`,
               classname: `${className}`,
               BaseUrl: `${URL}`,
               Thumbnail: `${thumbnail}`
             })
           } else {
-            console.log("add categories : ", "cat" + nbrcat)
+            console.log("add categories : ", "cat" + this.nbrcat)
             var tempMeta = {
-              ["cat" + nbrcat]: {
+              ["cat" + this.nbrcat]: {
                 label: `${categorie}`,
                 contents: [
                   {
@@ -245,12 +253,9 @@ class PedalBoard extends HTMLElement {
               }
             }
             this._pedalList = Object.assign(tempMeta, this._pedalList);
-            nbrcat++
+            this.nbrcat++
           }
         }
-      }
-
-    }
   }
 
 
