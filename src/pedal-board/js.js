@@ -162,6 +162,7 @@ class PedalBoard extends HTMLElement {
     // Dynamic loading PART
 
     this._pedalList = null;
+    var count =0;
 
 
     const request = async () => {
@@ -171,13 +172,12 @@ class PedalBoard extends HTMLElement {
     }
 
 
-    request().then((repo) => Object.keys(repo.plugs).map((key) => {
+    request().then((repo) => Object.keys(repo.plugs).map((key,index) => {
       var baseURL = repo.plugs[key];
       let MetadataFileURL = baseURL + "/main.json";
       let scriptURL = baseURL + "/main.js";
       // get the main.json for this plugin
       let metadata;
-
       fetch(MetadataFileURL)
         .then(responseJSON => {
           return responseJSON.json();
@@ -186,12 +186,13 @@ class PedalBoard extends HTMLElement {
           let tagName = `pedal-` + metadata.name
           let thumbnail = baseURL + '/' + metadata.thumbnail
           this.appendToPedalList(metadata.category, tagName, className, baseURL, thumbnail);
-          this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
+          if(count == Object.keys(repo.plugs).length -1) this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
+          count++;
         }).catch((e) => {
           console.log(e);
         });
 
-    }));
+    }))
 
 
   }

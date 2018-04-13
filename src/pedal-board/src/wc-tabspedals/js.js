@@ -13,38 +13,8 @@
       super();
 
       // Ecrire la fonctionnalité de l'élément ici
-      this._pedalList = "";//JSON.parse(this.getAttribute('data-pedallist'));
-      //var _pedalList = {
-        // cat1: {
-        //   label: "delay",
-        //   contents: ["pedal-delay"]
-        // },
-        // cat2: {
-        //   label: "Modulation",
-        //   contents: ["pedal-chorus","pedal-weirdphaser","pedal-thruzeroflanger","pedal-dualpitchshifter","pedal-stereofreqshifter","pedal-blipper"]
-        // },
-        // cat3: {
-        //   label: "overdrive",
-        //   contents: ["pedal-overdrive","pedal-quadra"]
-        // },
-        // cat4: {
-        //   label: "analyse",
-        //   contents: ["pedal-analyse"]
-        // },
-        // cat5: {
-        //   label: "synths",
-        //   contents: ["pedal-alike-dx7", "pedal-alike-obx", "pedal-alike-dexed", "pedal-alike-noisemaker", "webaudio-tinysynthetizer"]
-        // },
-        // cat6: {
-        //   label: "ampsim",
-        //   contents: ["amp-sim"]
-        // },
-        // cat7: {
-        //   label: "faust",
-        //   contents: ["pedal-zita_rev"]
-        // }
-      //};
-
+      this._pedalList = "";
+      
       this.currentOpenedTab = {};
       this.params = {
         pedalesDefault: this.getAttribute('data-pedallist') || this._pedalList
@@ -104,23 +74,11 @@
       const template = _currentDoc.querySelector(`template`);
       const instance = template.content.cloneNode(true);
       shadowRoot.appendChild(instance);
-
-      // Extract the attribute from our element. 
-     // this._pedalList = this.params.pedalesDefault;
-
-      // Fetch the data from the API and call the render method 
-      // Object.keys(this._pedalList).map(
-      //   (el, index) => {
-      //     this.render(this._pedalList[el]);
-      //   }
-      // )
-
-      // customListeners
-      //this.listeners();
     }
 
     // ----- METHODS: CUSTOM -----
     render(_data) {
+      
       let div_container = this.shadowRoot.querySelector('#div_container');
       console.log(_data);
       if (div_container.querySelector(`#content-${_data.label}`) == null) {

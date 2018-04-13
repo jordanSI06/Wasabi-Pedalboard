@@ -59,6 +59,7 @@
           if(this.plugin.plug instanceof AudioWorkletNode) this.soundNodeIn.disconnect(this.plugin.plug);
           else this.soundNodeIn.disconnect(this.plugin.plug.getInput(0));
           this.plugin.plug.disconnect(this.soundNodeOut);
+          console.log(this.plugin.plug.params);
           delete this.plugin;
 
         }
