@@ -231,7 +231,7 @@ class PedalBoard extends HTMLElement {
       this._pedalList = Object.assign(tempMeta, this._pedalList);
     } else {
           if (catExist) {
-            console.log("add pedal in categorie : ", "cat" + this.nbrcat)
+            console.log("add pedal in categorie : ", catMatchRank)
             this._pedalList[catMatchRank].contents.push({
               id: `${tagName.toLowerCase()}`,
               classname: `${className}`,
