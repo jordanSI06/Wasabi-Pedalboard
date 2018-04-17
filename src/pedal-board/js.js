@@ -204,7 +204,7 @@ class PedalBoard extends HTMLElement {
   appendToPedalList(categorie, tagName, className, URL, thumbnail) {
     var catExist;
     var catMatchRank;
-    console.log("append to pedalist", categorie, tagName);
+  //  console.log("append to pedalist", categorie, tagName);
 
     for (var cat in this._pedalList) {
          if (this._pedalList[cat].label == categorie) {
@@ -214,7 +214,7 @@ class PedalBoard extends HTMLElement {
 
     var currentCat = "cat" + this.nbrcat;
     if (this._pedalList === null) {
-      console.log("first categorie : ", "cat" + this.nbrcat)
+      //console.log("first categorie : ", "cat" + this.nbrcat)
       var tempMeta = {
         ["cat" + this.nbrcat]: {
           label: `${categorie}`,
@@ -231,7 +231,7 @@ class PedalBoard extends HTMLElement {
       this._pedalList = Object.assign(tempMeta, this._pedalList);
     } else {
           if (catExist) {
-            console.log("add pedal in categorie : ", catMatchRank)
+            //console.log("add pedal in categorie : ", catMatchRank)
             this._pedalList[catMatchRank].contents.push({
               id: `${tagName.toLowerCase()}`,
               classname: `${className}`,
@@ -239,7 +239,7 @@ class PedalBoard extends HTMLElement {
               Thumbnail: `${thumbnail}`
             })
           } else {
-            console.log("add categories : ", "cat" + this.nbrcat)
+           // console.log("add categories : ", "cat" + this.nbrcat)
             var tempMeta = {
               ["cat" + this.nbrcat]: {
                 label: `${categorie}`,
@@ -1079,7 +1079,7 @@ class PedalBoard extends HTMLElement {
             this.soundNodeConnection(j.p1, j.p2);
           })
         }
-        this.sound.monoMediaSourceM.connect(this.meter1);
+        this.monoMediaSourceM.connect(this.meter1);
         this.sound.state = 1;
 
         // 0 : disconnected
@@ -1127,7 +1127,7 @@ class PedalBoard extends HTMLElement {
           console.log("this.maxInputGain = " + this.maxInputGain);
           this.shadowRoot.querySelector("#knob_In_midi").max = 2 * this.maxInputGain;
           this.shadowRoot.querySelector("#knob_In_midi").setValue(this.maxInputGain, true);
-          this.shadowRoot.querySelector("#knob_In.max") = 2 * this.maxInputGain;
+          this.shadowRoot.querySelector("#knob_In").max = 2 * this.maxInputGain;
           this.shadowRoot.querySelector("#knob_In").setValue(this.maxInputGain, true);
           //console.log("changed max and value of this.shadowRoot.querySelector("#knob_In_midi to " + this.shadowRoot.querySelector("#knob_In_midi.max + " and " + this.shadowRoot.querySelector("#knob_In_midi.value);
 

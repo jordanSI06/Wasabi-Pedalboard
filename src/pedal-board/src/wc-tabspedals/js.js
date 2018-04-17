@@ -14,7 +14,7 @@
 
       // Ecrire la fonctionnalité de l'élément ici
       this._pedalList = "";
-      
+
       this.currentOpenedTab = {};
       this.params = {
         pedalesDefault: this.getAttribute('data-pedallist') || this._pedalList
@@ -39,19 +39,22 @@
             this.render(this._pedalList[el]);
           }
         )
-        
+
       } catch (error) {
         console.log(error);
-        
+
       }
       try {
-        this.listeners();
+        this.shadowRoot.querySelector("#div_tabs").querySelectorAll("label").forEach(l =>{
+          l.onclick = e => this.listeners(e);
+        })
+        this.shadowRoot.querySelector(".bt_pinViewTabs").onclick = e =>this.listeners(e);
       } catch (error) {
         console.log(error);
-        
+
       }
-     
-     
+
+
     }
 
     // appelé lorsque l'élément personnalisé est déplacé vers un nouveau document
@@ -78,12 +81,11 @@
 
     // ----- METHODS: CUSTOM -----
     render(_data) {
-      
+
       let div_container = this.shadowRoot.querySelector('#div_container');
-      console.log(_data);
       if (div_container.querySelector(`#content-${_data.label}`) == null) {
         // create New Tab
-        this.shadowRoot.querySelector('#div_tabs').insertAdjacentHTML('beforeEnd', `<input id='tab-${_data.label}' type='radio' value='${_data.label}' name='input-tab' />`);
+        this.shadowRoot.querySelector('#div_tabs').insertAdjacentHTML('beforeEnd', `<input id='tab-${_data.label}' type='radio' value='${_data.label}' name='input-tab' checked />`);
         this.shadowRoot.querySelector('#div_tabs').insertAdjacentHTML('beforeEnd', `<label for='tab-${_data.label}'>${_data.label}</label>`);
         div_container.insertAdjacentHTML('beforeEnd', `<div id='content-${_data.label}' class='content hidden'></div>`);
       }
@@ -92,58 +94,51 @@
       }
     }
 
-    listeners() {
+    listeners(event) {
       // viewPedalMenu
-      this.shadowRoot.querySelector('#bt_pinViewTabs').onclick = (event) => {
-        //this.shadowRoot.querySelector('#div_app').classList.toggle('bottomTabs');
-          // Ckick on the small icon on the right
-              console.log(this.currentOpenedTab.status);
-          if(event.target.textContent === "") {
-            if(this.currentOpenedTab.status === "opened") {
-              this.shadowRoot.querySelector('#div_app').classList.add("bottomTabs");
-              this.currentOpenedTab.status = "closed";
-              // change character ^ to reverse
-              this.shadowRoot.querySelector('#icon_view').setAttribute("icon","icons:expand-less");
-            } else {
-              this.shadowRoot.querySelector('#div_app').classList.remove("bottomTabs");
-              this.currentOpenedTab.status = "opened";
-              this.shadowRoot.querySelector('#icon_view').setAttribute("icon","icons:expand-more");
-            }
-            return;
-          }
-  
-          //clearTimeout(this.tabsAnimation);
-          if (this.this.shadowRoot.querySelector('#div_app').classList.contains("bottomTabs")) {
-            this.currentOpenedTab.name = event.target.textContent;
-            console.log(this.currentOpenedTab.name)
-  
-            // the clicked tab corresponds to a closed dashaboard
-            // Let's open it by removing the CSS class bottomTabs
-            this.shadowRoot.querySelector('#div_app').classList.remove("bottomTabs");
-            this.shadowRoot.querySelector('#icon_view').setAttribute("icon","icons:expand-more");
-            this.currentOpenedTab.status = "opened";
+        if (event.target.textContent === "") {
+          if (this.currentOpenedTab.status === "opened") {
+            this.shadowRoot.querySelector("#div_app").classList.add("bottomTabs");
+            this.currentOpenedTab.status = "closed";
+            // change character ^ to reverse
+            this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-less");
           } else {
-            // The clicked tab corresponds to an opened dashboard. We close it only if it's a click
-            // on the current opened tab
-            if(this.currentOpenedTab.name === event.target.textContent) {
-              
-              this.shadowRoot.querySelector('#div_app').classList.add("bottomTabs");
-              this.shadowRoot.querySelector('#icon_view').setAttribute("icon","icons:expand-less");
-              this.currentOpenedTab.status = "closed";
-            } else {
-              // We clicked on an oped tab that is different than the current one
-              // We do not close, but we need to set the new current opened tab
-              this.currentOpenedTab.name = event.target.textContent;
-            }
+            this.shadowRoot.querySelector("#div_app").classList.remove("bottomTabs");
+            this.currentOpenedTab.status = "opened";
+            this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-more");
           }
+          // display default content
+          let checked = this.shadowRoot.querySelectorAll("[name='input-tab']:checked");
+          this.viewTabs(checked[0].value);
+          return;
         }
-  
-        // hideTabs() {
-        //   this.tabsAnimation = setTimeout(() => { this.$.div_app_tabs.classList.add("bottomTabs"); }, 1000);
-        // }
+        //clearTimeout(this.tabsAnimation);
+        if (this.shadowRoot.querySelector("#div_app").classList.contains("bottomTabs")) {
+          this.currentOpenedTab.name = event.target.textContent;
+          console.log(this.currentOpenedTab.name)
+
+          // the clicked tab corresponds to a closed dashaboard
+          // Let's open it by removing the CSS class bottomTabs
+          this.shadowRoot.querySelector("#div_app").classList.remove("bottomTabs");
+          this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-more");
+          this.currentOpenedTab.status = "opened";
+        } else {
+          // The clicked tab corresponds to an opened dashboard. We close it only if it's a click
+          // on the current opened tab
+          if (this.currentOpenedTab.name === event.target.textContent) {
+
+            this.shadowRoot.querySelector("#div_app").classList.add("bottomTabs");
+            this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-less");
+            this.currentOpenedTab.status = "closed";
+          } else {
+            // We clicked on an oped tab that is different than the current one
+            // We do not close, but we need to set the new current opened tab
+            this.currentOpenedTab.name = event.target.textContent;
+          }
+
+      }
 
 
-    
 
       // viewTabs
       this.shadowRoot.querySelectorAll("[name='input-tab']").forEach((elem) => {
@@ -164,13 +159,12 @@
     }
 
     viewTabs(_idTab) {
-      console.log("here");
       this.shadowRoot.querySelectorAll('.content').forEach((e) => {
         if (e.id == `content-${_idTab}`) {
           if (e.classList.contains('hidden')) {
             e.classList.remove('hidden');
           }
-        } 
+        }
         else {
           if (!e.classList.contains('hidden')) {
             e.classList.add('hidden');
