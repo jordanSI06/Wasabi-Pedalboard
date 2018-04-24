@@ -141,39 +141,41 @@ class PedalBoard extends HTMLElement {
 
 
     this.setMediadevicesToSoundIn();
-    /*
-    // ADDING NEW PEDAL TO PEDALBOARD
-    let p0 = document.createElement("pedal-delay");
-    p0.setPosition(450, 200);
-    this.addPedal(p0);
-    /**/
-
-    /*
-    this.connect(this.pIn, p0);
-    this.connect(p0, p1);
-    this.connect(p1, this.pOut)
-    */
-
-    // customListeners
     this.listeners();
 
-    /* ############################################################################################################################################ */
-
     // Dynamic loading PART
-
     this._pedalList = null;
-    this.nbrcat=0;
-    var count =0;
+    this.nbrcat = 0;
 
 
-    const request = async () => {
-      const response = await fetch('https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json');
-      this.repo = await response.json();
-      return this.repo;
-    }
+    // to add another repository  : Uncomment the promise.all block, set the urls and comment the "this.request" line
 
 
-    request().then((repo) => Object.keys(repo.plugs).map((key,index) => {
+    // Promise.all([this.request(url1),this.request2(url2)]).then(repo =>{
+    //   for (var i = 0; i<repo.length; i++){
+    //     console.log(i);
+    //     if(i == repo.length -1) var lastrepo = true
+    //   this.explorerepo(repo[i],lastrepo);
+    //   }
+    // });
+  
+    this.request('https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json').then(repo =>this.explorerepo(repo, true))
+}
+
+
+  // ----- METHODS: CUSTOM -----
+
+  // fetching a json file asynchronously and return it
+  async request(URL){
+    const response = await fetch(URL);
+    this.repo = await response.json();
+    return this.repo;
+  }
+
+  // for each plugin of a repository, get the data (classname, tagName, categorie) and call appendtoPedalList
+  explorerepo(repo,last){
+    var count = 0;
+    Object.keys(repo.plugs).map((key, index) => {
       var baseURL = repo.plugs[key];
       let MetadataFileURL = baseURL + "/main.json";
       let scriptURL = baseURL + "/main.js";
@@ -187,34 +189,32 @@ class PedalBoard extends HTMLElement {
           let tagName = `pedal-` + metadata.name
           let thumbnail = baseURL + '/' + metadata.thumbnail
           this.appendToPedalList(metadata.category, tagName, className, baseURL, thumbnail);
-          if(count == Object.keys(repo.plugs).length -1) this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
+          
+          // set the attribute of wc-pedals to activate the callback in case :
+          // this is the last plugin to be append, this is the last repo to be fetch.
+          if (count == Object.keys(repo.plugs).length - 1 && last)  this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
           count++;
         }).catch((e) => {
           console.log(e);
         });
 
-    }))
-
-
+    });
   }
-  
 
-  // ----- METHODS: CUSTOM -----
-
+  // Append the json to pedalList
   appendToPedalList(categorie, tagName, className, URL, thumbnail) {
     var catExist;
     var catMatchRank;
-  //  console.log("append to pedalist", categorie, tagName);
-
     for (var cat in this._pedalList) {
-         if (this._pedalList[cat].label == categorie) {
-           catExist = true;
-           catMatchRank = cat;
-         }}
+      if (this._pedalList[cat].label == categorie) {
+        catExist = true;
+        catMatchRank = cat;
+      }
+    }
 
     var currentCat = "cat" + this.nbrcat;
+    // first case :  the json is empty, so we create a first categorie and append the linked content
     if (this._pedalList === null) {
-      //console.log("first categorie : ", "cat" + this.nbrcat)
       var tempMeta = {
         ["cat" + this.nbrcat]: {
           label: `${categorie}`,
@@ -228,39 +228,37 @@ class PedalBoard extends HTMLElement {
         }
       }
       this.nbrcat++;
+      // merge the json objects
       this._pedalList = Object.assign(tempMeta, this._pedalList);
     } else {
-          if (catExist) {
-            //console.log("add pedal in categorie : ", catMatchRank)
-            this._pedalList[catMatchRank].contents.push({
-              id: `${tagName.toLowerCase()}`,
-              classname: `${className}`,
-              BaseUrl: `${URL}`,
-              Thumbnail: `${thumbnail}`
-            })
-          } else {
-           // console.log("add categories : ", "cat" + this.nbrcat)
-            var tempMeta = {
-              ["cat" + this.nbrcat]: {
-                label: `${categorie}`,
-                contents: [
-                  {
-                    id: `${tagName.toLowerCase()}`,
-                    classname: `${className}`,
-                    BaseUrl: `${URL}`,
-                    Thumbnail: `${thumbnail}`
-                  }]
-              }
-            }
-            this._pedalList = Object.assign(tempMeta, this._pedalList);
-            this.nbrcat++
+      // 2nd case : the categorie exist : we just need to append the plugin into it
+      if (catExist) {
+        this._pedalList[catMatchRank].contents.push({
+          id: `${tagName.toLowerCase()}`,
+          classname: `${className}`,
+          BaseUrl: `${URL}`,
+          Thumbnail: `${thumbnail}`
+        })
+      } else {
+        // 3rd case : the categorie does not exist, so we add it and append the content into it
+        var tempMeta = {
+          ["cat" + this.nbrcat]: {
+            label: `${categorie}`,
+            contents: [
+              {
+                id: `${tagName.toLowerCase()}`,
+                classname: `${className}`,
+                BaseUrl: `${URL}`,
+                Thumbnail: `${thumbnail}`
+              }]
           }
         }
+        // merge the json objects
+        this._pedalList = Object.assign(tempMeta, this._pedalList);
+        this.nbrcat++
+      }
+    }
   }
-
-
-
-/* ############################################################################################################################################ */
 
 
   listeners() {

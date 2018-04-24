@@ -14,10 +14,6 @@
 
       // Current document needs to be defined to get DOM access to imported HTML
       const template = _currentdoc.querySelector(`template`);
-      // var script = document.createElement('script');
-      // script.src = _pluginUrl + `main.js`;
-      // console.log(script);
-     // document.head.appendChild(script);
 
       // Register the x-custom element with the browser
       customElements.define(_tagName, class extends PBPlugin(HTMLElement) {
@@ -25,10 +21,10 @@
         // ----- METHODS: DEFAULT -----
         // is called when an instance of the element is created
         constructor() {
-          // Toujours appeler "super" d'abord dans le constructeur
+          // super() reference to HTMLElemenent constructor
           super();
 
-          // Ecrire la fonctionnalité de l'élément ici
+          // Default values if non specified width/heigth nbinput/nboutput for pedal
           this.w = 140;
           this.h = 180;
 
@@ -42,30 +38,22 @@
         // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
         static get observedAttributes() { return ['']; }
 
-        // appelé lorsque l'un des attributs de l'élément personnalisé est ajouté, supprimé ou modifié.
+        // called when an observed attribute changes 
         attributeChangedCallback() {
           console.log(`Custom element ${this.is} attributes changed.`);
         }
 
-        // appelé lorsque l'élément personnalisé est déplacé vers un nouveau document
+        // called when the plugin is moved to another document
         adoptedCallback() {
           console.log(`Custom element ${this.is} moved to new page.`);
         }
 
-        // appelé lorsque l'élément personnalisé est déconnecté du DOM du document 
+        // Called when the pedal is disconnected from the dom 
         disconnectedCallback() {
           console.log(`Custom element ${this.is} removed from page.`);
-          console.log(this.plugin.plug);
-          if(this.plugin.plug instanceof AudioWorkletNode) this.soundNodeIn.disconnect(this.plugin.plug);
-          else this.soundNodeIn.disconnect(this.plugin.plug.getInput(0));
-          this.plugin.plug.disconnect(this.soundNodeOut);
-          console.log(this.plugin.plug.params);
-          delete this.plugin;
-
         }
 
         // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
-        // appelé lorsque l'élément personnalisé est connecté pour la première fois au DOM du document
         connectedCallback() {
           console.log(`Custom element ${this.is} added to page.`);
           console.log(this);
@@ -74,7 +62,10 @@
           const shadowRoot = this.attachShadow({ mode: `open` });
           const instance = template.content.cloneNode(true);
           shadowRoot.appendChild(instance);
+
+          // runBehavior is related to the I/O detection, and graphic behavior (drag and drop) for each pedals.
           this.runBehaviorMethods();
+
           this.createAllInternNodes();
         }
 
@@ -83,16 +74,39 @@
           var pedal = this;
           var wrapper = this.shadowRoot.querySelector(".laPedale");
           var pluginURL = _pluginUrl;
-         // script.onload = () => {
+
+            // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
             this.plugin = new WAPlugin[_pluginName](GlobalContext.context, pluginURL);
+
+            // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
             this.plugin.load().then((node) => {
               this.plugin.loadGui().then((elem) => {
-                this.w = elem.properties.dataWidth.value;
-                this.h = elem.properties.dataHeight.value;
+                try {
+                  // the "properties" method is recommended to set width and height of your wc
+                  this.w = elem.properties.dataWidth.value;
+                  this.h = elem.properties.dataHeight.value;
+                } catch (error) {
+                  console.log(error);
+                }
+
+                // the WC is added to the pbplugin wrapper
                 wrapper.appendChild(elem);
               });
+
+              // connect the node to the I/O of the pbplugin 
               if(node instanceof AudioWorkletNode) pedal.soundNodeIn.connect(node);
+              // case the node is pure JS graph
               else pedal.soundNodeIn.connect(node.getInput(0));
+
+              try {
+                // inputChannelCount is specified in the API
+                this.nbInput = node.inputChannelCount();
+                this.nbOutput = node.outputs.length;
+
+              } catch (error) {
+                console.log(error);
+              }
+            
               node.connect(pedal.soundNodeOut);
             });
         }
