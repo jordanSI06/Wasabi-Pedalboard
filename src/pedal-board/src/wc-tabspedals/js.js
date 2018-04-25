@@ -110,6 +110,7 @@
           // display default content
           let checked = this.shadowRoot.querySelectorAll("[name='input-tab']:checked");
           this.viewTabs(checked[0].value);
+          
           return;
         }
         //clearTimeout(this.tabsAnimation);

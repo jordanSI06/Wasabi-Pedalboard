@@ -151,15 +151,16 @@ class PedalBoard extends HTMLElement {
     // to add another repository  : Uncomment the promise.all block, set the urls and comment the "this.request" line
 
 
-    // Promise.all([this.request(url1),this.request2(url2)]).then(repo =>{
-    //   for (var i = 0; i<repo.length; i++){
-    //     console.log(i);
-    //     if(i == repo.length -1) var lastrepo = true
-    //   this.explorerepo(repo[i],lastrepo);
-    //   }
-    // });
+    Promise.all([this.request("https://webaudiomodules.org/repository.json"),this.request("https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo =>{
+    console.log(repo.length);  
+    for (var i = 0; i<repo.length; i++){
+        console.log(repo[i]);
+        if(i == repo.length -1) var lastrepo = true
+      this.explorerepo(repo[i],lastrepo);
+      }
+    });
   
-    this.request('https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json').then(repo =>this.explorerepo(repo, true))
+    //this.request('https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json').then(repo =>this.explorerepo(repo, true))
 }
 
 
@@ -929,6 +930,7 @@ class PedalBoard extends HTMLElement {
           if (categories.contents.hasOwnProperty(content)) {
             if (id == categories.contents[content].id) {
               target.baseUrl = categories.contents[content].BaseUrl;
+              console.log(target.baseUrl);
               target.Thumbnail = categories.contents[content].Thumbnail;
               target.classname = categories.contents[content].classname;
             }

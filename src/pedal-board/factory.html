@@ -10,7 +10,7 @@
 
   class factory {
 
-    createPedal(_tagName, _pluginName,_pluginUrl) {
+    createPedal(_tagName, _pluginName, _pluginUrl) {
 
       // Current document needs to be defined to get DOM access to imported HTML
       const template = _currentdoc.querySelector(`template`);
@@ -75,40 +75,58 @@
           var wrapper = this.shadowRoot.querySelector(".laPedale");
           var pluginURL = _pluginUrl;
 
-            // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
-            this.plugin = new WAPlugin[_pluginName](GlobalContext.context, pluginURL);
+          // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
+          this.plugin = new WAPlugin[_pluginName](GlobalContext.context, pluginURL);
 
-            // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
-            this.plugin.load().then((node) => {
-              this.plugin.loadGui().then((elem) => {
-                try {
-                  // the "properties" method is recommended to set width and height of your wc
-                  this.w = elem.properties.dataWidth.value;
-                  this.h = elem.properties.dataHeight.value;
-                } catch (error) {
-                  console.log(error);
-                }
+          // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
+          this.plugin.load().then((node) => {
+            
+            // temporary for handle wams
+            var nbInput
+            try {
+              nbInput = node.inputChannelCount();
 
-                // the WC is added to the pbplugin wrapper
-                wrapper.appendChild(elem);
-              });
+            } catch (error) {
+              console.log("the naming convention has to be fix between wam and others", error);
+              nbInput = node.numberOfInputs;
 
-              // connect the node to the I/O of the pbplugin 
-              if(node instanceof AudioWorkletNode) pedal.soundNodeIn.connect(node);
-              // case the node is pure JS graph
-              else pedal.soundNodeIn.connect(node.getInput(0));
-
+            }
+            this.plugin.loadGui().then((elem) => {
+              // console.log(elem.shadowRoot.querySelector("#wam-content").width);
+              // console.log(elem.shadowRoot.querySelector("#wam-content").getAttribute('style'));
               try {
-                // inputChannelCount is specified in the API
-                this.nbInput = node.inputChannelCount();
-                this.nbOutput = node.outputs.length;
-
+                // the "properties" method is recommended to set width and height of your wc
+                this.w = elem.properties.dataWidth.value;
+                this.h = elem.properties.dataHeight.value;
               } catch (error) {
                 console.log(error);
+                // temporary fix for wams
+                this.w = node._gui.width;
+                this.h = node._gui.height;
               }
-            
-              node.connect(pedal.soundNodeOut);
+
+              // the WC is added to the pbplugin wrapper
+              wrapper.appendChild(elem);
             });
+            if(nbInput > 0){
+              console.log(nbInput)
+            // connect the node to the I/O of the pbplugin 
+            if (node instanceof AudioWorkletNode) pedal.soundNodeIn.connect(node);
+            // case the node is pure JS graph
+            else pedal.soundNodeIn.connect(node.getInput(0));
+            }
+
+            try {
+              // inputChannelCount is specified in the API
+              this.nbInput = node.inputChannelCount();
+              this.nbOutput = node.outputs.length;
+
+            } catch (error) {
+              console.log(error);
+            }
+
+            node.connect(pedal.soundNodeOut);
+          });
         }
       });
     }
