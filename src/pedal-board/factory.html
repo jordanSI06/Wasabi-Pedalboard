@@ -25,8 +25,8 @@
           super();
 
           // Default values if non specified width/heigth nbinput/nboutput for pedal
-          this.w = 140;
-          this.h = 180;
+          this.w = 825;
+          this.h = 115;
 
           this.nbNodeIn = 1;
           this.nbNodeOut = 1;
@@ -100,9 +100,14 @@
                 this.h = elem.properties.dataHeight.value;
               } catch (error) {
                 console.log(error);
-                // temporary fix for wams
+                try {
+                   // temporary fix for wams
                 this.w = node._gui.width;
                 this.h = node._gui.height;
+                } catch (error) {
+                  console.log("the dx7 has not proper width", error);
+                }
+               
               }
 
               // the WC is added to the pbplugin wrapper
