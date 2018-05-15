@@ -124,11 +124,20 @@
       this.selectPresetsListeners();
     }
 
+
+    // RESTORE = LOAD
+    //restorePlugins()
     loadPreset(){
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
       let plugs=bankSelected.presets.find(item => item._id == this.presetSelected).plugs;
       console.log(`plugs loaded from "${this.presetSelected}"`,plugs);
+
+      // we have to call this method from pedalboard but we don't know how to set target.classname
+      // _e & _event will be replaced by _pos{x,y}
+      //this.pedalboard.addImportLink(url, id, _this, _e, _event, target);
     }
+
+
     
     selectBanksListeners() {
       this.nav_banks.querySelectorAll('a').forEach(e => {
@@ -235,7 +244,5 @@
         console.log('params',p);
       })
     }
-
-
   });
 })();
