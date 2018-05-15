@@ -10,6 +10,8 @@
 
   class factory {
 
+    
+
     createPedal(_tagName, _pluginName, _pluginUrl) {
 
       // Current document needs to be defined to get DOM access to imported HTML
@@ -83,6 +85,8 @@
           // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
           this.plugin.load().then((node) => {
             
+            window.PedalBoard.pluginList.push(node);
+            console.log("node params", window.PedalBoard.pluginList[0].params);
             // temporary for handle wams
             try {
               this.nbNodeIn = node.inputChannelCount();
@@ -90,6 +94,7 @@
             } catch (error) {
               console.log("the naming convention has to be fix between wam and others", error);
               this.nbNodeIn = node.numberOfInputs;
+
 
             }
             this.plugin.loadGui().then((elem) => {

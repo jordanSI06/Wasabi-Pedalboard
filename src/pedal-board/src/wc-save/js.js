@@ -91,6 +91,8 @@
     }
 
     openDialog() {
+      // Not every plugin have an "params" getter, you need to try catch when using it
+      console.log(this.pedalboard.pluginList[0].params);
       this.div_dialog.classList.remove('hidden');
     }
     closeDialog() {
@@ -193,7 +195,7 @@
     }
 
     // create preset name
-    savePreset() {
+    _savePreset() {
       let _presetName = this.input_presetName.value.trim();
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
       let _newPreset = {
@@ -209,8 +211,8 @@
       this.loadPresets();
     }
 
-    _savePreset() {
-      console.log(this.pedalboard);
+    savePreset() {
+      console.log(this.pedalboard.pedals);
       let _plugs = this.pedalboard.childNodes;
       let _p = "";
       let _queue = "";

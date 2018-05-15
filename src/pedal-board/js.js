@@ -11,9 +11,14 @@ class PedalBoard extends HTMLElement {
   constructor() {
     // Toujours appeler "super" d'abord dans le constructeur
     super();
+    window.PedalBoard = this;
 
     // Ecrire la fonctionnalité de l'élément ici
     this.pedals = [];
+
+
+    // getAudioPlugins
+    this.pluginList = [];
 
     this.pIn;
     this.pOut;
@@ -86,6 +91,8 @@ class PedalBoard extends HTMLElement {
   // appelé lorsque l'élément personnalisé est connecté pour la première fois au DOM du document
   connectedCallback() {
     console.log(`Custom element ${this.is} added to page.`);
+
+
 
     // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
     const shadowRoot = this.attachShadow({ mode: `open` });
