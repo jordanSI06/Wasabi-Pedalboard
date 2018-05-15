@@ -28,9 +28,10 @@
           this.w = 825;
           this.h = 115;
 
-          this.nbNodeIn = 1;
-          this.nbNodeOut = 1;
+          
           this.plugin;
+
+
         }
 
         get is() { return this.nodeName.toLowerCase(); }
@@ -64,9 +65,10 @@
           shadowRoot.appendChild(instance);
 
           // runBehavior is related to the I/O detection, and graphic behavior (drag and drop) for each pedals.
-          this.runBehaviorMethods();
+
 
           this.createAllInternNodes();
+          
         }
 
         // ----- METHODS: CUSTOM -----
@@ -82,13 +84,12 @@
           this.plugin.load().then((node) => {
             
             // temporary for handle wams
-            var nbInput
             try {
-              nbInput = node.inputChannelCount();
+              this.nbNodeIn = node.inputChannelCount();
 
             } catch (error) {
               console.log("the naming convention has to be fix between wam and others", error);
-              nbInput = node.numberOfInputs;
+              this.nbNodeIn = node.numberOfInputs;
 
             }
             this.plugin.loadGui().then((elem) => {
@@ -113,25 +114,28 @@
               // the WC is added to the pbplugin wrapper
               wrapper.appendChild(elem);
             });
-            if(nbInput > 0){
-              console.log(nbInput)
+            console.log(this.nbNodeIn)
+            if(this.nbNodeIn > 0){
+              
             // connect the node to the I/O of the pbplugin 
             if (node instanceof AudioWorkletNode) pedal.soundNodeIn.connect(node);
             // case the node is pure JS graph
             else pedal.soundNodeIn.connect(node.getInput(0));
             }
 
-            try {
-              // inputChannelCount is specified in the API
-              this.nbInput = node.inputChannelCount();
-              this.nbOutput = node.outputs.length;
+            // try {
+            //   // inputChannelCount is specified in the API
+            //   this.nbInput = node.inputChannelCount();
+            //   this.nbOutput = node.outputs.length;
 
-            } catch (error) {
-              console.log(error);
-            }
+            // } catch (error) {
+            //   console.log(error);
+            // }
 
             node.connect(pedal.soundNodeOut);
+            this.runBehaviorMethods();
           });
+          
         }
       });
     }

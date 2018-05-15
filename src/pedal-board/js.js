@@ -151,30 +151,30 @@ class PedalBoard extends HTMLElement {
     // to add another repository  : Uncomment the promise.all block, set the urls and comment the "this.request" line
 
 
-    Promise.all([this.request("https://webaudiomodules.org/repository.json"),this.request("https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo =>{
-    console.log(repo.length);  
-    for (var i = 0; i<repo.length; i++){
+    Promise.all([this.request("https://webaudiomodules.org/repository.json"), this.request("https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo => {
+      console.log(repo.length);
+      for (var i = 0; i < repo.length; i++) {
         console.log(repo[i]);
-        if(i == repo.length -1) var lastrepo = true
-      this.explorerepo(repo[i],lastrepo);
+        if (i == repo.length - 1) var lastrepo = true
+        this.explorerepo(repo[i], lastrepo);
       }
     });
-  
+
     //this.request('https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json').then(repo =>this.explorerepo(repo, true))
-}
+  }
 
 
   // ----- METHODS: CUSTOM -----
 
   // fetching a json file asynchronously and return it
-  async request(URL){
+  async request(URL) {
     const response = await fetch(URL);
     this.repo = await response.json();
     return this.repo;
   }
 
   // for each plugin of a repository, get the data (classname, tagName, categorie) and call appendtoPedalList
-  explorerepo(repo,last){
+  explorerepo(repo, last) {
     var count = 0;
     Object.keys(repo.plugs).map((key, index) => {
       var baseURL = repo.plugs[key];
@@ -190,10 +190,10 @@ class PedalBoard extends HTMLElement {
           let tagName = `pedal-` + metadata.name
           let thumbnail = baseURL + '/' + metadata.thumbnail
           this.appendToPedalList(metadata.category, tagName, className, baseURL, thumbnail);
-          
+
           // set the attribute of wc-pedals to activate the callback in case :
           // this is the last plugin to be append, this is the last repo to be fetch.
-          if (count == Object.keys(repo.plugs).length - 1 && last)  this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
+          if (count == Object.keys(repo.plugs).length - 1 && last) this.shadowRoot.querySelector('wc-tabspedals').setAttribute('data-pedallist', JSON.stringify(this._pedalList));
           count++;
         }).catch((e) => {
           console.log(e);
@@ -571,18 +571,25 @@ class PedalBoard extends HTMLElement {
   handleJackMenu(p) {
     // clic on an input
     let input = "";
-    p.inputP.addEventListener("click", (e) => {
-      e.preventDefault();
+    try {
+      p.inputP.addEventListener("click", (e) => {
+        e.preventDefault();
 
-      input = p.inputP;
-      this.currentPedalOppened = p;
-      if (input.getAttribute("open") && (input.getAttribute("open") == 'true')) {
-        input.setAttribute("open", false);
-      } else {
-        input.setAttribute("open", true);
-        // if number of jacks > 1
-      }
-    });
+        input = p.inputP;
+        this.currentPedalOppened = p;
+        if (input.getAttribute("open") && (input.getAttribute("open") == 'true')) {
+          input.setAttribute("open", false);
+        } else {
+          input.setAttribute("open", true);
+          // if number of jacks > 1
+        }
+      });
+
+    } catch (error) {
+      console.log("the plugin has no input", error)
+
+    }
+
   }
 
   static createSVGcanvas(w, h) {
@@ -914,6 +921,7 @@ class PedalBoard extends HTMLElement {
     GlobalContext.context.resume();
     // Generate a unique id for the pedal, handle case for multiple instances of the same pedal
     let id = e.dataTransfer.getData("pedalId");
+    console.log(id);
     var all = JSON.parse(this.shadowRoot.querySelector('wc-tabspedals').getAttribute('data-pedallist'));
     var target = {
       baseUrl: "",
