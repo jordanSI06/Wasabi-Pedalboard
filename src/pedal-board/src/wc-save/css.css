@@ -1,0 +1,139 @@
+/* #div_dialog.hidden */
+.hidden{
+  display: none !important;
+}
+#div_dialog{
+  background:#fff;
+  box-shadow: 0px 0px 3px #555;
+
+  width:40%;
+  margin:0 auto;
+  position: fixed;
+  top:100px;
+  left: 30%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+#div_dialog button{
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+#div_dialog header{
+  display: flex;
+  flex-direction: row;
+}
+#div_dialog header span{
+  background: #333;
+  color: #eee;
+
+  padding: 10px;
+  flex: 1;
+
+  text-align: left;
+}
+
+#div_dialog main{
+  display: flex;
+  flex-direction: row;
+}
+
+#div_dialog main aside{
+  background: #eee;
+
+  padding: 10px;
+
+  display: flex;
+  flex-direction: column;
+}
+#div_dialog main aside button{
+  flex: 1;
+  padding: 10px;
+}
+#div_dialog main aside ul{
+  flex: 1;
+
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+#div_dialog main aside nav#nav_banks{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+#div_dialog main aside nav#nav_banks a.a_selected{
+  background:dodgerblue !important;
+  border:1px solid dodgerblue;
+  color: #fff;
+}
+#div_dialog main aside nav#nav_banks a:hover{
+  border:1px solid dodgerblue;
+}
+#div_dialog main aside nav#nav_banks a{
+  background: #eee;
+  border:1px solid #ccc;
+  color: #333;
+
+  font-size: 14px;
+  padding: 5px;
+  margin:2px 0px;
+
+  text-decoration: none;
+}
+
+
+#div_dialog main section nav#nav_presets{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+#div_dialog main section nav#nav_presets a.a_selected{
+  background:orange !important;
+  /* color: #fff; */
+}
+#div_dialog main section nav#nav_presets a:hover{
+  background: #eee;
+}
+#div_dialog main section nav#nav_presets a{
+  background: #fff;
+  border:1px solid #eee;
+  color: #333;
+
+  font-size: 14px;
+  padding: 10px;
+  margin: 5px;
+
+  text-decoration: none;
+}
+
+#div_dialog main section{
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+}
+#div_dialog main section ul{
+  flex: 1;
+
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+#div_dialog footer{
+  display: flex;
+  flex-direction: row;
+}
+#div_dialog footer input{
+  flex: 1;
+}
+#div_dialog footer input,
+#div_dialog footer button{
+  padding: 10px;
+}

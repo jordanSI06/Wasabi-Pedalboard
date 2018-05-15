@@ -1,0 +1,32 @@
+<template>
+  <link rel="stylesheet" href="./src/pedal-board/src/wc-save/css.css">
+
+  <div id="div_app">
+    <button id='bt_openDialog'>
+      <iron-icon icon="icons:save"></iron-icon>
+    </button>
+  </div>
+
+  <div id='div_dialog' class='hidden'>
+    <header>
+      <span>Save as...</span>
+      <button id='bt_closeDialog'>x</button>
+    </header>
+
+    <main>
+      <aside>
+        <button id='bt_saveBank'>new bank</button>
+        <nav id='nav_banks'></nav>
+      </aside>
+      <section>
+        <nav id='nav_presets'></nav>
+      </section>
+    </main>
+
+    <footer>
+        <input id='input_presetName' type='text' placeholder='Name preset...'>
+        <button id='bt_savePreset'>save</button>
+      </footer>
+  </div>
+</template>
+<script src="./js.js"></script>
