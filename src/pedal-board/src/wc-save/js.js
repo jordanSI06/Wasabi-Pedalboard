@@ -68,7 +68,8 @@
       this.input_presetName = this.shadowRoot.querySelector('#input_presetName');
       this.nav_banks = this.shadowRoot.querySelector('#nav_banks');
       this.nav_presets = this.shadowRoot.querySelector('#nav_presets');
-
+      this.bt_getSettings = this.shadowRoot.querySelector('#bt_getSettings');
+      
       // customListeners
       this.bankSelected = '';
 
@@ -88,11 +89,11 @@
       this.bt_closeDialog.onclick = (e) => this.closeDialog();
       this.bt_saveBank.onclick = (e) => this.addNewBank();
       this.bt_savePreset.onclick = (e) => this.savePreset();
+      this.bt_getSettings.onclick = (e) => this.getSettings();
+      
     }
 
     openDialog() {
-      // Not every plugin have an "params" getter, you need to try catch when using it
-      console.log(this.pedalboard.pluginList[0].params);
       this.div_dialog.classList.remove('hidden');
     }
     closeDialog() {
@@ -123,6 +124,12 @@
       this.selectPresetsListeners();
     }
 
+    loadPreset(){
+      let bankSelected = this.banks.find(item => item._id == this.bankSelected);
+      let plugs=bankSelected.presets.find(item => item._id == this.presetSelected).plugs;
+      console.log(`plugs loaded from "${this.presetSelected}"`,plugs);
+    }
+    
     selectBanksListeners() {
       this.nav_banks.querySelectorAll('a').forEach(e => {
         console.log('a', e);
@@ -147,6 +154,7 @@
       this.nav_presets.querySelectorAll('a').forEach(e => {
         console.log('a', e);
         e.onclick = (e) => this.selectPreset(e.target.id);
+        e.ondblclick = (e) => this.loadPreset();
       })
     }
     selectPreset(_id) {
@@ -212,56 +220,20 @@
     }
 
     savePreset() {
-      console.log(this.pedalboard.pedals);
-      let _plugs = this.pedalboard.childNodes;
-      let _p = "";
-      let _queue = "";
-      let _savedPreset = {};
-      let _tabPreset = [];
-      _queue = Promise.resolve();
-      _tabPreset = []
-      // this.childNodes = all elements in pedalboard
-      Object.keys(_plugs).map(
-        (elem, index) => {
-          // 1 element
-          _p = _plugs[elem];
-          console.log('name', _p.tagName);
-          // if not pedal-in, pedal-out or svg: it will be saved!
-          if (_p.tagName != "PEDAL-IN" && _p.tagName != "PEDAL-OUT" && _p.tagName != "svg") {
-            console.log(_p);
-            console.log(_p.params);
-
-            _savedPreset = {
-              id: _p.id,
-              type: _p.tagName.toLowerCase(),
-              position: {
-                left: _p.x,
-                top: _p.y
-              },
-              settings: [],
-              activate: _p.isOn,
-              connexions: []
-            }
-            _tabPreset.push(_savedPreset);
-
-            if (index == _plugs.length - 1) {
-              _queue = _queue.then((res) => {
-                return _tabPreset;
-              });
-            }
-          }
-        }
-      )
-
-      _queue.then((lastResponse) => {
-        console.log("lastResponse", lastResponse);
+        // Not every plugin have an "params" getter, you need to try catch when using it
         let bankSelected = this.banks.find(item => item._id == this.bankSelected);
-        bankSelected.presets.find(item => item._id == this.presetSelected).plugs = lastResponse;
+        bankSelected.presets.find(item => item._id == this.presetSelected).plugs = this.pedalboard.pluginList;
         console.log("preset saved!!!", this.banks);
-        //this.saveBank();
-        //this.loadPresets();
-        //alert('Preset was successfully saved!');
-      });
+        this.saveBank();
+        this.loadPresets();
+        alert('Preset was successfully saved!');
+    }
+
+    getSettings(){
+      console.log('GET SETTINGS');
+      this.pedalboard.pluginList.forEach(p=>{
+        console.log('params',p);
+      })
     }
 
 

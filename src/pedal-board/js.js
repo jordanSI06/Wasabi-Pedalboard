@@ -978,6 +978,7 @@ class PedalBoard extends HTMLElement {
     var script = document.createElement('script');
     script.src = url + `/main.js`;
     script.onload = (e) => {
+      console.log('target.classname',target.classname);
       this.factory.createPedal(id, target.classname, url);
       let p = document.createElement(id);
       p.setPosition(_e.clientX - 30, _event.clientY - 10);

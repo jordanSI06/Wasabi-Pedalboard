@@ -81,12 +81,25 @@
 
           // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
           this.plugin = new WAPlugin[_pluginName](GlobalContext.context, pluginURL);
+          let _savedPreset={};
 
           // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
           this.plugin.load().then((node) => {
             
-            window.PedalBoard.pluginList.push(node);
-            console.log("node params", window.PedalBoard.pluginList[0].params);
+
+            _savedPreset = {
+              id: pedal.id,
+              type: pedal.tagName.toLowerCase(),
+              position: {
+                left: pedal.x,
+                top: pedal.y
+              },
+              settings: node.params,
+              connexions: []
+            }
+            // nodeInfos:node,
+            window.PedalBoard.pluginList.push(_savedPreset);
+            
             // temporary for handle wams
             try {
               this.nbNodeIn = node.inputChannelCount();
