@@ -1032,8 +1032,12 @@ class PedalBoard extends HTMLElement {
     return target;
   }
 
-  addImportLinkNEW(id, _this, _pos) {
+  addImportLinkNEW(p, _this) {
     return new Promise((resolve, reject) => {
+      let id=p.type;
+      let _pos={ x: p.position.left, y: p.position.top };
+      let _settings=p.settings;
+      console.log('------ _settings ------',_settings);
 
       let target = this.getTarget(id);
       let isImported = document.querySelector(`script[src="${target.baseUrl}/main.js"]`);
@@ -1048,8 +1052,8 @@ class PedalBoard extends HTMLElement {
         var script = document.createElement('script');
         script.src = target.baseUrl + `/main.js`;
         script.onload = (e) => {
-          this.factory.createPedal(id, target.classname, target.baseUrl).then(e=>resolve(true));
-          
+          this.factory.createPedal(id, target.classname, target.baseUrl, _settings).then(e=>resolve(true));
+
           let p = document.createElement(id);
           p.setPosition(_pos.x, _pos.y);
           _this.addPedal(p);

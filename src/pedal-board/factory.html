@@ -12,7 +12,7 @@
 
     
 
-    createPedal(_tagName, _pluginName, _pluginUrl) {
+    createPedal(_tagName, _pluginName, _pluginUrl, _settings) {
       return new Promise((resolve,reject)=>{
 
     
@@ -112,6 +112,11 @@
 
 
             }
+            
+            
+            console.log('NODE PARAMS BEFORE SETTINGS',node.params);
+            if(_settings) node.params = _settings;
+            console.log('NODE PARAMS AFTER SETTINGS',node.params);
             this.plugin.loadGui().then((elem) => {
               // console.log(elem.shadowRoot.querySelector("#wam-content").width);
               // console.log(elem.shadowRoot.querySelector("#wam-content").getAttribute('style'));

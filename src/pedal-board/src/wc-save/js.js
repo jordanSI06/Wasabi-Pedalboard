@@ -126,14 +126,14 @@
       this.plugs = bankSelected.presets.find(item => item._id == this.presetSelected).plugs;
       console.log(`START: LOAD PRESET ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
 
-      this.nbPluginTraitee=0;
+      this.nbPluginTraitee = 0;
       this.loadPlugin(this.plugs[0]);
     }
 
-    loadPlugin(p){
-      this.pedalboard.addImportLinkNEW(p.type, this.pedalboard, { x: p.position.left, y: p.position.top }).then(e=>{
-        this.nbPluginTraitee+=1;
-        if (this.nbPluginTraitee<this.plugs.length) this.loadPlugin(this.plugs[this.nbPluginTraitee]);
+    loadPlugin(p) {
+      this.pedalboard.addImportLinkNEW(p, this.pedalboard).then(e => {
+        this.nbPluginTraitee += 1;
+        if (this.nbPluginTraitee < this.plugs.length) this.loadPlugin(this.plugs[this.nbPluginTraitee]);
         else console.log(`END: ALL ${this.nbPluginTraitee} PLUGINS WERE LOADED`);
       })
     }
@@ -144,7 +144,7 @@
         e.onclick = (e) => this.selectBank(e.target.id);
       })
     }
-    
+
     selectBank(_id) {
       console.log('selectBank', _id);
       this.nav_banks.querySelectorAll('a').forEach(e => {
@@ -216,7 +216,9 @@
       let _presetName = this.input_presetName.value.trim();
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
       let _newPreset = {};
+      let _currentPlugs = this.pedalboard.pluginList;
       console.log("bankSelected", bankSelected);
+
       if (!bankSelected.presets.find(item => item.label == _presetName)) {
         console.log('preset not exist');
 
@@ -224,14 +226,15 @@
           "_id": `${Date.now()}_preset`,
           "label": `${_presetName}`,
           "date": `${new Date().toJSON().slice(0, 10)}`,
-          "plugs": this.pedalboard.pluginList
+          "plugs": _currentPlugs
         }
         bankSelected.presets.push(_newPreset);
       } else {
-        console.log('preset exist',bankSelected.presets.find(item => item.label == _presetName));
+        console.log('preset exist', bankSelected.presets.find(item => item.label == _presetName));
         // Not every plugin have an "params" getter, you need to try catch when using it
-        bankSelected.presets.find(item => item._id == this.presetSelected).plugs = this.pedalboard.pluginList;
+        bankSelected.presets.find(item => item._id == this.presetSelected).plugs = _currentPlugs;
       }
+
       this.saveBank();
       this.loadPresets();
       alert('Preset was successfully saved!');
