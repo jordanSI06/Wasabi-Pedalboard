@@ -1036,29 +1036,23 @@ class PedalBoard extends HTMLElement {
     return new Promise((resolve, reject) => {
 
       let target = this.getTarget(id);
-      console.log('TARGET',target);
       let isImported = document.querySelector(`script[src="${target.baseUrl}/main.js"]`);
       if (isImported) {
-        console.log('ALREADY IMPORTED');
-
         // add pedal
         let p = document.createElement(id);
         p.setPosition(_pos.x, _pos.y);
         this.addPedal(p);
+
         resolve(true);
       } else {
-        console.log('NOT IMPORTED');
         var script = document.createElement('script');
         script.src = target.baseUrl + `/main.js`;
         script.onload = (e) => {
-          console.log('NOW WAS IMPORTED');
-
-          this.factory.createPedal(id, target.classname, target.baseUrl);
-
+          this.factory.createPedal(id, target.classname, target.baseUrl).then(e=>resolve(true));
+          
           let p = document.createElement(id);
           p.setPosition(_pos.x, _pos.y);
           _this.addPedal(p);
-          resolve(true);
         };
         document.head.appendChild(script);
       }

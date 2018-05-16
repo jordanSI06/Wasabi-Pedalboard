@@ -13,7 +13,9 @@
     
 
     createPedal(_tagName, _pluginName, _pluginUrl) {
+      return new Promise((resolve,reject)=>{
 
+    
       // Current document needs to be defined to get DOM access to imported HTML
       const template = _currentdoc.querySelector(`template`);
 
@@ -131,6 +133,7 @@
 
               // the WC is added to the pbplugin wrapper
               wrapper.appendChild(elem);
+              resolve(elem);
             });
             console.log(this.nbNodeIn)
             if(this.nbNodeIn > 0){
@@ -156,6 +159,9 @@
           
         }
       });
+
+
+    });
     }
 
   }

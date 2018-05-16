@@ -102,7 +102,6 @@
       this.nav_banks.innerHTML = '';
       Object.keys(this.banks).map(
         (elem, index) => {
-          console.log('elem', elem);
           this.nav_banks.insertAdjacentHTML('beforeEnd', this.renderLink(this.banks[elem]));
         }
       )
@@ -122,55 +121,22 @@
       this.selectPresetsListeners();
     }
 
-
-    // RESTORE = LOAD
-    //restorePlugins()
     loadPreset() {
-      //this.pedalboard.pluginList.forEach(p => console.log('params', p));
-
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
       this.plugs = bankSelected.presets.find(item => item._id == this.presetSelected).plugs;
-      console.log(`RESTORE PRESET: ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
+      console.log(`START: LOAD PRESET ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
 
-      // we have to call this method from pedalboard but we don't know how to set target.classname
-      // _e & _event will be replaced by _pos{x,y}
-      //this.pedalboard.addImportLink(url, id, _this, _e, _event, target);
-
-      // plugs.forEach(p => {
-      //   this.pedalboard.addImportLinkNEW(p.type, this.pedalboard, { x: p.position.left, y: p.position.top });
-      // })
-
-      // const start = async () => {
-      //   await this.asyncForEach(plugs, async (p) => {
-      //     await this.pedalboard.addImportLinkNEW(p.type, this.pedalboard, { x: p.position.left, y: p.position.top });
-      //     console.log('await p',p)
-      //   })
-      //   console.log('Done')
-      // }
-      // start();
       this.nbPluginTraitee=0;
-      this.traitementPlugin(this.plugs[0]);
+      this.loadPlugin(this.plugs[0]);
     }
 
-    traitementPlugin(p){
-      console.log('this.pedalboard',this.pedalboard);
+    loadPlugin(p){
       this.pedalboard.addImportLinkNEW(p.type, this.pedalboard, { x: p.position.left, y: p.position.top }).then(e=>{
-        this.nbPluginTraitee=this.nbPluginTraitee+1;
-        if (this.nbPluginTraitee<this.plugs.length){
-          this.traitementPlugin(this.plugs[this.nbPluginTraitee])
-        }else{
-          console.log('FINISHED',this.plugs.length);
-        }
+        this.nbPluginTraitee+=1;
+        if (this.nbPluginTraitee<this.plugs.length) this.loadPlugin(this.plugs[this.nbPluginTraitee]);
+        else console.log(`END: ALL ${this.nbPluginTraitee} PLUGINS WERE LOADED`);
       })
     }
-
-    async asyncForEach(array, callback) {
-      for (let index = 0; index < array.length; index++) {
-        await callback(array[index], index, array)
-      }
-    }
-
-
 
     selectBanksListeners() {
       this.nav_banks.querySelectorAll('a').forEach(e => {
@@ -178,6 +144,7 @@
         e.onclick = (e) => this.selectBank(e.target.id);
       })
     }
+    
     selectBank(_id) {
       console.log('selectBank', _id);
       this.nav_banks.querySelectorAll('a').forEach(e => {
