@@ -217,7 +217,16 @@
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
       let _newPreset = {};
       let _currentPlugs = this.pedalboard.pluginList;
-      console.log("bankSelected", bankSelected);
+
+      // get good positions
+      let _plugin='';
+      _currentPlugs.forEach(e=>{
+        _plugin=this.pedalboard.querySelector('#'+e.id);
+        e.position.left=_plugin.x;
+        e.position.top=_plugin.y;
+      });
+
+      console.log('END FOREACH',_currentPlugs);
 
       if (!bankSelected.presets.find(item => item.label == _presetName)) {
         console.log('preset not exist');
