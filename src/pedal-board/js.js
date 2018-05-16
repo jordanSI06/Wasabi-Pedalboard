@@ -588,7 +588,9 @@ class PedalBoard extends HTMLElement {
           input.setAttribute("open", false);
         } else {
           input.setAttribute("open", true);
-          // if number of jacks > 1
+        }
+        if (p.inputJacks.length > 1) {
+          this.createMenuItems(p.inputJacks, input.getAttribute("open") === 'true');
         }
       });
 
@@ -598,6 +600,18 @@ class PedalBoard extends HTMLElement {
     }
 
   }
+  createMenuItems(jacks, open) {
+    let len = jacks.length;
+    let offsetY = 0;
+    
+    jacks.forEach((j) => {
+      j.repositionJack(offsetY, open);
+      if (open) offsetY += 20;
+      else offsetY -= 0;
+    })
+
+  }
+
 
   static createSVGcanvas(w, h) {
     let svg = document.getElementById("svg-canvas");
