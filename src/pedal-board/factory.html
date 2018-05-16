@@ -67,8 +67,7 @@
           shadowRoot.appendChild(instance);
 
           // runBehavior is related to the I/O detection, and graphic behavior (drag and drop) for each pedals.
-
-
+          this.runBehaviorMethods();
           this.createAllInternNodes();
           
         }
@@ -152,7 +151,7 @@
             // }
 
             node.connect(pedal.soundNodeOut);
-            this.runBehaviorMethods();
+            
           });
           
         }
