@@ -68,8 +68,7 @@
       this.input_presetName = this.shadowRoot.querySelector('#input_presetName');
       this.nav_banks = this.shadowRoot.querySelector('#nav_banks');
       this.nav_presets = this.shadowRoot.querySelector('#nav_presets');
-      this.bt_getSettings = this.shadowRoot.querySelector('#bt_getSettings');
-      
+
       // customListeners
       this.bankSelected = '';
 
@@ -89,8 +88,7 @@
       this.bt_closeDialog.onclick = (e) => this.closeDialog();
       this.bt_saveBank.onclick = (e) => this.addNewBank();
       this.bt_savePreset.onclick = (e) => this.savePreset();
-      this.bt_getSettings.onclick = (e) => this.getSettings();
-      
+
     }
 
     openDialog() {
@@ -127,18 +125,53 @@
 
     // RESTORE = LOAD
     //restorePlugins()
-    loadPreset(){
+    loadPreset() {
+      //this.pedalboard.pluginList.forEach(p => console.log('params', p));
+
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
-      let plugs=bankSelected.presets.find(item => item._id == this.presetSelected).plugs;
-      console.log(`plugs loaded from "${this.presetSelected}"`,plugs);
+      this.plugs = bankSelected.presets.find(item => item._id == this.presetSelected).plugs;
+      console.log(`RESTORE PRESET: ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
 
       // we have to call this method from pedalboard but we don't know how to set target.classname
       // _e & _event will be replaced by _pos{x,y}
       //this.pedalboard.addImportLink(url, id, _this, _e, _event, target);
+
+      // plugs.forEach(p => {
+      //   this.pedalboard.addImportLinkNEW(p.type, this.pedalboard, { x: p.position.left, y: p.position.top });
+      // })
+
+      // const start = async () => {
+      //   await this.asyncForEach(plugs, async (p) => {
+      //     await this.pedalboard.addImportLinkNEW(p.type, this.pedalboard, { x: p.position.left, y: p.position.top });
+      //     console.log('await p',p)
+      //   })
+      //   console.log('Done')
+      // }
+      // start();
+      this.nbPluginTraitee=0;
+      this.traitementPlugin(this.plugs[0]);
+    }
+
+    traitementPlugin(p){
+      console.log('this.pedalboard',this.pedalboard);
+      this.pedalboard.addImportLinkNEW(p.type, this.pedalboard, { x: p.position.left, y: p.position.top }).then(e=>{
+        this.nbPluginTraitee=this.nbPluginTraitee+1;
+        if (this.nbPluginTraitee<this.plugs.length){
+          this.traitementPlugin(this.plugs[this.nbPluginTraitee])
+        }else{
+          console.log('FINISHED',this.plugs.length);
+        }
+      })
+    }
+
+    async asyncForEach(array, callback) {
+      for (let index = 0; index < array.length; index++) {
+        await callback(array[index], index, array)
+      }
     }
 
 
-    
+
     selectBanksListeners() {
       this.nav_banks.querySelectorAll('a').forEach(e => {
         console.log('a', e);
@@ -212,37 +245,31 @@
     }
 
     // create preset name
-    _savePreset() {
+    savePreset() {
       let _presetName = this.input_presetName.value.trim();
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
-      let _newPreset = {
-        "_id": `${Date.now()}_preset`,
-        "label": `${_presetName}`,
-        "date": `${new Date().toJSON().slice(0, 10)}`,
-        "plugs": []
+      let _newPreset = {};
+      console.log("bankSelected", bankSelected);
+      if (!bankSelected.presets.find(item => item.label == _presetName)) {
+        console.log('preset not exist');
+
+        let _newPreset = {
+          "_id": `${Date.now()}_preset`,
+          "label": `${_presetName}`,
+          "date": `${new Date().toJSON().slice(0, 10)}`,
+          "plugs": this.pedalboard.pluginList
+        }
+        bankSelected.presets.push(_newPreset);
+      } else {
+        console.log('preset exist',bankSelected.presets.find(item => item.label == _presetName));
+        // Not every plugin have an "params" getter, you need to try catch when using it
+        bankSelected.presets.find(item => item._id == this.presetSelected).plugs = this.pedalboard.pluginList;
       }
-      bankSelected.presets.push(_newPreset);
-      //console.log(this.banks.find(item => item._id == this.bankSelected));
-      //console.log(this.banks);
       this.saveBank();
       this.loadPresets();
+      alert('Preset was successfully saved!');
+      console.log("preset saved!!!", this.banks);
     }
 
-    savePreset() {
-        // Not every plugin have an "params" getter, you need to try catch when using it
-        let bankSelected = this.banks.find(item => item._id == this.bankSelected);
-        bankSelected.presets.find(item => item._id == this.presetSelected).plugs = this.pedalboard.pluginList;
-        console.log("preset saved!!!", this.banks);
-        this.saveBank();
-        this.loadPresets();
-        alert('Preset was successfully saved!');
-    }
-
-    getSettings(){
-      console.log('GET SETTINGS');
-      this.pedalboard.pluginList.forEach(p=>{
-        console.log('params',p);
-      })
-    }
   });
 })();
