@@ -10,163 +10,166 @@
 
   class factory {
 
-    
+
 
     createPedal(_tagName, _pluginName, _pluginUrl, _settings) {
-      return new Promise((resolve,reject)=>{
-
-    
-      // Current document needs to be defined to get DOM access to imported HTML
-      const template = _currentdoc.querySelector(`template`);
-
-      // Register the x-custom element with the browser
-      customElements.define(_tagName, class extends PBPlugin(HTMLElement) {
-
-        // ----- METHODS: DEFAULT -----
-        // is called when an instance of the element is created
-        constructor() {
-          // super() reference to HTMLElemenent constructor
-          super();
-
-          // Default values if non specified width/heigth nbinput/nboutput for pedal
-          this.w = 825;
-          this.h = 115;
-
-          
-          this.plugin;
+      return new Promise((resolve, reject) => {
 
 
-        }
+        // Current document needs to be defined to get DOM access to imported HTML
+        const template = _currentdoc.querySelector(`template`);
 
-        get is() { return this.nodeName.toLowerCase(); }
+        // Register the x-custom element with the browser
+        customElements.define(_tagName, class extends PBPlugin(HTMLElement) {
 
-        // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
-        static get observedAttributes() { return ['']; }
+          // ----- METHODS: DEFAULT -----
+          // is called when an instance of the element is created
+          constructor() {
+            // super() reference to HTMLElemenent constructor
+            super();
 
-        // called when an observed attribute changes 
-        attributeChangedCallback() {
-          console.log(`Custom element ${this.is} attributes changed.`);
-        }
-
-        // called when the plugin is moved to another document
-        adoptedCallback() {
-          console.log(`Custom element ${this.is} moved to new page.`);
-        }
-
-        // Called when the pedal is disconnected from the dom 
-        disconnectedCallback() {
-          console.log(`Custom element ${this.is} removed from page.`);
-        }
-
-        // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
-        connectedCallback() {
-          console.log(`Custom element ${this.is} added to page.`);
-          console.log(this);
-
-          // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
-          const shadowRoot = this.attachShadow({ mode: `open` });
-          const instance = template.content.cloneNode(true);
-          shadowRoot.appendChild(instance);
-
-          // runBehavior is related to the I/O detection, and graphic behavior (drag and drop) for each pedals.
-          this.runBehaviorMethods();
-          this.createAllInternNodes();
-          
-        }
-
-        // ----- METHODS: CUSTOM -----
-        createAllInternNodes() {
-          var pedal = this;
-          var wrapper = this.shadowRoot.querySelector(".laPedale");
-          var pluginURL = _pluginUrl;
-
-          // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
-          this.plugin = new WAPlugin[_pluginName](GlobalContext.context, pluginURL);
-          let _savedPreset={};
-
-          // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
-          this.plugin.load().then((node) => {
-            
-
-            _savedPreset = {
-              id: pedal.id,
-              type: pedal.tagName.toLowerCase(),
-              position: {
-                left: pedal.x,
-                top: pedal.y
-              },
-              settings: node.params,
-              connexions: []
-            }
-            // nodeInfos:node,
-            window.PedalBoard.pluginList.push(_savedPreset);
-            console.log("node",node);
-            
-            // temporary for handle wams
-            try {
-              this.nbNodeIn = node.inputChannelCount();
-
-            } catch (error) {
-              console.log("the naming convention has to be fix between wam and others", error);
-              this.nbNodeIn = node.numberOfInputs;
+            // Default values if non specified width/heigth nbinput/nboutput for pedal
+            this.w = 825;
+            this.h = 115;
 
 
-            }
-            
-            
-            console.log('NODE PARAMS BEFORE SETTINGS',node.params);
-            if(_settings) node.params = _settings;
-            console.log('NODE PARAMS AFTER SETTINGS',node.params);
-            this.plugin.loadGui().then((elem) => {
-              // console.log(elem.shadowRoot.querySelector("#wam-content").width);
-              // console.log(elem.shadowRoot.querySelector("#wam-content").getAttribute('style'));
+            this.plugin;
+
+
+          }
+
+          get is() { return this.nodeName.toLowerCase(); }
+
+          // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
+          static get observedAttributes() { return ['']; }
+
+          // called when an observed attribute changes 
+          attributeChangedCallback() {
+            console.log(`Custom element ${this.is} attributes changed.`);
+          }
+
+          // called when the plugin is moved to another document
+          adoptedCallback() {
+            console.log(`Custom element ${this.is} moved to new page.`);
+          }
+
+          // Called when the pedal is disconnected from the dom 
+          disconnectedCallback() {
+            console.log(`Custom element ${this.is} removed from page.`);
+          }
+
+          // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
+          connectedCallback() {
+            console.log(`Custom element ${this.is} added to page.`);
+            console.log(this);
+
+            // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
+            const shadowRoot = this.attachShadow({ mode: `open` });
+            const instance = template.content.cloneNode(true);
+            shadowRoot.appendChild(instance);
+
+            // runBehavior is related to the I/O detection, and graphic behavior (drag and drop) for each pedals.
+            this.runBehaviorMethods();
+            this.createAllInternNodes();
+
+          }
+
+          // ----- METHODS: CUSTOM -----
+          createAllInternNodes() {
+            var pedal = this;
+            var wrapper = this.shadowRoot.querySelector(".laPedale");
+            var pluginURL = _pluginUrl;
+
+            // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
+            this.plugin = new WAPlugin[_pluginName](GlobalContext.context, pluginURL);
+            let _savedPreset = {};
+
+            // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
+            this.plugin.load().then((node) => {
+
+              _savedPreset = {
+                id: pedal.id,
+                type: pedal.tagName.toLowerCase(),
+                position: {
+                  left: pedal.x,
+                  top: pedal.y
+                },
+                settings: node.params,
+                connexions: []
+              }
+              // nodeInfos:node,
+              window.PedalBoard.pluginList.push(_savedPreset);
+              console.log("node", node);
+
+              // temporary for handle wams
               try {
-                // the "properties" method is recommended to set width and height of your wc
-                this.w = elem.properties.dataWidth.value;
-                this.h = elem.properties.dataHeight.value;
+                this.nbNodeIn = node.inputChannelCount();
+
               } catch (error) {
-                console.log(error);
-                try {
-                   // temporary fix for wams
-                this.w = node._gui.width;
-                this.h = node._gui.height;
-                } catch (error) {
-                  console.log("the dx7 has not proper width", error);
-                }
-               
+                console.log("the naming convention has to be fix between wam and others", error);
+                this.nbNodeIn = node.numberOfInputs;
+
+
               }
 
-              // the WC is added to the pbplugin wrapper
-              wrapper.appendChild(elem);
-              resolve(elem);
+
+              this.plugin.loadGui().then((elem) => {
+                try {
+                  // the "properties" method is recommended to set width and height of your wc
+                  this.w = elem.properties.dataWidth.value;
+                  this.h = elem.properties.dataHeight.value;
+                } catch (error) {
+                  console.log(error);
+                  try {
+                    // temporary fix for wams
+                    this.w = node._gui.width;
+                    this.h = node._gui.height;
+                  } catch (error) {
+                    console.log("the dx7 has not proper width", error);
+                  }
+
+                }
+
+                // the WC is added to the pbplugin wrapper
+                wrapper.appendChild(elem);
+                resolve(elem);
+              });
+              console.log(this.nbNodeIn)
+              if (this.nbNodeIn > 0) {
+
+                // connect the node to the I/O of the pbplugin 
+                if (node instanceof AudioWorkletNode) pedal.soundNodeIn.connect(node);
+                // case the node is pure JS graph     ---> is resolved in PingPongDelay3, soon we'll keep the first way for everything
+                else pedal.soundNodeIn.connect(node.getInput(0));
+              }
+
+              /**
+               * temporary code for recover state and params for a plugin (for pure JS modules)
+               * API has to be precise of what is really a state and what really is a param.
+               */
+              if (_settings) {
+                node.params = _settings;
+                Object.keys(_settings).map(
+                  (elem, index) => {
+                    console.log(elem, _settings[elem]);
+
+                    node.setParam(elem, _settings[elem]);
+                  }
+                )
+                if (_settings.hasOwnProperty('status')) {
+                  node.setState(_settings.status);
+                }
+              }
+
+              node.connect(pedal.soundNodeOut);
+
             });
-            console.log(this.nbNodeIn)
-            if(this.nbNodeIn > 0){
-              
-            // connect the node to the I/O of the pbplugin 
-            if (node instanceof AudioWorkletNode) pedal.soundNodeIn.connect(node);
-            // case the node is pure JS graph
-            else pedal.soundNodeIn.connect(node.getInput(0));
-            }
 
-            // try {
-            //   // inputChannelCount is specified in the API
-            //   this.nbInput = node.inputChannelCount();
-            //   this.nbOutput = node.outputs.length;
+          }
+        });
 
-            // } catch (error) {
-            //   console.log(error);
-            // }
 
-            node.connect(pedal.soundNodeOut);
-            
-          });
-          
-        }
       });
-
-
-    });
     }
 
   }
