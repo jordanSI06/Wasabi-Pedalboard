@@ -19,8 +19,9 @@ class PedalBoard extends HTMLElement {
 
     // getAudioPlugins
     this.pluginList = [];
+    this.pluginConnected = [],
 
-    this.pIn;
+      this.pIn;
     this.pOut;
 
 
@@ -385,6 +386,10 @@ class PedalBoard extends HTMLElement {
       p1.addJackAtOutput(j);
       p2.addJackAtInput(j);
       this.soundNodeConnection(p1, p2);
+
+      // add connexion for "this.pluginConnected"
+      this.pluginConnected.push({in:p2.id,out:p1.id});
+      console.log('this.pluginConnected',this.pluginConnected);
     }
   }
 
@@ -409,6 +414,15 @@ class PedalBoard extends HTMLElement {
     }
 
     this.soundNodeDisconnection(p1, p2);
+
+    // remove connexion from "this.pluginConnected"
+    for (let i=0;i<this.pluginConnected.length;i++){
+      if (this.pluginConnected[i].in==p2.id && this.pluginConnected[i].out==p1.id){
+        this.pluginConnected.splice(i,1);
+        break;
+      }
+    }
+    console.log('this.pluginConnected',this.pluginConnected);
   }
 
   getPedalFromHtmlElem(elem) {
@@ -603,7 +617,7 @@ class PedalBoard extends HTMLElement {
   createMenuItems(jacks, open) {
     let len = jacks.length;
     let offsetY = 0;
-    
+
     jacks.forEach((j) => {
       j.repositionJack(offsetY, open);
       if (open) offsetY += 20;
@@ -992,7 +1006,7 @@ class PedalBoard extends HTMLElement {
     var script = document.createElement('script');
     script.src = url + `/main.js`;
     script.onload = (e) => {
-      console.log('target.classname',target.classname);
+      console.log('target.classname', target.classname);
       this.factory.createPedal(id, target.classname, url);
       let p = document.createElement(id);
       p.setPosition(_e.clientX - 30, _event.clientY - 10);
@@ -1034,10 +1048,10 @@ class PedalBoard extends HTMLElement {
 
   addImportLinkNEW(p, _this) {
     return new Promise((resolve, reject) => {
-      let id=p.type;
-      let _pos={ x: p.position.left, y: p.position.top };
-      let _settings=p.settings;
-      console.log('------ _settings ------',_settings);
+      let id = p.type;
+      let _pos = { x: p.position.left, y: p.position.top };
+      let _settings = p.settings;
+      console.log('------ _settings ------', _settings);
 
       let target = this.getTarget(id);
       let isImported = document.querySelector(`script[src="${target.baseUrl}/main.js"]`);
@@ -1052,7 +1066,7 @@ class PedalBoard extends HTMLElement {
         var script = document.createElement('script');
         script.src = target.baseUrl + `/main.js`;
         script.onload = (e) => {
-          this.factory.createPedal(id, target.classname, target.baseUrl, _settings).then(e=>resolve(true));
+          this.factory.createPedal(id, target.classname, target.baseUrl, _settings).then(e => resolve(true));
 
           let p = document.createElement(id);
           p.setPosition(_pos.x, _pos.y);
