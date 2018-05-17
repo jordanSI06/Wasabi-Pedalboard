@@ -83,9 +83,12 @@
             // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
             this.plugin = new WAPlugin[_pluginName](GlobalContext.context, pluginURL);
             let _savedPreset = {};
+            let settings = "";
+
 
             // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
             this.plugin.load().then((node) => {
+              if(_settings) settings = node.getState();else settings =""; 
 
               _savedPreset = {
                 id: pedal.id,
@@ -94,9 +97,10 @@
                   left: pedal.x,
                   top: pedal.y
                 },
-                settings: node.params,
+                settings: settings,
                 connexions: []
               }
+             
               // nodeInfos:node,
               window.PedalBoard.pluginList.push(_savedPreset);
               console.log("node", node);
@@ -148,17 +152,7 @@
                * API has to be precise of what is really a state and what really is a param.
                */
               if (_settings) {
-                node.params = _settings;
-                Object.keys(_settings).map(
-                  (elem, index) => {
-                    console.log(elem, _settings[elem]);
-
-                    node.setParam(elem, _settings[elem]);
-                  }
-                )
-                if (_settings.hasOwnProperty('status')) {
-                  node.setState(_settings.status);
-                }
+                 node.setState(_settings); 
               }
 
               node.connect(pedal.soundNodeOut);
