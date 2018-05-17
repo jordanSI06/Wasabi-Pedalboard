@@ -71,6 +71,7 @@
 
       // customListeners
       this.bankSelected = '';
+      this.plugsConnexions='';
 
       //
       if (localStorage.getItem('banks')) this.banks = JSON.parse(localStorage.getItem('banks'));
@@ -124,6 +125,8 @@
     loadPreset() {
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
       this.plugs = bankSelected.presets.find(item => item._id == this.presetSelected).plugs;
+      this.plugsConnexions = bankSelected.presets.find(item => item._id == this.presetSelected).connexions;
+      console.log('LOADING',bankSelected.presets.find(item => item._id == this.presetSelected));
       console.log(`START: LOAD PRESET ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
 
       this.nbPluginTraitee = 0;
@@ -134,8 +137,18 @@
       this.pedalboard.addImportLinkNEW(p, this.pedalboard).then(e => {
         this.nbPluginTraitee += 1;
         if (this.nbPluginTraitee < this.plugs.length) this.loadPlugin(this.plugs[this.nbPluginTraitee]);
-        else console.log(`END: ALL ${this.nbPluginTraitee} PLUGINS WERE LOADED`);
+        else {
+          console.log(`END: ALL ${this.nbPluginTraitee} PLUGINS WERE LOADED`);
+          this.loadConnexions();
+        }
       })
+    }
+
+    loadConnexions(){
+      //console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
+      for (let i=0;i<this.plugsConnexions.length;i++){
+        this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`),this.pedalboard.querySelector(`#${this.plugsConnexions[i].in}`));
+      }
     }
 
     selectBanksListeners() {
@@ -217,7 +230,8 @@
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
       let _newPreset = {};
       let _currentPlugs = this.pedalboard.pluginList;
-
+      let _currentConnexions= this.pedalboard.pluginConnected;
+      
       // get good positions
       let _plugin='';
       _currentPlugs.forEach(e=>{
@@ -235,13 +249,15 @@
           "_id": `${Date.now()}_preset`,
           "label": `${_presetName}`,
           "date": `${new Date().toJSON().slice(0, 10)}`,
-          "plugs": _currentPlugs
+          "plugs": _currentPlugs,
+          "connexions":_currentConnexions
         }
         bankSelected.presets.push(_newPreset);
       } else {
         console.log('preset exist', bankSelected.presets.find(item => item.label == _presetName));
         // Not every plugin have an "params" getter, you need to try catch when using it
         bankSelected.presets.find(item => item._id == this.presetSelected).plugs = _currentPlugs;
+        bankSelected.presets.find(item => item._id == this.presetSelected).connexions = _currentConnexions;
       }
 
       this.saveBank();
