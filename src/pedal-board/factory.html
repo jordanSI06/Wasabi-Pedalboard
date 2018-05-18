@@ -88,8 +88,8 @@
 
             // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
             this.plugin.load().then((node) => {
-              if(_settings) settings = node.getState();else settings =""; 
-              console.log(settings);
+              if(!_settings) settings = node.getState(); 
+              console.log(_settings);
 
               _savedPreset = {
                 id: pedal.id,
@@ -104,7 +104,7 @@
              
               // nodeInfos:node,
               window.PedalBoard.pluginList.push(_savedPreset);
-              console.log("node", node);
+              console.log(window.PedalBoard.pluginList);
 
               // temporary for handle wams
               try {
