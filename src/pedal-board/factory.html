@@ -89,6 +89,7 @@
             // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
             this.plugin.load().then((node) => {
               if(_settings) settings = node.getState();else settings =""; 
+              console.log(settings);
 
               _savedPreset = {
                 id: pedal.id,
@@ -137,6 +138,11 @@
                 // the WC is added to the pbplugin wrapper
                 wrapper.appendChild(elem);
                 resolve(elem);
+
+
+                if (_settings) {
+                 node.setState(_settings); 
+              }
               });
               console.log(this.nbNodeIn)
               if (this.nbNodeIn > 0) {
@@ -147,13 +153,8 @@
                 else pedal.soundNodeIn.connect(node.getInput(0));
               }
 
-              /**
-               * temporary code for recover state and params for a plugin (for pure JS modules)
-               * API has to be precise of what is really a state and what really is a param.
-               */
-              if (_settings) {
-                 node.setState(_settings); 
-              }
+              
+              
 
               node.connect(pedal.soundNodeOut);
 
