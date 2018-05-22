@@ -13,7 +13,7 @@
       root.GlobalContext = GlobalContext;
 
     var AudioContext = root.AudioContext || root.webkitAudioContext;
-    GlobalContext.context = new AudioContext;
+    GlobalContext.context = new AudioContext({ latencyHint: 0.00001 /* seconds */ });
     //GlobalContext.soundNodeIn=GlobalContext.context.createGain();
     //GlobalContext.soundNodeOut=GlobalContext.context.createGain();
 
