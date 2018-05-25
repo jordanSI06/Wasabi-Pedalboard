@@ -7,166 +7,153 @@
 <script>
 
   const _currentdoc = document.currentScript.ownerDocument;
-
   class factory {
 
+    createPedal(_tagName,_pluginName,_pluginUrl) {
+      // var _tagName = _pluginInfos.type;
+      // var _pluginName = _pluginInfos.target.classname;
+      // var _pluginUrl = _pluginInfos.target.baseUrl;
 
+      // console.log('1- createPedal', { tagName: _tagName, pluginName: _pluginName, pluginUrl: _pluginUrl });
+      // console.log('2- document exist ?', document.querySelector(_tagName));
 
-    createPedal(_tagName, _pluginName, _pluginUrl, _settings) {
-      return new Promise((resolve, reject) => {
+      // Current document needs to be defined to get DOM access to imported HTML
+      const template = _currentdoc.querySelector(`template`);
 
+      // Register the x-custom element with the browser
+      customElements.define(_tagName, class extends PBPlugin(HTMLElement) {
 
-        // Current document needs to be defined to get DOM access to imported HTML
-        const template = _currentdoc.querySelector(`template`);
+        // ----- METHODS: DEFAULT -----
+        // is called when an instance of the element is created
+        constructor() {
+          // super() reference to HTMLElemenent constructor
+          super();
 
-        // Register the x-custom element with the browser
-        customElements.define(_tagName, class extends PBPlugin(HTMLElement) {
+          // Default values if non specified width/heigth nbinput/nboutput for pedal
+          this.w = 825;
+          this.h = 115;
 
-          // ----- METHODS: DEFAULT -----
-          // is called when an instance of the element is created
-          constructor() {
-            // super() reference to HTMLElemenent constructor
-            super();
+          this.params = '';
+          this.node = '';
+          this.paramsLoaded = '';
+        }
 
-            // Default values if non specified width/heigth nbinput/nboutput for pedal
-            this.w = 825;
-            this.h = 115;
+        get is() { return this.nodeName.toLowerCase(); }
 
+        // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
+        static get observedAttributes() { return ['params']; }
 
-            this.plugin;
-
-
+        // appelé lorsque l'un des attributs de l'élément personnalisé est ajouté, supprimé ou modifié.
+        attributeChangedCallback(name, oldValue, newValue) {
+          console.log(`Custom element ${this.is} attributes changed.`);
+          try {
+            console.log(`name: ${name}`);
+            console.log(`oldValue:`, oldValue);
+            console.log(`newValue:`, newValue);
+            this.paramsLoaded = JSON.parse(newValue);
+            console.log('this.paramsLoaded', this.paramsLoaded);
+            console.log('thisNODE',this.node);
+                this.node.setState((this.paramsLoaded));
           }
-
-          get is() { return this.nodeName.toLowerCase(); }
-
-          // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
-          static get observedAttributes() { return ['']; }
-
-          // called when an observed attribute changes 
-          attributeChangedCallback() {
-            console.log(`Custom element ${this.is} attributes changed.`);
+          catch (err) {
+            console.log(err);
           }
+        }
 
-          // called when the plugin is moved to another document
-          adoptedCallback() {
-            console.log(`Custom element ${this.is} moved to new page.`);
-          }
+        // called when the plugin is moved to another document
+        adoptedCallback() {
+          console.log(`Custom element ${this.is} moved to new page.`);
+        }
 
-          // Called when the pedal is disconnected from the dom 
-          disconnectedCallback() {
-            console.log(`Custom element ${this.is} removed from page.`);
-          }
+        // Called when the pedal is disconnected from the dom 
+        disconnectedCallback() {
+          console.log(`Custom element ${this.is} removed from page.`);
+        }
 
-          // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
-          connectedCallback() {
-            console.log(`Custom element ${this.is} added to page.`);
-            console.log(this);
+        // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
+        connectedCallback() {
+          console.log(`Custom element ${this.is} added to page.`);
 
-            // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
-            const shadowRoot = this.attachShadow({ mode: `open` });
-            const instance = template.content.cloneNode(true);
-            shadowRoot.appendChild(instance);
+          // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
+          const shadowRoot = this.attachShadow({ mode: `open` });
+          const instance = template.content.cloneNode(true);
+          shadowRoot.appendChild(instance);
 
-            // runBehavior is related to the I/O detection, and graphic behavior (drag and drop) for each pedals.
-            this.runBehaviorMethods();
-            this.createAllInternNodes();
+          // runBehavior is related to the I/O detection, and graphic behavior (drag and drop) for each pedals.
+          this.runBehaviorMethods();
+          this.createAllInternNodes();
+        }
 
-          }
+        // ----- METHODS: CUSTOM -----
+        createAllInternNodes() {
+          var pedal = this;
+          var wrapper = this.shadowRoot.querySelector(".laPedale");
 
-          // ----- METHODS: CUSTOM -----
-          createAllInternNodes() {
-            var pedal = this;
-            var wrapper = this.shadowRoot.querySelector(".laPedale");
-            var pluginURL = _pluginUrl;
+          // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
+          this.plugin = new WAPlugin[_pluginName](GlobalContext.context, _pluginUrl);
 
-            // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
-            this.plugin = new WAPlugin[_pluginName](GlobalContext.context, pluginURL);
-            let _savedPreset = {};
-            let settings = "";
+          // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
+          // LOAD NODE
+          this.plugin.load().then((node) => {
 
+            // temporary for handle wams
+            try {
+              this.nbNodeIn = node.inputChannelCount();
+            } catch (error) {
+              console.log("the naming convention has to be fix between wam and others", error);
+              this.nbNodeIn = node.numberOfInputs;
+            }
 
-            // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
-            this.plugin.load().then((node) => {
-              if(!_settings) settings = node.getState(); 
-              console.log(_settings);
-
-              _savedPreset = {
-                id: pedal.id,
-                type: pedal.tagName.toLowerCase(),
-                position: {
-                  left: pedal.x,
-                  top: pedal.y
-                },
-                settings: settings,
-                connexions: []
-              }
-             
-              // nodeInfos:node,
-              window.PedalBoard.pluginList.push(_savedPreset);
-              console.log(window.PedalBoard.pluginList);
-
-              // temporary for handle wams
+            // LOAD GUI
+            this.plugin.loadGui().then((elem) => {
               try {
-                this.nbNodeIn = node.inputChannelCount();
-
+                // the "properties" method is recommended to set width and height of your wc
+                this.w = elem.properties.dataWidth.value;
+                this.h = elem.properties.dataHeight.value;
               } catch (error) {
-                console.log("the naming convention has to be fix between wam and others", error);
-                this.nbNodeIn = node.numberOfInputs;
-
-
-              }
-
-
-              this.plugin.loadGui().then((elem) => {
+                console.log(error);
                 try {
-                  // the "properties" method is recommended to set width and height of your wc
-                  this.w = elem.properties.dataWidth.value;
-                  this.h = elem.properties.dataHeight.value;
+                  // temporary fix for wams
+                  this.w = node._gui.width;
+                  this.h = node._gui.height;
                 } catch (error) {
-                  console.log(error);
-                  try {
-                    // temporary fix for wams
-                    this.w = node._gui.width;
-                    this.h = node._gui.height;
-                  } catch (error) {
-                    console.log("the dx7 has not proper width", error);
-                  }
-
+                  console.log("the dx7 has not proper width", error);
                 }
-
-                // the WC is added to the pbplugin wrapper
-                wrapper.appendChild(elem);
-                resolve(elem);
-
-
-                if (_settings) {
-                 node.setState(_settings); 
               }
-              });
-              console.log(this.nbNodeIn)
-              if (this.nbNodeIn > 0) {
+              this.node = node;
+              this.params = node.params;
 
-                // connect the node to the I/O of the pbplugin 
-                if (node instanceof AudioWorkletNode) pedal.soundNodeIn.connect(node);
-                // case the node is pure JS graph     ---> is resolved in PingPongDelay3, soon we'll keep the first way for everything
-                else pedal.soundNodeIn.connect(node.getInput(0));
+              // the WC is added to the pbplugin wrapper
+              wrapper.appendChild(elem);
+              console.log('nnnnnn NODE', node);
+
+              // _pluginInfos.node = node;
+              //this.pedalboard.setPluginInfos('ok');
+
+
+              /*
+                !!!!!!!! POUR SETTER LES PARAMS AUX PLUGINS !!!!!!!! (à faire une fois que les plugs sont TOUS chargés et connectés)
+              */
+              // if settings already exists, we loaded it
+              if (Object.keys(this.paramsLoaded).length > 0) {
+                console.log('changeSettings', this.paramsLoaded)
+                this.node.setState((this.paramsLoaded));
               }
 
-              
-              
-
-              node.connect(pedal.soundNodeOut);
-
+              //resolve({ params: node.params, node: node });
             });
 
-          }
-        });
-
-
+            if (this.nbNodeIn > 0) {
+              // connect the node to the I/O of the pbplugin 
+              if (node instanceof AudioWorkletNode) pedal.soundNodeIn.connect(node);
+              // case the node is pure JS graph     ---> is resolved in PingPongDelay3, soon we'll keep the first way for everything
+              else pedal.soundNodeIn.connect(node.getInput(0));
+            }
+            node.connect(pedal.soundNodeOut);
+          });
+        }
       });
-    }
+    };
 
   }
-
 </script>

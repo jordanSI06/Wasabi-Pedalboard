@@ -27,34 +27,37 @@
     static get observedAttributes() { return ['data-pedallist']; }
 
     // appelé lorsque l'un des attributs de l'élément personnalisé est ajouté, supprimé ou modifié.
-    attributeChangedCallback() {
+    attributeChangedCallback(name, oldValue, newValue) {
       console.log(`Custom element ${this.is} attributes changed.`);
       try {
-        this._pedalList = JSON.parse(this.getAttribute('data-pedallist'));
-        console.log(this._pedalList);
-
-        // Fetch the data from the API and call the render method 
-        Object.keys(this._pedalList).map(
-          (el, index) => {
-            this.render(this._pedalList[el]);
-          }
-        )
-
-      } catch (error) {
-        console.log(error);
-
+        // console.log(`name: ${name}`);
+        // console.log(`oldValue:`, oldValue);
+        // console.log(`newValue:`, newValue);
       }
-      try {
-        this.shadowRoot.querySelector("#div_tabs").querySelectorAll("label").forEach(l =>{
-          l.onclick = e => this.listeners(e);
-        })
-        this.shadowRoot.querySelector(".bt_pinViewTabs").onclick = e =>this.listeners(e);
-      } catch (error) {
-        console.log(error);
-
+      catch (err) {
+        console.log(err);
       }
-
-
+      if (newValue) {
+        try {
+          this._pedalList = JSON.parse(newValue);
+          // Fetch the data from the API and call the render method 
+          Object.keys(this._pedalList).map(
+            (el, index) => {
+              this.render(this._pedalList[el]);
+            }
+          )
+        } catch (error) {
+          console.log(error);
+        }
+        try {
+          this.shadowRoot.querySelector("#div_tabs").querySelectorAll("label").forEach(l => {
+            l.onclick = e => this.listeners(e);
+          })
+          this.shadowRoot.querySelector(".bt_pinViewTabs").onclick = e => this.listeners(e);
+        } catch (error) {
+          console.log(error);
+        }
+      }
     }
 
     // appelé lorsque l'élément personnalisé est déplacé vers un nouveau document
@@ -96,46 +99,45 @@
 
     listeners(event) {
       // viewPedalMenu
-        if (event.target.textContent === "") {
-          if (this.currentOpenedTab.status === "opened") {
-            this.shadowRoot.querySelector("#div_app").classList.add("bottomTabs");
-            this.currentOpenedTab.status = "closed";
-            // change character ^ to reverse
-            this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-less");
-          } else {
-            this.shadowRoot.querySelector("#div_app").classList.remove("bottomTabs");
-            this.currentOpenedTab.status = "opened";
-            this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-more");
-          }
-          // display default content
-          let checked = this.shadowRoot.querySelectorAll("[name='input-tab']:checked");
-          this.viewTabs(checked[0].value);
-          
-          return;
-        }
-        //clearTimeout(this.tabsAnimation);
-        if (this.shadowRoot.querySelector("#div_app").classList.contains("bottomTabs")) {
-          this.currentOpenedTab.name = event.target.textContent;
-          console.log(this.currentOpenedTab.name)
-
-          // the clicked tab corresponds to a closed dashaboard
-          // Let's open it by removing the CSS class bottomTabs
-          this.shadowRoot.querySelector("#div_app").classList.remove("bottomTabs");
-          this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-more");
-          this.currentOpenedTab.status = "opened";
+      if (event.target.textContent === "") {
+        if (this.currentOpenedTab.status === "opened") {
+          this.shadowRoot.querySelector("#div_app").classList.add("bottomTabs");
+          this.currentOpenedTab.status = "closed";
+          // change character ^ to reverse
+          this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-less");
         } else {
-          // The clicked tab corresponds to an opened dashboard. We close it only if it's a click
-          // on the current opened tab
-          if (this.currentOpenedTab.name === event.target.textContent) {
+          this.shadowRoot.querySelector("#div_app").classList.remove("bottomTabs");
+          this.currentOpenedTab.status = "opened";
+          this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-more");
+        }
+        // display default content
+        let checked = this.shadowRoot.querySelectorAll("[name='input-tab']:checked");
+        this.viewTabs(checked[0].value);
 
-            this.shadowRoot.querySelector("#div_app").classList.add("bottomTabs");
-            this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-less");
-            this.currentOpenedTab.status = "closed";
-          } else {
-            // We clicked on an oped tab that is different than the current one
-            // We do not close, but we need to set the new current opened tab
-            this.currentOpenedTab.name = event.target.textContent;
-          }
+        return;
+      }
+      //clearTimeout(this.tabsAnimation);
+      if (this.shadowRoot.querySelector("#div_app").classList.contains("bottomTabs")) {
+        this.currentOpenedTab.name = event.target.textContent;
+
+        // the clicked tab corresponds to a closed dashaboard
+        // Let's open it by removing the CSS class bottomTabs
+        this.shadowRoot.querySelector("#div_app").classList.remove("bottomTabs");
+        this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-more");
+        this.currentOpenedTab.status = "opened";
+      } else {
+        // The clicked tab corresponds to an opened dashboard. We close it only if it's a click
+        // on the current opened tab
+        if (this.currentOpenedTab.name === event.target.textContent) {
+
+          this.shadowRoot.querySelector("#div_app").classList.add("bottomTabs");
+          this.shadowRoot.querySelector("#icon_view").setAttribute("icon", "icons:expand-less");
+          this.currentOpenedTab.status = "closed";
+        } else {
+          // We clicked on an oped tab that is different than the current one
+          // We do not close, but we need to set the new current opened tab
+          this.currentOpenedTab.name = event.target.textContent;
+        }
 
       }
 
@@ -155,7 +157,6 @@
     }
 
     pedalDragStart(event) {
-      console.log("pedalDragStart", event.target.id);
       event.dataTransfer.setData("pedalId", event.target.id);
     }
 
