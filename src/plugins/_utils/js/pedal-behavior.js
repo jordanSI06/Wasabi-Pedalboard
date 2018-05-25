@@ -69,12 +69,12 @@
         let elem = this.shadowRoot.querySelector(".laPedale");
 
         // - input
-        if(!this.nbNodeIn == 0){
+     //   if(!this.nbNodeIn == 0){
         this.inputP = document.createElement("div");
         this.inputP.style.transform = 'scale(' + this.dataZoom + ')';
         this.inputP.classList.add("input");
         if (typeof this.nbNodeIn == "undefined" || (this.nbNodeIn > 0)) elem.appendChild(this.inputP);
-        }
+        //}
 
         // - output
         this.outputP = document.createElement("div");

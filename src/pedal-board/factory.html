@@ -80,12 +80,13 @@
           shadowRoot.appendChild(instance);
 
           // runBehavior is related to the I/O detection, and graphic behavior (drag and drop) for each pedals.
-          this.runBehaviorMethods();
           this.createAllInternNodes();
         }
 
         // ----- METHODS: CUSTOM -----
         createAllInternNodes() {
+
+          
           var pedal = this;
           var wrapper = this.shadowRoot.querySelector(".laPedale");
 
@@ -126,6 +127,7 @@
               // the WC is added to the pbplugin wrapper
               wrapper.appendChild(elem);
               console.log('nnnnnn NODE', node);
+              this.runBehaviorMethods();
 
               // _pluginInfos.node = node;
               //this.pedalboard.setPluginInfos('ok');
@@ -152,6 +154,7 @@
             node.connect(pedal.soundNodeOut);
           });
         }
+      
       });
     };
 
