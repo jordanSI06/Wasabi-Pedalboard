@@ -12,8 +12,8 @@ class Jack {
       y1 = oPos.y;
 
     let iPos = pedal2.getInputPos();
-    let x2 = iPos.x,
-      y2 = iPos.y;
+    let x2 = iPos.xpos[pedal2.bestInputNumber],
+      y2 = iPos.ypos[pedal2.bestInputNumber];
 
     this.id = "jack_" + pedal1.id + "_" + pedal2.id;
 
@@ -36,8 +36,9 @@ class Jack {
     let x1 = oPos.x,
       y1 = oPos.y;
     let iPos = this.p2.getInputPos();
-    let x2 = iPos.x,
-      y2 = iPos.y;
+    let x2 = iPos.xpos[p2.bestInputNumber],
+      y2 = iPos.ypos[p2.bestInputNumber];
+
 
     let _pos = {
       x1: x1,
@@ -53,6 +54,7 @@ class Jack {
     let pedalboard = this.p1.pedalboard;
     let posPedal1 = this.p1.getOutputPos();
     let posPedal2 = this.p2.getInputPos();
+    console.log(posPedal2);
 
     let wid = 0;
     if (open) wid = 70;
@@ -60,8 +62,8 @@ class Jack {
     let _pos = {
       x1: posPedal1.x,
       y1: posPedal1.y,
-      x2: (posPedal2.x + offestX),
-      y2: (posPedal2.y + offsetY)
+      x2: (posPedal2.xpos[p2.bestInputNumber] + offestX),
+      y2: (posPedal2.ypos[pedal2.bestInputNumber] + offsetY)
     }
     this.reviewSVGJack(_pos);
   }

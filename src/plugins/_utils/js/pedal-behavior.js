@@ -9,7 +9,7 @@
         this.dataZoom = 0.5;
 
         // elem html
-        this.inputP = "";
+        this.inputP = [];
         this.outputP = "";
 
         this.inputJacks = [];
@@ -21,8 +21,10 @@
         this.w = 0;
         this.h = 0;
 
-        this.nbNodeIn=1;
+        this.nbNodeIn="";
         this.nbNodeOut=1;
+
+        this.bestInputNumber;
         
         // relative position of input and output
         this.IOsize = 15;
@@ -68,13 +70,14 @@
 
         let elem = this.shadowRoot.querySelector(".laPedale");
 
-        // - input
-     //   if(!this.nbNodeIn == 0){
-        this.inputP = document.createElement("div");
-        this.inputP.style.transform = 'scale(' + this.dataZoom + ')';
-        this.inputP.classList.add("input");
-        if (typeof this.nbNodeIn == "undefined" || (this.nbNodeIn > 0)) elem.appendChild(this.inputP);
-        //}
+        console.log("this.nbNodeIn", this.nbNodeIn);
+        for (var i = 0; i < this.nbNodeIn; i++) {
+          this.inputP[i] = document.createElement("div");
+          this.inputP[i].style ='margin-top :'+20*i+'px';
+          this.inputP[i].style.transform = 'scale(' + this.dataZoom + ')';
+          this.inputP[i].classList.add("input");
+          if (typeof this.nbNodeIn == "undefined" || (this.nbNodeIn > 0)) elem.appendChild(this.inputP[i]);
+        }
 
         // - output
         this.outputP = document.createElement("div");
@@ -265,10 +268,13 @@
       }
 
       getInputPos() {
-        return {
-          x: this.x + this.IOsize / 2 + (-this.IOsize / 2),
-          y: this.y + this.IOsize / 2 + (this.IOsize - 4) + 12
+        var xpos = [];
+        var ypos=[];
+        for(var i=0; i<this.nbNodeIn;i++){
+           xpos[i] = this.x + this.IOsize / 2 + (-this.IOsize / 2);
+           ypos[i] = (this.y + this.IOsize / 2 + (this.IOsize - 4) + 12) + 20*i;
         }
+        return {xpos,ypos}
       }
 
       getOutputPos() {
@@ -303,14 +309,18 @@
         this.outputJacks.forEach((j) => j.update());
       }
 
-      highLightInput(flag) {
-        if (flag) this.inputP.style.backgroundColor = "rgba(255,255,255,0.4)";
-        else this.inputP.style.backgroundColor = null;
+      highLightInput(i,flag) {
+        if (flag){
+          this.inputP[i].style.backgroundColor = "red";
+        } 
+        else {
+          this.inputP[i].style.backgroundColor = null;
+        }
         this.inputHighlighted = flag;
       }
 
       highLightOutput(flag) {
-        // if(flag) this.output.style.backgroundColor = "rgba(255,255,255,0.4)";
+        //if(flag) this.output.style.backgroundColor = "red";
         // else this.output.style.backgroundColor = null;
         this.outputHighlighted = flag;
       }
