@@ -18,10 +18,10 @@ class PedalBoard extends HTMLElement {
 
 
     // getAudioPlugins
-    this.pluginList = [];
-    this.pluginConnected = [],
+    this.pluginConnected = [];
+    this.pluginSettings = [];
 
-      this.pIn;
+    this.pIn;
     this.pOut;
 
 
@@ -41,7 +41,7 @@ class PedalBoard extends HTMLElement {
     this.currentDraggablePedal = "";
     this.currentPedalOppened = "";
     this.pedalboardOrigin = [];
-    this.nbPedalsAdded = 0;
+    //this.nbPedalsAdded = 0;
 
     this.w = 0;
     this.h = 0;
@@ -74,8 +74,6 @@ class PedalBoard extends HTMLElement {
   // appelé lorsque l'un des attributs de l'élément personnalisé est ajouté, supprimé ou modifié.
   attributeChangedCallback() {
     console.log(`Custom element ${this.is} attributes changed.`);
-
-
   }
 
   // appelé lorsque l'élément personnalisé est déplacé vers un nouveau document
@@ -93,36 +91,23 @@ class PedalBoard extends HTMLElement {
   connectedCallback() {
     console.log(`Custom element ${this.is} added to page.`);
 
-
-
     // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
     const shadowRoot = this.attachShadow({ mode: `open` });
     const template = _currentDoc.querySelector(`template`);
     const instance = template.content.cloneNode(true);
     shadowRoot.appendChild(instance);
 
-    // this.soundSample = shadowRoot.querySelector("#soundSample");
     this.soundSample = shadowRoot.querySelector('wc-audio').shadowRoot.querySelector('audio');
-    console.log(" -------- this.soundSample ---", this.soundSample);
 
     this.w = this.offsetWidth;
     this.wO = this.w;
 
-    // this.h = this.offsetHeight;
     this.h = this.getBoundingClientRect().height;
-    console.log("-------- H --------");
-    console.log("-------- H --------");
-    console.log("-------- H --------");
-    console.log("-------- this.h ", this.h);
-    console.log("-------- H --------");
-    console.log("-------- H --------");
     this.hO = this.h;
 
-    //this.pIn = shadowRoot.querySelector("pedal-in");
     this.pIn = document.createElement('pedal-in');
     this.pIn.id = "pedalIn";
 
-    //this.pOut = shadowRoot.querySelector("pedal-out");
     this.pOut = document.createElement('pedal-out');
     this.pOut.id = "pedalOut";
 
@@ -155,20 +140,13 @@ class PedalBoard extends HTMLElement {
     this._pedalList = null;
     this.nbrcat = 0;
 
-
     // to add another repository  : Uncomment the promise.all block, set the urls and comment the "this.request" line
-
-
     Promise.all([this.request("https://webaudiomodules.org/repository.json"), this.request("https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo => {
-      console.log(repo.length);
       for (var i = 0; i < repo.length; i++) {
-        console.log(repo[i]);
         if (i == repo.length - 1) var lastrepo = true
         this.explorerepo(repo[i], lastrepo);
       }
     });
-
-    //this.request('https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json').then(repo =>this.explorerepo(repo, true))
   }
 
 
@@ -333,17 +311,14 @@ class PedalBoard extends HTMLElement {
   }
 
   addPedal(p) {
-    console.log("addPedal", p)
+    if (p.id != "pedalIn" && p.id != "pedalOut") p.className = "draggable";
+
     this.pedals.push(p);
-    if (p.id != "pedalIn" && p.id != "pedalOut") {
-      p.className = "draggable";
-      p.id = "p" + this.nbPedalsAdded;
-      this.nbPedalsAdded++;
-    }
+
     p.pedalboard = this;
 
-    //console.log("this", this.shadowRoot.querySelector("#slot"));
     this.appendChild(p);
+    //this.insertAdjacentElement('beforeEnd',p);
 
     // For the jack menu to appear
     this.handleJackMenu(p);
@@ -356,8 +331,6 @@ class PedalBoard extends HTMLElement {
 
       if (jacksIn.length > 0) {
         for (let i = jacksIn.length - 1; i >= 0; i--) {
-          // console.log("jacksIn[i].p1", jacksIn[i].p1);
-          // console.log("jacksIn[i].p2", jacksIn[i].p2);
           this.disconnect(jacksIn[i].p1, jacksIn[i].p2);
         }
       }
@@ -379,6 +352,7 @@ class PedalBoard extends HTMLElement {
   }
 
   connect(p1, p2) {
+    console.log(p1, p2);
     // si p1_Out && p2_In existent (>1) alors la connexion est possible
     if (this.isConnexionPossible(p1.nbNodeOut, p2.nbNodeIn)) {
       let j = new Jack();
@@ -388,8 +362,7 @@ class PedalBoard extends HTMLElement {
       this.soundNodeConnection(p1, p2);
 
       // add connexion for "this.pluginConnected"
-      this.pluginConnected.push({in:p2.id,out:p1.id});
-      console.log('this.pluginConnected',this.pluginConnected);
+      this.pluginConnected.push({ in: p2.id, out: p1.id });
     }
   }
 
@@ -416,13 +389,12 @@ class PedalBoard extends HTMLElement {
     this.soundNodeDisconnection(p1, p2);
 
     // remove connexion from "this.pluginConnected"
-    for (let i=0;i<this.pluginConnected.length;i++){
-      if (this.pluginConnected[i].in==p2.id && this.pluginConnected[i].out==p1.id){
-        this.pluginConnected.splice(i,1);
+    for (let i = 0; i < this.pluginConnected.length; i++) {
+      if (this.pluginConnected[i].in == p2.id && this.pluginConnected[i].out == p1.id) {
+        this.pluginConnected.splice(i, 1);
         break;
       }
     }
-    console.log('this.pluginConnected',this.pluginConnected);
   }
 
   getPedalFromHtmlElem(elem) {
@@ -610,7 +582,6 @@ class PedalBoard extends HTMLElement {
 
     } catch (error) {
       console.log("the plugin has no input", error)
-
     }
 
   }
@@ -942,78 +913,10 @@ class PedalBoard extends HTMLElement {
   }
 
   dragPedalHandler(e) {
-    console.log("dragPedalHandler");
     e.preventDefault();
     return false;
   }
 
-
-
-
-  dropPedalHandler(e) {
-    var liste
-    console.log("dropPedalHandler");
-    GlobalContext.context.resume();
-    // Generate a unique id for the pedal, handle case for multiple instances of the same pedal
-    let id = e.dataTransfer.getData("pedalId");
-    console.log(id);
-    var all = JSON.parse(this.shadowRoot.querySelector('wc-tabspedals').getAttribute('data-pedallist'));
-    var target = {
-      baseUrl: "",
-      Thumbnail: "",
-      classname: ""
-    };
-    console.log(`id = ${id}`);
-
-
-    for (var cat in all) {
-      if (all.hasOwnProperty(cat)) {
-        const categories = all[cat];
-        for (var content in categories.contents) {
-          if (categories.contents.hasOwnProperty(content)) {
-            if (id == categories.contents[content].id) {
-              target.baseUrl = categories.contents[content].BaseUrl;
-              console.log(target.baseUrl);
-              target.Thumbnail = categories.contents[content].Thumbnail;
-              target.classname = categories.contents[content].classname;
-            }
-          }
-        }
-      }
-    }
-
-    // check if plugin was already imported or not
-    let isImported = document.querySelector(`script[src="${target.baseUrl}/main.js"]`);
-    if (isImported) {
-      console.log(isImported);
-
-      // add pedal
-      let p = document.createElement(id);
-      p.setPosition(e.clientX - 30, event.clientY - 10);
-      this.addPedal(p);
-    } else {
-      console.log('not imported - we create import dynamically');
-
-      this.addImportLink(target.baseUrl, id, this, e, event, target);
-    }
-
-  }
-
-
-  // from https://www.html5rocks.com/en/tutorials/webcomponents/imports/
-  // A PLACER DANS LE ADD PEDAL : addImportLink => addPedal
-  addImportLink(url, id, _this, _e, _event, target) {
-    var script = document.createElement('script');
-    script.src = url + `/main.js`;
-    script.onload = (e) => {
-      console.log('target.classname', target.classname);
-      this.factory.createPedal(id, target.classname, url);
-      let p = document.createElement(id);
-      p.setPosition(_e.clientX - 30, _event.clientY - 10);
-      _this.addPedal(p);
-    };
-    document.head.appendChild(script);
-  }
 
 
 
@@ -1046,36 +949,96 @@ class PedalBoard extends HTMLElement {
     return target;
   }
 
-  addImportLinkNEW(p, _this) {
+
+  // from https://www.html5rocks.com/en/tutorials/webcomponents/imports/
+  // A PLACER DANS LE ADD PEDAL : addImportLink => addPedal
+  dropPedalHandler(e) {
+    let p = {
+      id: `p_${Date.now()}`,
+      type: e.dataTransfer.getData("pedalId"),
+      position: { x: e.clientX - 30, y: event.clientY - 10 },
+      settings: {}
+    }
+    this.loadPlugin(p);
+  }
+
+  loadPlugin(p) {
     return new Promise((resolve, reject) => {
-      let id = p.type;
-      let _pos = { x: p.position.left, y: p.position.top };
+      console.log('--------------------------');
+      console.log('==> PLUGIN INFOS', p);
+      console.log('--------------------------');
+      // WE LOAD: type, id, positions, settings, connexions (we'll be treated this after plugins were loaded)
+      // - id
+      let _id = p.id;
+      // - settings
       let _settings = p.settings;
-      console.log('------ _settings ------', _settings);
+      // - type
+      let _tagName = p.type;
+      let target = this.getTarget(_tagName);
+      // - position
+      let _pos = { x: p.position.x, y: p.position.y };
 
-      let target = this.getTarget(id);
-      let isImported = document.querySelector(`script[src="${target.baseUrl}/main.js"]`);
-      if (isImported) {
+
+
+      let _promise = new Promise((_resolve, _reject) => {
+        // script was already loaded
+        if (document.querySelector(`script[src="${target.baseUrl}/main.js"]`)) _resolve(true);
+        else {
+          // script was never loaded -> we create it
+          var script = document.createElement('script');
+          script.src = target.baseUrl + `/main.js`;
+          script.async = true;
+          script.onload = (e) => {
+            // create webcomponent plugin + setSettings
+            this.factory.createPedal(_tagName, target.classname, target.baseUrl)
+            // .then(res=>{
+            //   console.log('RES',res);
+            // })
+            _resolve(true);
+          };
+          document.head.appendChild(script);
+        }
+      }).then(async res => {
         // add pedal
-        let p = document.createElement(id);
-        p.setPosition(_pos.x, _pos.y);
-        this.addPedal(p);
-
-        resolve(true);
-      } else {
-        var script = document.createElement('script');
-        script.src = target.baseUrl + `/main.js`;
-        script.onload = (e) => {
-          this.factory.createPedal(id, target.classname, target.baseUrl, _settings).then(e => resolve(true));
-
-          let p = document.createElement(id);
-          p.setPosition(_pos.x, _pos.y);
-          _this.addPedal(p);
-        };
-        document.head.appendChild(script);
-      }
+        let plug = document.createElement(_tagName);
+        //plug.setAttribute('params', JSON.stringify(_settings));
+        plug.id = _id;
+        plug.setPosition(_pos.x, _pos.y);
+        this.addPedal(plug);
+        await this.sleep(300).then(e => console.log(e));
+        console.log('finished to sleep');
+        resolve(plug);
+      });
     })
   }
+
+  sleep(_mms) {
+    return new Promise((resolve, reject) => {
+      setTimeout(()=>resolve(_mms),_mms);
+    })
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1118,15 +1081,10 @@ class PedalBoard extends HTMLElement {
     this.sound.mediaSource.connect(this.sound.gainNodeIn);
     this.sound.mediaSource.connect(this.sound.gainNodeInMid);
 
-    //this.monoMediaSourceM.connect(this.sound.gainNodeIn);
     this.sound.gainNodeOut.connect(this.sound.audioDestination);
-    //
+
     this.sound.gainNodeIn.connect(this.meter1);
     this.sound.gainNodeInMid.connect(this.meter3);
-    // this.sound.mediaSource.connect(this.meter1);
-    // this.sound.mediaSource.connect(this.meter3);
-
-    //console.log(this.nbPedalsAdded);
 
     if (navigator.mediaDevices.getUserMedia) {
       var constraints = {
@@ -1136,7 +1094,6 @@ class PedalBoard extends HTMLElement {
           mozAutoGainControl: false
         }
       };
-      console.log("1 : navigator.mediaDevices", navigator.mediaDevices);
       navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
         window.stream = stream;
         this.sound.mediaSourceM = this.sound.context.createMediaStreamSource(stream);
@@ -1170,7 +1127,6 @@ class PedalBoard extends HTMLElement {
       GlobalContext.context.resume();
       // 1 : connected
       if (e.target.value) {
-        console.log('audio input enabled');
 
         if (this.pedals[0].outputJacks.length != 0) {
           this.pedals[0].outputJacks.forEach((j) => {
@@ -1187,7 +1143,6 @@ class PedalBoard extends HTMLElement {
 
         // 0 : disconnected
       } else {
-        console.log('mic disabled');
 
         if (this.pedals[0].outputJacks.length != 0) {
           this.pedals[0].outputJacks.forEach((j) => {
@@ -1227,13 +1182,10 @@ class PedalBoard extends HTMLElement {
           this.sound.gainNodeInMid.gain.value = (1 / volumeMax) / 2.;
           this.sound.gainNodeIn.gain.value = this.sound.gainNodeInMid.gain.value;
           this.maxInputGain = this.sound.gainNodeInMid.gain.value;
-          console.log("this.maxInputGain = " + this.maxInputGain);
           this.shadowRoot.querySelector("#knob_In_midi").max = 2 * this.maxInputGain;
           this.shadowRoot.querySelector("#knob_In_midi").setValue(this.maxInputGain, true);
           this.shadowRoot.querySelector("#knob_In").max = 2 * this.maxInputGain;
           this.shadowRoot.querySelector("#knob_In").setValue(this.maxInputGain, true);
-          //console.log("changed max and value of this.shadowRoot.querySelector("#knob_In_midi to " + this.shadowRoot.querySelector("#knob_In_midi.max + " and " + this.shadowRoot.querySelector("#knob_In_midi.value);
-
           window.clearInterval(_interval);
         }
       }, 100);
@@ -1244,7 +1196,6 @@ class PedalBoard extends HTMLElement {
     if (window.stream) {
       window.stream.getTracks().forEach(function (track) {
         track.stop();
-        console.log("changeStreamAsInputInGraph : stopped track");
       });
     }
     var constraints = {
@@ -1267,34 +1218,21 @@ class PedalBoard extends HTMLElement {
   soundNodeConnection(p1, p2) {
     if (p1.id == "pedalIn" && p2.id == "pedalOut") {
       if (this.sound.state == 0) {
-        //this.sound.mediaSource.connect(this.sound.gainNodeIn);
         this.sound.gainNodeIn.connect(this.sound.gainNodeOut);
         this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
-
-        //this.sound.gainNodeOut.connect(this.sound.audioDestination);
       } else {
-        //this.monoMediaSourceM.connect(this.sound.gainNodeIn);
         this.sound.gainNodeInMid.connect(this.sound.gainNodeOut);
         this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
-
-        //this.sound.gainNodeOut.connect(this.sound.audioDestination);
       }
     } else if (p1.id == "pedalIn") {
       if (this.sound.state == 0) {
-        //this.sound.mediaSource.connect(this.sound.gainNodeIn);
         this.sound.gainNodeIn.connect(p2.soundNodeIn);
-        // console.log(p2.elem.soundNodeIn);
-        // console.log(p2.soundNodeIn);
       } else {
-        //his.monoMediaSourceM.connect(this.sound.gainNodeIn);
         this.sound.gainNodeInMid.connect(p2.soundNodeIn);
       }
     } else if (p2.id == "pedalOut") {
-      //console.log("p1.elem.soundNodeOut : ", p1.elem.soundNodeOut);
-      //p1.soundNodeOut.connect(this.meter2);
       p1.soundNodeOut.connect(this.sound.gainNodeOut);
       this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
-      //this.sound.gainNodeOut.connect(this.sound.audioDestination);
     } else {
       p1.soundNodeOut.connect(p2.soundNodeIn);
     }
@@ -1303,36 +1241,21 @@ class PedalBoard extends HTMLElement {
   soundNodeDisconnection(p1, p2) {
     if (p1.id == "pedalIn" && p2.id == "pedalOut") {
       if (this.sound.state == 0) {
-        //this.sound.mediaSource.disconnect(this.sound.gainNodeIn);
         this.sound.gainNodeIn.disconnect(this.sound.gainNodeOut);
-        //this.sound.gainNodeOut.disconnect(this.sound.audioDestination);
       } else {
-        //this.sound.mediaSourceM.disconnect(this.sound.audioDestination);
-
         this.sound.gainNodeInMid.disconnect(this.sound.gainNodeOut);
-        // this.monoMediaSourceM.disconnect(this.sound.gainNodeIn);
-        // this.sound.gainNodeIn.disconnect(this.sound.gainNodeOut);
-        // this.sound.gainNodeOut.disconnect(this.sound.audioDestination);
       }
     } else if (p1.id == "pedalIn") {
       if (this.sound.state == 0) {
-        //this.sound.mediaSource.disconnect(this.sound.gainNodeIn);
         this.sound.gainNodeIn.disconnect(p2.soundNodeIn);
       } else {
-        //this.sound.mediaSourceM.disconnect(p2.elem.soundNodeIn);
-        //this.monoMediaSourceM.disconnect(this.sound.gainNodeIn);
         this.sound.gainNodeInMid.disconnect(p2.soundNodeIn);
       }
     } else if (p2.id == "pedalOut") {
       p1.soundNodeOut.disconnect(this.sound.gainNodeOut);
-      //this.sound.gainNodeOut.disconnect(this.sound.audioDestination);
     } else {
       p1.soundNodeOut.disconnect(p2.soundNodeIn);
     }
   }
 }
 customElements.define(`pedal-board`, PedalBoard);
-
-
-
-// })();

@@ -53,9 +53,6 @@
       //  this.inputP=_inputP;
       // }
       runBehaviorMethods() {
-
-        console.log("-------- ready -----");
-        console.log(this.isOn);
         /*
         once all is loaded, we create bases elements of pedals :
         -  delete knob
@@ -76,7 +73,6 @@
         this.inputP = document.createElement("div");
         this.inputP.style.transform = 'scale(' + this.dataZoom + ')';
         this.inputP.classList.add("input");
-        console.log("this.nbNodeIn", this.nbNodeIn);
         if (typeof this.nbNodeIn == "undefined" || (this.nbNodeIn > 0)) elem.appendChild(this.inputP);
         }
 
@@ -84,7 +80,6 @@
         this.outputP = document.createElement("div");
         this.outputP.style.transform = 'scale(' + this.dataZoom + ')';
         this.outputP.classList.add("output");
-        console.log("this.nbNodeOut", this.nbNodeOut);
         if (typeof this.nbNodeOut == "undefined" || (this.nbNodeOut > 0)) elem.appendChild(this.outputP);
 
 
@@ -124,6 +119,13 @@
         this.style.left = x + "px";
         this.style.top = y + "px";
       }
+      
+      // getPosition(){
+      //   return {
+      //     x:this.style.left,
+      //     y:this.style.top
+      //   }
+      // }
 
       /** The abstract functions every pedal must override **/
       createAllInternNodes() { }
@@ -150,7 +152,6 @@
       connect(src, destination) {
         this.connectIn(src);
         this.connectOut(destination);
-        console.log("destination",destination);
       }
 
       /**

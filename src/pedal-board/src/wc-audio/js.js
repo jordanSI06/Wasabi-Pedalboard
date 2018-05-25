@@ -119,7 +119,6 @@
     listeners() {
       const soundSample = this.shadowRoot.querySelector('#soundSample');
       this.shadowRoot.querySelector('#select_audio').onchange = (e) => {
-        console.log(e.target.value);
         if (e.target.value === "---------------") {
 
         } else if (e.target.value === "UPLOAD") {
@@ -130,7 +129,6 @@
           soundSample.load();
           soundSample.play();
           soundSample.onplay = function (e) {
-            console.log(GlobalContext.context);
             GlobalContext.context.resume();
           }
         }
@@ -140,7 +138,6 @@
       this.shadowRoot.querySelector('#input-file').onchange = (e) => {
         filename = e.currentTarget.files[0].name;
         extension = filename.split('.').pop();
-        console.log(extension);
 
         if (extension === "mid") {
           // var reader = new FileReader();
@@ -154,7 +151,6 @@
           soundSample.load();
           soundSample.play();
           soundSample.onplay = function (e) {
-            console.log(GlobalContext.context);
             GlobalContext.context.resume();
           }
         }

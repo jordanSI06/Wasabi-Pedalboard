@@ -71,7 +71,7 @@
 
       // customListeners
       this.bankSelected = '';
-      this.plugsConnexions='';
+      this.plugsConnexions = '';
 
       //
       if (localStorage.getItem('banks')) this.banks = JSON.parse(localStorage.getItem('banks'));
@@ -83,22 +83,6 @@
     }
 
 
-    listeners() {
-      // button savePreset
-      this.bt_openDialog.onclick = (e) => this.openDialog();
-      this.bt_closeDialog.onclick = (e) => this.closeDialog();
-      this.bt_saveBank.onclick = (e) => this.addNewBank();
-      this.bt_savePreset.onclick = (e) => this.savePreset();
-
-    }
-
-    openDialog() {
-      this.div_dialog.classList.remove('hidden');
-    }
-    closeDialog() {
-      this.div_dialog.classList.add('hidden');
-    }
-
     loadBanks() {
       this.nav_banks.innerHTML = '';
       Object.keys(this.banks).map(
@@ -109,10 +93,24 @@
       this.selectBanksListeners();
     }
 
+    listeners() {
+      // button savePreset
+      this.bt_openDialog.onclick = (e) => this.openDialog();
+      this.bt_closeDialog.onclick = (e) => this.closeDialog();
+      this.bt_saveBank.onclick = (e) => this.addNewBank();
+      this.bt_savePreset.onclick = (e) => this.savePreset();
+    }
+
+    openDialog() {
+      this.div_dialog.classList.remove('hidden');
+    }
+    closeDialog() {
+      this.div_dialog.classList.add('hidden');
+    }
+
     loadPresets() {
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
       let _presets = bankSelected.presets;
-      console.log(_presets);
       this.nav_presets.innerHTML = '';
       Object.keys(_presets).map(
         (elem, index) => {
@@ -122,44 +120,63 @@
       this.selectPresetsListeners();
     }
 
+    renderLink(_json) {
+      return `<a href='#' id='${_json._id}' value='${_json.label}'>${_json.label}</a>`;
+    }
+
     loadPreset() {
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
       this.plugs = bankSelected.presets.find(item => item._id == this.presetSelected).plugs;
       this.plugsConnexions = bankSelected.presets.find(item => item._id == this.presetSelected).connexions;
-      console.log('LOADING',bankSelected.presets.find(item => item._id == this.presetSelected));
-      console.log(`START: LOAD PRESET ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
+      //console.log('LOADING',bankSelected.presets.find(item => item._id == this.presetSelected));
+      //console.log(`START: LOAD PRESET ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
 
       this.nbPluginTraitee = 0;
-      this.loadPlugin(this.plugs[0]);
+
+      //this.pedalboard.loadPresets(this.plugs);
+      this.loadNewPlugin(this.plugs[0]);
     }
 
-    loadPlugin(p) {
-      this.pedalboard.addImportLinkNEW(p, this.pedalboard).then(e => {
+    loadNewPlugin(p) {
+      this.pedalboard.loadPlugin(p).then(plugin => {
+        // console.log('plugin',plugin);
+        // console.log('p.settings',p.settings);
+        // plugin.setAttribute('params', JSON.stringify(p.settings));
+        console.log('----- !!!! PLUGIN LOADED !!!!! -----', plugin);
+        console.log('NEXT : -----{{{{ this.nbPluginTraitee----- }}}}}', this.nbPluginTraitee);
         this.nbPluginTraitee += 1;
-        if (this.nbPluginTraitee < this.plugs.length) this.loadPlugin(this.plugs[this.nbPluginTraitee]);
-        else {
-          console.log(`END: ALL ${this.nbPluginTraitee} PLUGINS WERE LOADED`);
-          this.loadConnexions();
-        }
+        if (this.nbPluginTraitee < this.plugs.length) this.loadNewPlugin(this.plugs[this.nbPluginTraitee]);
+        else this.loadConnexions();
       })
     }
 
-    loadConnexions(){
-      //console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
-      for (let i=0;i<this.plugsConnexions.length;i++){
-        this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`),this.pedalboard.querySelector(`#${this.plugsConnexions[i].in}`));
+    async loadConnexions() {
+      console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
+      for (let i = 0; i < this.plugsConnexions.length; i++) {
+        this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in}`));
+      }
+      await this.sleep(1000);
+      console.log('finished to sleep');
+      for (let i=0;i<this.plugs.length;i++){
+        console.log(this.plugs[i]);
+        this.pedalboard.querySelector(`#${this.plugs[i].id}`).setAttribute('params', JSON.stringify(this.plugs[i].settings));
       }
     }
 
+    sleep(_mms){
+      return new Promise((resolve,reject)=>{
+        setTimeout(()=>resolve(_mms),_mms);
+      })
+    }
     selectBanksListeners() {
       this.nav_banks.querySelectorAll('a').forEach(e => {
-        console.log('a', e);
+        //console.log('a', e);
         e.onclick = (e) => this.selectBank(e.target.id);
       })
     }
 
     selectBank(_id) {
-      console.log('selectBank', _id);
+      //console.log('selectBank', _id);
       this.nav_banks.querySelectorAll('a').forEach(e => {
         if (e.id == _id) {
           e.classList.add('a_selected');
@@ -171,16 +188,15 @@
       })
     }
 
-
     selectPresetsListeners() {
       this.nav_presets.querySelectorAll('a').forEach(e => {
-        console.log('a', e);
+        //console.log('a', e);
         e.onclick = (e) => this.selectPreset(e.target.id);
         e.ondblclick = (e) => this.loadPreset();
       })
     }
+
     selectPreset(_id) {
-      console.log('selectPreset', _id);
       this.nav_presets.querySelectorAll('a').forEach(e => {
         if (e.id == _id) {
           e.classList.add('a_selected');
@@ -199,10 +215,6 @@
 
     clearBanks() {
       localStorage.clear();
-    }
-
-    renderLink(_json) {
-      return `<a href='#' id='${_json._id}' value='${_json.label}'>${_json.label}</a>`;
     }
 
     addNewBank() {
@@ -228,33 +240,47 @@
     savePreset() {
       let _presetName = this.input_presetName.value.trim();
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
-      let _newPreset = {};
-      let _currentPlugs = this.pedalboard.pluginList;
-      let _currentConnexions= this.pedalboard.pluginConnected;
-      
-      // get good positions
-      let _plugin='';
-      _currentPlugs.forEach(e=>{
-        _plugin=this.pedalboard.querySelector('#'+e.id);
-        e.position.left=_plugin.x;
-        e.position.top=_plugin.y;
-      });
 
-      console.log('END FOREACH',_currentPlugs);
+      let _currentPlugs = [];
+      let _currentConnexions = this.pedalboard.pluginConnected;
+
+      let _plugin = '';
+      let _plugsToSave = {};
+      let _settings = [];
+      for (let i = 0; i < this.pedalboard.pedals.length; i++) {
+        _plugin = this.pedalboard.pedals[i];
+        _settings = [];
+        if (_plugin.id != "pedalIn" && _plugin.id != "pedalOut") {
+          _settings = _plugin.params;
+          console.log(`#${_plugin.id}`, _settings);
+
+          _plugsToSave = {
+            id: _plugin.id,
+            type: _plugin.tagName.toLowerCase(),
+            position: {
+              x: _plugin.x,
+              y: _plugin.y
+            },
+            settings: _settings
+          }
+
+          _currentPlugs.push(_plugsToSave);
+        }
+      }
 
       if (!bankSelected.presets.find(item => item.label == _presetName)) {
-        console.log('preset not exist');
+        //console.log('preset not exist');
 
         let _newPreset = {
           "_id": `${Date.now()}_preset`,
           "label": `${_presetName}`,
           "date": `${new Date().toJSON().slice(0, 10)}`,
           "plugs": _currentPlugs,
-          "connexions":_currentConnexions
+          "connexions": _currentConnexions
         }
         bankSelected.presets.push(_newPreset);
       } else {
-        console.log('preset exist', bankSelected.presets.find(item => item.label == _presetName));
+        //console.log('preset exist', bankSelected.presets.find(item => item.label == _presetName));
         // Not every plugin have an "params" getter, you need to try catch when using it
         bankSelected.presets.find(item => item._id == this.presetSelected).plugs = _currentPlugs;
         bankSelected.presets.find(item => item._id == this.presetSelected).connexions = _currentConnexions;
