@@ -15,6 +15,8 @@
       // Ecrire la fonctionnalité de l'élément ici
       this.w = 20;
       this.h = 20;
+      this.nbNodeIn =1;
+      this.nbNodeOut=1;
     }
 
     get is() { return this.nodeName.toLowerCase(); }
