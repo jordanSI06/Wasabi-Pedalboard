@@ -36,8 +36,8 @@ class Jack {
     let x1 = oPos.x,
       y1 = oPos.y;
     let iPos = this.p2.getInputPos();
-    let x2 = iPos.xpos[p2.bestInputNumber],
-      y2 = iPos.ypos[p2.bestInputNumber];
+    let x2 = iPos.xpos[this.p2.bestInputNumber],
+      y2 = iPos.ypos[this.p2.bestInputNumber];
 
 
     let _pos = {
