@@ -10,7 +10,7 @@
 
         // elem html
         this.inputP = [];
-        this.outputP = "";
+        this.outputP = [];
 
         this.inputJacks = [];
         this.outputJacks = [];
@@ -25,6 +25,10 @@
         this.nbNodeOut="";
 
         this.bestInputNumber = 0;
+        this.bestOutputNumber = 0;
+
+        // this.inputHighlighted = [];
+        // this.outputHighlighted = [];
         
         // relative position of input and output
         this.IOsize = 15;
@@ -80,11 +84,15 @@
         }
 
         // - output
-        this.outputP = document.createElement("div");
-        this.outputP.style.transform = 'scale(' + this.dataZoom + ')';
-        this.outputP.classList.add("output");
-        if (typeof this.nbNodeOut == "undefined" || (this.nbNodeOut > 0)) elem.appendChild(this.outputP);
+        console.log("this.nbNodeOut", this.nbNodeOut);
 
+        for (var i = 0; i < this.nbNodeOut; i++) {
+          console.log("here?");
+        this.outputP[i] = document.createElement("div");
+        this.outputP[i].style.transform = 'scale(' + this.dataZoom + ')';
+        this.outputP[i].classList.add("output");
+        if (typeof this.nbNodeOut == "undefined" || (this.nbNodeOut > 0)) elem.appendChild(this.outputP[i]);
+        }
 
         if (this.classList.contains("draggable")) {
           // - bouton delete
@@ -278,10 +286,13 @@
       }
 
       getOutputPos() {
-        return {
-          x: this.x + this.IOsize / 2 + (this.w + 2 * this.IOsize - 2),
-          y: this.y + this.IOsize / 2 + (this.IOsize) + 8
+        var xpos = [];
+        var ypos=[];
+        for(var i=0; i<this.nbNodeOut;i++){
+          xpos[i] =  this.x + this.IOsize / 2 + (this.w + 2 * this.IOsize - 2),
+          ypos[i] =  this.y + this.IOsize / 2 + (this.IOsize) + 8
         }
+        return {xpos,ypos}
       }
 
       // ---------------------- JACK ---------------------------------
@@ -319,10 +330,10 @@
         this.inputHighlighted = flag;
       }
 
-      highLightOutput(flag) {
-        //if(flag) this.output.style.backgroundColor = "red";
-        // else this.output.style.backgroundColor = null;
-        this.outputHighlighted = flag;
+      highLightOutput(i,flag) {
+        if(flag) this.outputP[i].style.backgroundColor = "red";
+         else this.outputP[i].style.backgroundColor = null;
+        this.outputHighlighted= flag;
       }
 
 

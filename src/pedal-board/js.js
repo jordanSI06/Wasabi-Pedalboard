@@ -450,10 +450,13 @@ class PedalBoard extends HTMLElement {
         }
       }
 
-      let distOutput = this.distance(x, y, oPos.x, oPos.y);
+      let distOutput = []
+      for (var i = 0; i < oPos.xpos.length; i++) {
+        distOutput[i] = this.distance(x, y, oPos.xpos[i], oPos.ypos[i]);
+      }
+      
       // It depends if we're trying to plug a jack or not
       let bestInputDistance = 100;
-      p.bestInputNumber = 0;
       for (var i = 0; i < distInput.length; i++) {
         if (distInput[i] < bestInputDistance) {
           bestInputDistance = distInput[i];
@@ -467,11 +470,17 @@ class PedalBoard extends HTMLElement {
       }
 
 
-
+      let bestOutputDistance = 100;
+      for (var i = 0; i < distOutput.length; i++) {
+        if (distOutput[i] < bestOutputDistance) {
+          bestOutputDistance = distOutput[i];
+          p.bestOutputNumber = i;
+        }
+      }
       if (distOutput < 40) {
-        if (!p.outputHighlighted) p.highLightOutput(true);
+        if (!p.outputHighlighted) p.highLightOutput(p.bestOutputNumber,true);
       } else {
-        if (p.outputHighlighted) p.highLightOutput(false);
+        if (p.outputHighlighted) p.highLightOutput(p.bestOutputNumber,false);
       }
     });
   }
@@ -577,26 +586,30 @@ class PedalBoard extends HTMLElement {
     let closest = this.findClosestIO(mouseX, mouseY);
   }
 
+  addInputOpenClass(p,i,input){
+    p.inputP[i].addEventListener("click", (e) => {
+      e.preventDefault();
+
+      input = p.inputP[i];
+      this.currentPedalOppened = p;
+      if (input.getAttribute("open") && (input.getAttribute("open") == 'true')) {
+        input.setAttribute("open", false);
+      } else {
+        input.setAttribute("open", true);
+      }
+      if (p.inputJacks.length > 1) {
+        this.createMenuItems(p.inputJacks, input.getAttribute("open") === 'true');
+      }
+    });
+  }
+
   handleJackMenu(p) {
     // clic on an input
-    console.log(p.nbNodeIn);
-    let input = "";
+    var input = "";
     try {
-      console.log("apirgbaeprogbaerg",p.inputP);
-      p.inputP[0].addEventListener("click", (e) => {
-        e.preventDefault();
-
-        input = p.inputP[0];
-        this.currentPedalOppened = p;
-        if (input.getAttribute("open") && (input.getAttribute("open") == 'true')) {
-          input.setAttribute("open", false);
-        } else {
-          input.setAttribute("open", true);
-        }
-        if (p.inputJacks.length > 1) {
-          this.createMenuItems(p.inputJacks, input.getAttribute("open") === 'true');
-        }
-      });
+      for(var i=0;i<p.inputP.length;i++){
+        this.addInputOpenClass(p,i,input);
+      }      
 
     } catch (error) {
       console.log("the plugin has no input", error)
@@ -662,8 +675,8 @@ class PedalBoard extends HTMLElement {
   }
 
   removeJack(loc, sourcePedal) {
-    let x1 = sourcePedal.getOutputPos().x;
-    let y1 = sourcePedal.getOutputPos().y;
+    let x1 = sourcePedal.getOutputPos().xpos[sourcePedal.bestOutputNumber];
+    let y1 = sourcePedal.getOutputPos().ypos[sourcePedal.bestOutputNumber];
     let _pos = {
       x1: x1,
       y1: y1,
@@ -687,7 +700,6 @@ class PedalBoard extends HTMLElement {
   mouseDownDraggable(e) {
     // Computes the location of the mouse in the SVG canvas
     var loc = this.cursorPoint(e);
-
     // e.preventDefault();
     // e.stopPropagation();
 
@@ -983,9 +995,6 @@ class PedalBoard extends HTMLElement {
 
   loadPlugin(p) {
     return new Promise((resolve, reject) => {
-      console.log('--------------------------');
-      console.log('==> PLUGIN INFOS', p);
-      console.log('--------------------------');
       // WE LOAD: type, id, positions, settings, connexions (we'll be treated this after plugins were loaded)
       // - id
       let _id = p.id;

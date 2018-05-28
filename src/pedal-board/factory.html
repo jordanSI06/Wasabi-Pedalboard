@@ -96,8 +96,10 @@
           // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
           // LOAD NODE
           this.plugin.load().then((node) => {
-            this.nbNodeOut = node.numberOfOutputs;
             this.nbNodeIn = node.numberOfInputs;
+            this.nbNodeOut = node.numberOfOutputs;
+            console.log("in : ",node.numberOfInputs," out : ",node.numberOfOutputs )
+
 
             // LOAD GUI
             this.plugin.loadGui().then((elem) => {
