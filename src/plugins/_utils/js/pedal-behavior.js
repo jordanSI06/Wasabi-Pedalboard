@@ -24,7 +24,7 @@
         this.nbNodeIn="";
         this.nbNodeOut="";
 
-        this.bestInputNumber;
+        this.bestInputNumber = 0;
         
         // relative position of input and output
         this.IOsize = 15;
