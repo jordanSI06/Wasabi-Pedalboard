@@ -87,8 +87,8 @@
         console.log("this.nbNodeOut", this.nbNodeOut);
 
         for (var i = 0; i < this.nbNodeOut; i++) {
-          console.log("here?");
         this.outputP[i] = document.createElement("div");
+        this.outputP[i].style ='margin-top :'+20*i+'px';
         this.outputP[i].style.transform = 'scale(' + this.dataZoom + ')';
         this.outputP[i].classList.add("output");
         if (typeof this.nbNodeOut == "undefined" || (this.nbNodeOut > 0)) elem.appendChild(this.outputP[i]);

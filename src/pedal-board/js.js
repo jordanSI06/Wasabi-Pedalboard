@@ -450,7 +450,7 @@ class PedalBoard extends HTMLElement {
         }
       }
 
-      let distOutput = []
+      var distOutput = []
       for (var i = 0; i < oPos.xpos.length; i++) {
         distOutput[i] = this.distance(x, y, oPos.xpos[i], oPos.ypos[i]);
       }
@@ -477,7 +477,7 @@ class PedalBoard extends HTMLElement {
           p.bestOutputNumber = i;
         }
       }
-      if (distOutput < 40) {
+      if (bestOutputDistance < 40) {
         if (!p.outputHighlighted) p.highLightOutput(p.bestOutputNumber,true);
       } else {
         if (p.outputHighlighted) p.highLightOutput(p.bestOutputNumber,false);
