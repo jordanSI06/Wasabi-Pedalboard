@@ -101,10 +101,16 @@
             try {
               this.nbNodeIn = node.inputChannelCount();
             } catch (error) {
-              console.log("the naming convention has to be fix between wam and others", error);
+              console.log("the naming convention has to be fixed between wam and others", error);
               this.nbNodeIn = node.numberOfInputs;
             }
-            console.log(this.nbNodeIn);
+            try {
+              this.nbNodeOut = node.ouputChannelCount();
+            } catch (error) {
+              console.log("the naming convention has to be fixed between wam and others", error);
+              this.nbNodeIn = node.numberOfOuputs;
+            }
+
 
             // LOAD GUI
             this.plugin.loadGui().then((elem) => {
