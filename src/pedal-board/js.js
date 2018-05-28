@@ -321,7 +321,8 @@ class PedalBoard extends HTMLElement {
     //this.insertAdjacentElement('beforeEnd',p);
 
     // For the jack menu to appear
-    this.handleJackMenu(p);
+
+    this.sleep(300).then(() =>{this.handleJackMenu(p)});
   }
 
   removePedal(p) {
@@ -578,12 +579,14 @@ class PedalBoard extends HTMLElement {
 
   handleJackMenu(p) {
     // clic on an input
+    console.log(p.nbNodeIn);
     let input = "";
     try {
-      p.inputP.addEventListener("click", (e) => {
+      console.log("apirgbaeprogbaerg",p.inputP);
+      p.inputP[0].addEventListener("click", (e) => {
         e.preventDefault();
 
-        input = p.inputP;
+        input = p.inputP[0];
         this.currentPedalOppened = p;
         if (input.getAttribute("open") && (input.getAttribute("open") == 'true')) {
           input.setAttribute("open", false);

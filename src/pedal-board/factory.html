@@ -9,7 +9,7 @@
   const _currentdoc = document.currentScript.ownerDocument;
   class factory {
 
-    createPedal(_tagName,_pluginName,_pluginUrl) {
+    createPedal(_tagName, _pluginName, _pluginUrl) {
       // var _tagName = _pluginInfos.type;
       // var _pluginName = _pluginInfos.target.classname;
       // var _pluginUrl = _pluginInfos.target.baseUrl;
@@ -52,8 +52,8 @@
             console.log(`newValue:`, newValue);
             this.paramsLoaded = JSON.parse(newValue);
             console.log('this.paramsLoaded', this.paramsLoaded);
-            console.log('thisNODE',this.node);
-                this.node.setState((this.paramsLoaded));
+            console.log('thisNODE', this.node);
+            this.node.setState((this.paramsLoaded));
           }
           catch (err) {
             console.log(err);
@@ -86,7 +86,7 @@
         // ----- METHODS: CUSTOM -----
         createAllInternNodes() {
 
-          
+
           var pedal = this;
           var wrapper = this.shadowRoot.querySelector(".laPedale");
 
@@ -96,21 +96,8 @@
           // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
           // LOAD NODE
           this.plugin.load().then((node) => {
-
-            // temporary for handle wams
-            try {
-              this.nbNodeIn = node.inputChannelCount();
-            } catch (error) {
-              console.log("the naming convention has to be fixed between wam and others", error);
-              this.nbNodeIn = node.numberOfInputs;
-            }
-            try {
-              this.nbNodeOut = node.ouputChannelCount();
-            } catch (error) {
-              console.log("the naming convention has to be fixed between wam and others", error);
-              this.nbNodeIn = node.numberOfOuputs;
-            }
-
+            this.nbNodeOut = node.numberOfOutputs;
+            this.nbNodeIn = node.numberOfInputs;
 
             // LOAD GUI
             this.plugin.loadGui().then((elem) => {
@@ -161,7 +148,7 @@
             node.connect(pedal.soundNodeOut);
           });
         }
-      
+
       });
     };
 

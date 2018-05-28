@@ -62,8 +62,8 @@ class Jack {
     let _pos = {
       x1: posPedal1.x,
       y1: posPedal1.y,
-      x2: (posPedal2.xpos[p2.bestInputNumber] + offestX),
-      y2: (posPedal2.ypos[pedal2.bestInputNumber] + offsetY)
+      x2: (posPedal2.xpos[this.p2.bestInputNumber] + offestX),
+      y2: (posPedal2.ypos[this.p2.bestInputNumber] + offsetY)
     }
     this.reviewSVGJack(_pos);
   }

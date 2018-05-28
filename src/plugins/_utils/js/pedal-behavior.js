@@ -22,7 +22,7 @@
         this.h = 0;
 
         this.nbNodeIn="";
-        this.nbNodeOut=1;
+        this.nbNodeOut="";
 
         this.bestInputNumber;
         
