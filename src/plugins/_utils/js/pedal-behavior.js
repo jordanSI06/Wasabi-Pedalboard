@@ -290,7 +290,7 @@
         var ypos=[];
         for(var i=0; i<this.nbNodeOut;i++){
           xpos[i] =  this.x + this.IOsize / 2 + (this.w + 2 * this.IOsize - 2),
-          ypos[i] =  this.y + this.IOsize / 2 + (this.IOsize) + 8
+          ypos[i] =  (this.y + this.IOsize / 2 + (this.IOsize) + 8) + 20*i;
         }
         return {xpos,ypos}
       }
