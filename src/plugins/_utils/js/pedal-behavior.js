@@ -9,8 +9,8 @@
         this.dataZoom = 0.5;
 
         // elem html
-        this.inputP = "";
-        this.outputP = "";
+        this.inputP = [];
+        this.outputP = [];
 
         this.inputJacks = [];
         this.outputJacks = [];
@@ -21,8 +21,14 @@
         this.w = 0;
         this.h = 0;
 
-        this.nbNodeIn=1;
-        this.nbNodeOut=1;
+        this.nbNodeIn="";
+        this.nbNodeOut="";
+
+        this.bestInputNumber = 0;
+        this.bestOutputNumber = 0;
+
+        // this.inputHighlighted = [];
+        // this.outputHighlighted = [];
         
         // relative position of input and output
         this.IOsize = 15;
@@ -68,18 +74,25 @@
 
         let elem = this.shadowRoot.querySelector(".laPedale");
 
-        // - input
-        this.inputP = document.createElement("div");
-        this.inputP.style.transform = 'scale(' + this.dataZoom + ')';
-        this.inputP.classList.add("input");
-        if (typeof this.nbNodeIn == "undefined" || (this.nbNodeIn > 0)) elem.appendChild(this.inputP);
+        console.log("this.nbNodeIn", this.nbNodeIn);
+        for (var i = 0; i < this.nbNodeIn; i++) {
+          this.inputP[i] = document.createElement("div");
+          this.inputP[i].style ='margin-top :'+20*i+'px';
+          this.inputP[i].style.transform = 'scale(' + this.dataZoom + ')';
+          this.inputP[i].classList.add("input");
+          if (typeof this.nbNodeIn == "undefined" || (this.nbNodeIn > 0)) elem.appendChild(this.inputP[i]);
+        }
 
         // - output
-        this.outputP = document.createElement("div");
-        this.outputP.style.transform = 'scale(' + this.dataZoom + ')';
-        this.outputP.classList.add("output");
-        if (typeof this.nbNodeOut == "undefined" || (this.nbNodeOut > 0)) elem.appendChild(this.outputP);
+        console.log("this.nbNodeOut", this.nbNodeOut);
 
+        for (var i = 0; i < this.nbNodeOut; i++) {
+        this.outputP[i] = document.createElement("div");
+        this.outputP[i].style ='margin-top :'+20*i+'px';
+        this.outputP[i].style.transform = 'scale(' + this.dataZoom + ')';
+        this.outputP[i].classList.add("output");
+        if (typeof this.nbNodeOut == "undefined" || (this.nbNodeOut > 0)) elem.appendChild(this.outputP[i]);
+        }
 
         if (this.classList.contains("draggable")) {
           // - bouton delete
@@ -263,17 +276,23 @@
       }
 
       getInputPos() {
-        return {
-          x: this.x + this.IOsize / 2 + (-this.IOsize / 2),
-          y: this.y + this.IOsize / 2 + (this.IOsize - 4) + 12
+        var xpos = [];
+        var ypos=[];
+        for(var i=0; i<this.nbNodeIn;i++){
+           xpos[i] = this.x + this.IOsize / 2 + (-this.IOsize / 2);
+           ypos[i] = (this.y + this.IOsize / 2 + (this.IOsize - 4) + 12) + 20*i;
         }
+        return {xpos,ypos}
       }
 
       getOutputPos() {
-        return {
-          x: this.x + this.IOsize / 2 + (this.w + 2 * this.IOsize - 2),
-          y: this.y + this.IOsize / 2 + (this.IOsize) + 8
+        var xpos = [];
+        var ypos=[];
+        for(var i=0; i<this.nbNodeOut;i++){
+          xpos[i] =  this.x + this.IOsize / 2 + (this.w + 2 * this.IOsize - 2),
+          ypos[i] =  (this.y + this.IOsize / 2 + (this.IOsize) + 8) + 20*i;
         }
+        return {xpos,ypos}
       }
 
       // ---------------------- JACK ---------------------------------
@@ -301,16 +320,20 @@
         this.outputJacks.forEach((j) => j.update());
       }
 
-      highLightInput(flag) {
-        if (flag) this.inputP.style.backgroundColor = "rgba(255,255,255,0.4)";
-        else this.inputP.style.backgroundColor = null;
+      highLightInput(i,flag) {
+        if (flag){
+          this.inputP[i].style.backgroundColor = "red";
+        } 
+        else {
+          this.inputP[i].style.backgroundColor = null;
+        }
         this.inputHighlighted = flag;
       }
 
-      highLightOutput(flag) {
-        // if(flag) this.output.style.backgroundColor = "rgba(255,255,255,0.4)";
-        // else this.output.style.backgroundColor = null;
-        this.outputHighlighted = flag;
+      highLightOutput(i,flag) {
+        if(flag) this.outputP[i].style.backgroundColor = "red";
+         else this.outputP[i].style.backgroundColor = null;
+        this.outputHighlighted= flag;
       }
 
 

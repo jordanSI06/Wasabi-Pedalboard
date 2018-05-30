@@ -9,7 +9,7 @@
   const _currentdoc = document.currentScript.ownerDocument;
   class factory {
 
-    createPedal(_tagName,_pluginName,_pluginUrl) {
+    createPedal(_tagName, _pluginName, _pluginUrl) {
       // var _tagName = _pluginInfos.type;
       // var _pluginName = _pluginInfos.target.classname;
       // var _pluginUrl = _pluginInfos.target.baseUrl;
@@ -52,8 +52,8 @@
             console.log(`newValue:`, newValue);
             this.paramsLoaded = JSON.parse(newValue);
             console.log('this.paramsLoaded', this.paramsLoaded);
-            console.log('thisNODE',this.node);
-                this.node.setState((this.paramsLoaded));
+            console.log('thisNODE', this.node);
+            this.node.setState((this.paramsLoaded));
           }
           catch (err) {
             console.log(err);
@@ -80,12 +80,13 @@
           shadowRoot.appendChild(instance);
 
           // runBehavior is related to the I/O detection, and graphic behavior (drag and drop) for each pedals.
-          this.runBehaviorMethods();
           this.createAllInternNodes();
         }
 
         // ----- METHODS: CUSTOM -----
         createAllInternNodes() {
+
+
           var pedal = this;
           var wrapper = this.shadowRoot.querySelector(".laPedale");
 
@@ -95,14 +96,9 @@
           // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
           // LOAD NODE
           this.plugin.load().then((node) => {
+            this.nbNodeIn = node.numberOfInputs;
+            this.nbNodeOut = node.numberOfOutputs;
 
-            // temporary for handle wams
-            try {
-              this.nbNodeIn = node.inputChannelCount();
-            } catch (error) {
-              console.log("the naming convention has to be fix between wam and others", error);
-              this.nbNodeIn = node.numberOfInputs;
-            }
 
             // LOAD GUI
             this.plugin.loadGui().then((elem) => {
@@ -126,6 +122,7 @@
               // the WC is added to the pbplugin wrapper
               wrapper.appendChild(elem);
               console.log('nnnnnn NODE', node);
+              this.runBehaviorMethods();
 
               // _pluginInfos.node = node;
               //this.pedalboard.setPluginInfos('ok');
@@ -152,6 +149,7 @@
             node.connect(pedal.soundNodeOut);
           });
         }
+
       });
     };
 

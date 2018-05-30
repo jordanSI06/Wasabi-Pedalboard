@@ -367,7 +367,8 @@ class PedalBoard extends HTMLElement {
     //this.insertAdjacentElement('beforeEnd',p);
 
     // For the jack menu to appear
-    this.handleJackMenu(p);
+
+    this.sleep(300).then(() =>{this.handleJackMenu(p)});
   }
 
   removePedal(p) {
@@ -465,6 +466,7 @@ class PedalBoard extends HTMLElement {
 
   findClosestIO(x, y) {
     this.pedals.forEach((p) => {
+      //console.log("eske t allume",p.inputHighlighted);
       /*
       be careful here this is not the pedalboard,
       we're in a forEach callback, remind the trap
@@ -473,35 +475,58 @@ class PedalBoard extends HTMLElement {
       */
       let iPos = p.getInputPos();
       let oPos = p.getOutputPos();
+      //console.log("ipos", iPos);
 
-      let distInput;
+      let distInput = [];
       let distMinToInputForHighlight = 20;
 
+      for (var i = 0; i < iPos.xpos.length; i++) {
 
-      if (this.currentState === "drawingNewJack") {
-        /*
-        We must highlight the pedal input taking
-        into account the length of the jack ending (an image of 100px width)
-        */
-        distInput = this.distance(x, y, iPos.x - 100, iPos.y);
-        distMinToInputForHighlight = 100;
-      } else {
-        // regular case, we're just pointing the mouse around
-        distInput = this.distance(x, y, iPos.x, iPos.y);
+        if (this.currentState === "drawingNewJack") {
+          /*
+           We must highlight the pedal input taking
+           into account the length of the jack ending (an image of 100px width)
+           */
+
+          distInput[i] = this.distance(x, y, iPos.xpos[i] - 100, iPos.ypos[i]);
+          distMinToInputForHighlight = 100;
+        } else {
+          // regular case, we're just pointing the mouse around
+          distInput[i] = this.distance(x, y, iPos.xpos[i], iPos.ypos[i]);
+        }
       }
 
-      let distOutput = this.distance(x, y, oPos.x, oPos.y);
+      var distOutput = []
+      for (var i = 0; i < oPos.xpos.length; i++) {
+        distOutput[i] = this.distance(x, y, oPos.xpos[i], oPos.ypos[i]);
+      }
+      
       // It depends if we're trying to plug a jack or not
-      if (distInput < distMinToInputForHighlight) {
-        if (!p.inputHighlighted) p.highLightInput(true);
+      let bestInputDistance = 100;
+      for (var i = 0; i < distInput.length; i++) {
+        if (distInput[i] < bestInputDistance) {
+          bestInputDistance = distInput[i];
+          p.bestInputNumber = i;
+        }
+      }
+      if (bestInputDistance < distMinToInputForHighlight) {
+        if (!p.inputHighlighted){p.highLightInput(p.bestInputNumber, true);} 
       } else {
-        if (p.inputHighlighted) p.highLightInput(false);
+        if (p.inputHighlighted) p.highLightInput(p.bestInputNumber, false);
       }
 
-      if (distOutput < 40) {
-        if (!p.outputHighlighted) p.highLightOutput(true);
+
+      let bestOutputDistance = 100;
+      for (var i = 0; i < distOutput.length; i++) {
+        if (distOutput[i] < bestOutputDistance) {
+          bestOutputDistance = distOutput[i];
+          p.bestOutputNumber = i;
+        }
+      }
+      if (bestOutputDistance < 40) {
+        if (!p.outputHighlighted) p.highLightOutput(p.bestOutputNumber,true);
       } else {
-        if (p.outputHighlighted) p.highLightOutput(false);
+        if (p.outputHighlighted) p.highLightOutput(p.bestOutputNumber,false);
       }
     });
   }
@@ -607,24 +632,30 @@ class PedalBoard extends HTMLElement {
     let closest = this.findClosestIO(mouseX, mouseY);
   }
 
+  addInputOpenClass(p,i,input){
+    p.inputP[i].addEventListener("click", (e) => {
+      e.preventDefault();
+
+      input = p.inputP[i];
+      this.currentPedalOppened = p;
+      if (input.getAttribute("open") && (input.getAttribute("open") == 'true')) {
+        input.setAttribute("open", false);
+      } else {
+        input.setAttribute("open", true);
+      }
+      if (p.inputJacks.length > 1) {
+        this.createMenuItems(p.inputJacks, input.getAttribute("open") === 'true');
+      }
+    });
+  }
+
   handleJackMenu(p) {
     // clic on an input
-    let input = "";
+    var input = "";
     try {
-      p.inputP.addEventListener("click", (e) => {
-        e.preventDefault();
-
-        input = p.inputP;
-        this.currentPedalOppened = p;
-        if (input.getAttribute("open") && (input.getAttribute("open") == 'true')) {
-          input.setAttribute("open", false);
-        } else {
-          input.setAttribute("open", true);
-        }
-        if (p.inputJacks.length > 1) {
-          this.createMenuItems(p.inputJacks, input.getAttribute("open") === 'true');
-        }
-      });
+      for(var i=0;i<p.inputP.length;i++){
+        this.addInputOpenClass(p,i,input);
+      }      
 
     } catch (error) {
       console.log("the plugin has no input", error)
@@ -690,8 +721,8 @@ class PedalBoard extends HTMLElement {
   }
 
   removeJack(loc, sourcePedal) {
-    let x1 = sourcePedal.getOutputPos().x;
-    let y1 = sourcePedal.getOutputPos().y;
+    let x1 = sourcePedal.getOutputPos().xpos[sourcePedal.bestOutputNumber];
+    let y1 = sourcePedal.getOutputPos().ypos[sourcePedal.bestOutputNumber];
     let _pos = {
       x1: x1,
       y1: y1,
@@ -715,7 +746,6 @@ class PedalBoard extends HTMLElement {
   mouseDownDraggable(e) {
     // Computes the location of the mouse in the SVG canvas
     var loc = this.cursorPoint(e);
-
     // e.preventDefault();
     // e.stopPropagation();
 
@@ -862,6 +892,7 @@ class PedalBoard extends HTMLElement {
             x2: loc.x,
             y2: loc.y
           };
+         // console.log('===>pos', _pos);
           jackWeAreDragging.reviewSVGJack(_pos);
         }
         break;
@@ -1009,9 +1040,6 @@ class PedalBoard extends HTMLElement {
 
   loadPlugin(p) {
     return new Promise((resolve, reject) => {
-      console.log('--------------------------');
-      console.log('==> PLUGIN INFOS', p);
-      console.log('--------------------------');
       // WE LOAD: type, id, positions, settings, connexions (we'll be treated this after plugins were loaded)
       // - id
       let _id = p.id;
@@ -1059,7 +1087,7 @@ class PedalBoard extends HTMLElement {
 
   sleep(_mms) {
     return new Promise((resolve, reject) => {
-      setTimeout(()=>resolve(_mms),_mms);
+      setTimeout(() => resolve(_mms), _mms);
     })
   }
 
