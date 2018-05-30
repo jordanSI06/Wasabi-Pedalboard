@@ -1,3 +1,28 @@
+*{
+  padding:0px;
+  margin:0px;
+  border:0px;
+  font-weight: 300;
+
+  border-collapse: collapse;
+  box-sizing: border-box;
+  vertical-align: top;
+
+  font-family: 'helvetica', sans-serif, cursive;
+
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+*:focus {
+  outline: none;
+}
+
+html,body{
+  height: 100%;
+}
+
 :host{
   background-color: #eee;
 
@@ -32,8 +57,7 @@
 /***** header *****/
 
 header {
-  background: rgba(0, 0, 0, 0.7);
-
+  /* background: #eee; */
   position: fixed;
   top: 0px;
   left: 0px;
@@ -42,15 +66,20 @@ header {
 
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: flex-start;
   align-content: center;
   align-items: stretch;
 }
+#header_settings{
+  background: #fff;
 
+  transition: 0.2s;
+  flex:1;
+
+  align-items: center;
+}
 header audio,
-header select,
-header span,
-header a {
+header select {
   color: #ccc;
 
   font-size: 16px;
@@ -58,11 +87,29 @@ header a {
   text-decoration: none;
 }
 
-header a.a_title {
-  color: #fff;
-
-  font-size: 18px;
+header div.div_title{
+  display: flex;
+  flex-direction: column;
   padding: 0px 10px;
+  flex:1;
+}
+header div.div_title span{
+  color: #333;
+
+  text-decoration: none;
+}
+
+header div.div_title span:nth-child(1){
+  font-size: 22px;
+
+  /* font-weight: bold; */
+}
+header div.div_title #version,
+header div.div_title #date {
+  /* color: #ccc; */
+
+  /* padding: 0px 2px; */
+  font-size: 10px;
 }
 
 header div {
@@ -72,20 +119,10 @@ header div {
   align-content: center;
   align-items: center;
   text-align: center;
-
-  flex: 1;
 }
 
 header div:last-child {
   justify-content: flex-end;
-}
-
-header #version,
-header #date {
-  color: #ccc;
-
-  padding: 0px 2px;
-  font-size: 10px;
 }
 
 header .div_audio {
@@ -109,8 +146,53 @@ header select option {
   background: #222;
   color: #eee;
 }
+header a{
+  font-size: 14px;
 
-header div.column {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-decoration: none;
+}
+header a span{
+  padding: 5px;
+  
+  text-transform: uppercase;
+}
+header button#bt_hideHeader iron-icon{
+  width: 16px;
+}
+header button#bt_hideHeader{
+  background: #fafafa;
+  padding: 0px 10px;
+  /* margin:0px auto; */
+  width:40px;
+
+  cursor: pointer;
+}
+
+#div_setIO:hover{
+  opacity: 1;
+}
+#div_setIO{
+  color: #333;
+
+  opacity: 0.7;
+  font-size: 12px;
+  padding: 0px 20px;
+  
+  display: flex;
+  flex-direction: row;
+}
+
+.row{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+}
+.column {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -120,11 +202,10 @@ header div.column {
 }
 
 header .span_gainLevel {
-  color: #ccc;
 
   font-size: 12px;
 
-  text-align: left;
+  align-self: flex-end;
 }
 
 /***** https://stackoverflow.com/questions/4126708/is-it-possible-to-style-html5-audio-tag *****/
@@ -137,7 +218,7 @@ audio::-webkit-media-controls-time-remaining-display {
 }
 
 input[type=range] {
-  -webkit-appearance: none;
+  /* -webkit-appearance: none; */
   background: #ccc;
   height: 2px;
   width: 50px;
@@ -145,7 +226,7 @@ input[type=range] {
 }
 
 input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
+  /* -webkit-appearance: none; */
   background: dodgerblue;
   height: 12px;
   width: 12px;
@@ -155,13 +236,17 @@ input[type=range]::-webkit-slider-thumb {
 
 /* devices midi learn */
 
+#divSoundIn,
+#divAudioPlayer{
+  top: 44px;
+}
+
 #divSoundIn {
   background: #222;
 
   position: absolute;
-  top: 44px;
   right: 0px;
-  padding: 10px 50px;
+  padding: 10px 20px;
 
   display: flex;
   flex-direction: column;
@@ -170,10 +255,12 @@ input[type=range]::-webkit-slider-thumb {
   align-items: stretch;
 }
 
-#divSoundIn span.span_tuto {
+#divSoundIn span{
   color: #777;
 
   font-size: 12px;
+}
+#divSoundIn span.span_tuto {
   padding: 10px;
 }
 
@@ -191,6 +278,14 @@ input[type=range]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
+
+#divAudioPlayer{
+  background: #222;
+  position: absolute;
+  right:0px;
+
+  padding: 10px;
+}
 .select_devices {
   border: 1px solid #555;
 
@@ -264,4 +359,26 @@ footer {
     filter: blur(0px);
     transform: scale(1, 1);
   }
+}
+
+.div_settings{
+  display: flex;
+}
+.div_settings a:hover,
+.div_settings button:hover {
+  background: #222;
+}
+.div_settings a, 
+.div_settings button {
+  background: transparent;
+  color: #ccc;
+
+  border:0px;
+  padding: 10px;
+  
+  cursor: pointer;
+}
+.div_settings a iron-icon,
+.div_settings button iron-icon{
+  width: 20px;
 }

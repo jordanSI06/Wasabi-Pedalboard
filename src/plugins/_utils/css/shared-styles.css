@@ -1,184 +1,72 @@
 :host {
-  display: block;
-  /* box-shadow: inset -3px -3px 3px 5px rgba(0, 0, 0, 0.6), inset 3px 3px 3px 5px rgba(255, 255, 255, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.9), 0 4px 5px 0 rgba(0, 0, 0, 0.9), 0 1px 10px 0 rgba(0, 0, 0, 0.9); */
-  /* box-shadow: inset -3px -3px 3px 5px rgba(0, 0, 0, 0.69), inset 3px 3px 3px 2px rgba(255, 255, 255, 0.45), 0 2px 4px -1px rgba(0, 0, 0, 0), 0 4px 5px 0 rgba(0, 0, 0, 0), 0 1px 10px 0 rgba(181, 181, 181, 0); */
-  /* box-shadow: 4px 5px 6px rgba(0, 0, 0, 0.7), inset -2px -2px 5px 0px rgba(0, 0, 0, 0.2), inset 3px 1px 1px 4px rgba(255, 255, 255, 0.2), 1px 0px 1px 0px rgba(0, 0, 0, 0.9), 0 2px 1px 0 rgba(0, 0, 0, 0.9), 1px 1px 1px 0px rgba(0, 0, 0, 0.9); */
-
-
-  /* height: [[dataHeight]]px; */
   position: absolute;
   top: 0px;
   left: 0px;
-  user-select: none;
-  cursor: move;
   z-index: 9;
 
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
+  display: block;
+  user-select: none;
+  cursor: move;
 }
+* {
+  padding: 0px;
+  border: 0px;
+  margin: 0px;
 
+  border-collapse: collapse;
+  box-sizing: border-box;
+  vertical-align: top;
+}
 *:focus {
   outline: 0;
 }
 
-.pedalLabel,
-.div_buttons {
-  border-radius: 8px;
-}
-
-.div_menuPanel {
-  /* border-top-left-radius: 8px;
-    border-top-right-radius: 8px; */
-}
-
-webaudio-switch {
-  left: -6px;
-}
-
-.pedalLabel {
-  /* background: rgba(0, 0, 0, 0.4); */
-  box-shadow: inset 0px 1px 5px #111;
-  border: 1px solid #ccc;
-  color: #ccc;
-  /* border:2px solid #aaa; */
-  padding: 4px 10px;
-  margin: 2px 0px;
-
-  font-size: 10px;
-  text-align: center;
-  user-select: none;
-  /* font-family: Lemon\/Milk; */
-  font-family: helvetica;
-  text-transform: uppercase;
-}
-
-.knob-label {
-  color: #ddd;
-  text-shadow: 0px 1px 1px #000;
-
-  font-size: 8px;
-  margin-top: -2px;
-
-  text-align: center;
-  text-transform: uppercase;
-  overflow: hidden;
-  user-select: none;
-  font-family: helvetica;
-
-}
-
-.elements {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-
-  padding: 10px;
-}
-
-.column {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-
-  flex: 1;
-  margin: 3px;
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: stretch;
-}
-
 /***** .input,.output  *****/
-
 .input,
 .output {
-  position: absolute;
-  top: 20px;
-}
-
-.output:hover {
-  background-image: url("../../../../img/outputHover.png");
-}
-
-.output {
-  background-image: url("../../../../img/output.png");
-  background-repeat: no-repeat;
-  background-position: center center;
-
-  width: 90px;
-  height: 20px;
-
-  /* right: -88px; */
-  right: -65px;
-
-  /* transform: scale(0.5); */
-}
-
-
-.input:hover {
-  background-image: url("../../../../img/inputHover.png");
-}
-
-.input {
-  background-image: url("../../../../img/input.png");
   background-repeat: no-repeat;
   background-position: left center;
 
-  width: 20px;
+  position: absolute;
+  top: 20px;
   height: 20px;
+}
+.output {
+  background-image: url("../../../../img/output.png");
 
-  /* left: -20px; */
+  width: 90px;
+  right: -65px;
+}
+.input {
+  background-image: url("../../../../img/input.png");
+
+  width: 20px;
   left: -15px;
-
-  /* transform: scale(0.5); */
 }
 
 /***** div_menuPanel *****/
-
 .div_menuPanel {
-  /* background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.5)); */
   background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.5));
 
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: stretch;
-
-  /* position: absolute; */
-  top: 0px;
-  right: 0px;
-  left: 0px;
-  z-index: 99;
 }
-
-.div_menuPanel button:hover>iron-icon {
-  color: #000;
-}
-
-.div_menuPanel button:hover {
-  /* background: rgba(0, 0, 0, 0.4); */
-}
-
 .div_menuPanel button {
   background: transparent;
-  border: 0px;
-  padding: 0px 3px;
+  
   height: 18px;
-  line-height: 0px;
+  padding: 0px 3px;
 
   cursor: pointer;
 }
-
+.div_menuPanel button iron-icon:hover {
+  color: #000;
+}
 .div_menuPanel button iron-icon {
   color: #777;
 
   height: 14px;
   width: 14px;
-  vertical-align: middle;
-  font-weight: bold;
 }

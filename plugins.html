@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>SimplePedalBoard: available plugins</title>
+  <link rel="import" href="./bower_components/iron-icons/iron-icons.html">
+  <link rel="import" href="./bower_components/iron-icons/image-icons.html">
+</head>
+
+<body>
+  <style>
+    * {
+      padding: 0px;
+      margin: 0px;
+      border: 0px;
+      font-weight: 300;
+
+      border-collapse: collapse;
+      box-sizing: border-box;
+      vertical-align: top;
+
+      font-family: 'helvetica', sans-serif, cursive;
+
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    *:focus {
+      outline: none;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      background: #fafafa;
+    }
+
+    header {
+      background: #333;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    header span {
+      color: #eee;
+      display: block;
+      font-size: 16px;
+      padding: 10px;
+      flex: 1;
+    }
+
+    header a:hover {
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    header a {
+      color: #eee;
+
+      padding: 10px;
+
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    main {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+
+      padding: 20px;
+    }
+
+    main div {
+      background: #fff;
+      box-shadow: 0px 2px 8px #ccc;
+
+      display: flex;
+      flex-direction: column;
+
+      /* padding: 10px; */
+      margin: 4px;
+    }
+
+    main div img {
+      border: 1px solid #555;
+      height: 200px;
+    }
+
+    main div span {
+    }
+
+    .span_name {
+      background: #fafafa;
+      color: #333;
+      border-top: 1px solid #ccc;
+
+      font-size: 16px;
+      padding: 10px;
+
+      text-align: center;
+    }
+
+    .span_category {
+      background: lightblue;
+
+      font-size: 14px;
+      padding: 5px;
+      margin: 10px;
+      border-radius: 4px;
+
+      align-self: center;
+    }
+  </style>
+  <header>
+    <a href='./'>
+      <iron-icon icon="icons:chevron-left"></iron-icon>
+    </a>
+    <span>PedalBoard plugin gallery</span>
+  </header>
+  <main id='mainPlugins'></main>
+  <script>window.onload = () => {
+      let _mainPlugins = document.querySelector('#mainPlugins');
+
+      fetch('https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json')
+        .then(res => res.json())
+        .then(data => {
+          Object.keys(data.plugs).map(
+            (elem, index) => {
+              fetch(data.plugs[elem] + "/main.json")
+                .then(tab => tab.json())
+                .then(plugs => {
+                  //console.log("plugs", plugs);
+                  _mainPlugins.insertAdjacentHTML('beforeEnd', render(data.plugs[elem], plugs));
+                })
+            }
+          )
+        })
+    }
+
+    function render(_url, _json) {
+      return '<div><img src="' + _url + '/' + _json.thumbnail + '"><span class="span_category">#' + _json.category + '</span><span class="span_name">' + _json.name + '</span></div>';
+    }</script>
+</body>
+
+</html>

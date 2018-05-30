@@ -62,12 +62,12 @@
       // Extract the attribute from our element. 
       this.div_dialog = this.shadowRoot.querySelector('#div_dialog');
       this.bt_openDialog = this.shadowRoot.querySelector('#bt_openDialog');
-      this.bt_closeDialog = this.shadowRoot.querySelector('#bt_closeDialog');
       this.bt_saveBank = this.shadowRoot.querySelector('#bt_saveBank');
       this.bt_savePreset = this.shadowRoot.querySelector('#bt_savePreset');
       this.input_presetName = this.shadowRoot.querySelector('#input_presetName');
       this.nav_banks = this.shadowRoot.querySelector('#nav_banks');
       this.nav_presets = this.shadowRoot.querySelector('#nav_presets');
+      this.img_screenshot = this.shadowRoot.querySelector('#img_screenshot');
 
       // customListeners
       this.bankSelected = '';
@@ -82,6 +82,32 @@
       this.listeners();
     }
 
+    takeScreenshot() {
+      console.log('takeScreenshot');
+      html2canvas(this.pedalboard,{
+        allowTaint:true,
+        // foreignObjectRendering:true
+      }).then(canvas=>{
+          console.log('onrendered',canvas);
+          // var tempcanvas = document.createElement('canvas');
+          // tempcanvas.width = 350;
+          // tempcanvas.height = 350;
+
+          // var context = tempcanvas.getContext('2d');
+          // context.drawImage(canvas, 112, 0, 288, 200, 0, 0, 350, 350);
+
+          let img=document.createElement('img');
+          img.src=canvas.toDataURL('image/png');
+          img.style.width="400px";
+          this.pedalboard.appendChild(img);
+
+
+          // var link = document.createElement("a");
+          // link.href = canvas.toDataURL('image/jpg');   //function blocks CORS
+          // link.download = 'screenshot.jpg';
+          // link.click();
+      })
+    }
 
     loadBanks() {
       this.nav_banks.innerHTML = '';
@@ -96,16 +122,12 @@
     listeners() {
       // button savePreset
       this.bt_openDialog.onclick = (e) => this.openDialog();
-      this.bt_closeDialog.onclick = (e) => this.closeDialog();
       this.bt_saveBank.onclick = (e) => this.addNewBank();
       this.bt_savePreset.onclick = (e) => this.savePreset();
     }
 
     openDialog() {
-      this.div_dialog.classList.remove('hidden');
-    }
-    closeDialog() {
-      this.div_dialog.classList.add('hidden');
+      this.div_dialog.classList.toggle('hidden');
     }
 
     loadPresets() {
@@ -121,6 +143,8 @@
     }
 
     renderLink(_json) {
+      //console.log('screenshot', _json.screenshot);
+      // <img src="${_json.screenshot}" width=200>
       return `<a href='#' id='${_json._id}' value='${_json.label}'>${_json.label}</a>`;
     }
 
@@ -157,17 +181,18 @@
       }
       await this.sleep(1000);
       console.log('finished to sleep');
-      for (let i=0;i<this.plugs.length;i++){
+      for (let i = 0; i < this.plugs.length; i++) {
         console.log(this.plugs[i]);
         this.pedalboard.querySelector(`#${this.plugs[i].id}`).setAttribute('params', JSON.stringify(this.plugs[i].settings));
       }
     }
 
-    sleep(_mms){
-      return new Promise((resolve,reject)=>{
-        setTimeout(()=>resolve(_mms),_mms);
+    sleep(_mms) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => resolve(_mms), _mms);
       })
     }
+
     selectBanksListeners() {
       this.nav_banks.querySelectorAll('a').forEach(e => {
         //console.log('a', e);
@@ -238,6 +263,9 @@
 
     // create preset name
     savePreset() {
+      this.takeScreenshot();
+      //this.takeScreenshot().then(_screenshot=>{
+      //  console.log('_screenshot',_screenshot);
       let _presetName = this.input_presetName.value.trim();
       let bankSelected = this.banks.find(item => item._id == this.bankSelected);
 
@@ -267,7 +295,6 @@
           _currentPlugs.push(_plugsToSave);
         }
       }
-
       if (!bankSelected.presets.find(item => item.label == _presetName)) {
         //console.log('preset not exist');
 
@@ -276,7 +303,8 @@
           "label": `${_presetName}`,
           "date": `${new Date().toJSON().slice(0, 10)}`,
           "plugs": _currentPlugs,
-          "connexions": _currentConnexions
+          "connexions": _currentConnexions,
+          //"screenshot":_screenshot
         }
         bankSelected.presets.push(_newPreset);
       } else {
@@ -284,12 +312,15 @@
         // Not every plugin have an "params" getter, you need to try catch when using it
         bankSelected.presets.find(item => item._id == this.presetSelected).plugs = _currentPlugs;
         bankSelected.presets.find(item => item._id == this.presetSelected).connexions = _currentConnexions;
+        // bankSelected.presets.find(item => item._id == this.presetSelected).screenshot = _screenshot;
       }
 
       this.saveBank();
       this.loadPresets();
       alert('Preset was successfully saved!');
       console.log("preset saved!!!", this.banks);
+
+      //})
     }
 
   });

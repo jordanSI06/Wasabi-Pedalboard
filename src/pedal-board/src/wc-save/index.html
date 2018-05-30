@@ -8,25 +8,21 @@
   </div>
 
   <div id='div_dialog' class='hidden'>
-    <header>
-      <span>Save as...</span>
-      <button id='bt_closeDialog'>x</button>
-    </header>
-
-    <main>
-      <aside>
-        <button id='bt_saveBank'>new bank</button>
-        <nav id='nav_banks'></nav>
-      </aside>
-      <section>
-        <nav id='nav_presets'></nav>
-      </section>
-    </main>
 
     <footer>
-      <input id='input_presetName' type='text' placeholder='New name preset...'>
+      <input id='input_presetName' type='text' placeholder='Save as: tape name preset here...'>
       <button id='bt_savePreset'>save</button>
+      <button id='bt_saveBank'>create new bank</button>
     </footer>
+    <main>
+        <section>
+          <nav id='nav_presets'></nav>
+        </section>
+      <aside>
+        <nav id='nav_banks'></nav>
+      </aside>
+    </main>
   </div>
 </template>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="./js.js"></script>

@@ -263,9 +263,55 @@ class PedalBoard extends HTMLElement {
       this.dropPedalHandler(e);
     }
 
-    this.shadowRoot.querySelector('#microDevices').onclick = (e) => {
+    this.shadowRoot.querySelector('#bt_openMicroDevices').onclick = (e) => {
       this.openMediaDevices();
     }
+
+    this.shadowRoot.querySelector('#bt_openAudio').onclick = (e) => {
+      this.openAudioPlayer();
+    }
+
+    this.shadowRoot.querySelector('#bt_fullScreen').onclick = (e) => {
+      this.openFullScreen();
+    }
+
+    this.shadowRoot.querySelector('#bt_hideHeader').onclick = (e) => {
+      this.openHeader();
+    }
+    
+  }
+
+  openHeader(){
+    let bt_hideHeader=this.shadowRoot.querySelector('#bt_hideHeader').querySelector('iron-icon');
+    let _fullScreenBT=this.shadowRoot.querySelector('#header_settings');
+    let _open=parseInt(_fullScreenBT.getAttribute('open'));
+    console.log('openHeader',_open);
+    if (_open==-1){
+      _fullScreenBT.style.transform='translate(0,0)';
+      bt_hideHeader.setAttribute('icon','icons:expand-less');
+    }else{
+      _fullScreenBT.style.transform='translate(0,-43px)';
+      bt_hideHeader.setAttribute('icon','icons:expand-more');
+    }
+    _fullScreenBT.setAttribute('open',-1*_open);
+
+  }
+  
+  openFullScreen(){
+    let _fullScreenBT=this.shadowRoot.querySelector('#bt_fullScreen');
+    let _open=parseInt(_fullScreenBT.getAttribute('open'));
+    if (_open==-1){
+      document.body.webkitRequestFullScreen();
+      _fullScreenBT.querySelector('iron-icon').setAttribute('icon','icons:fullscreen-exit');
+    }else{
+      document.webkitExitFullscreen();
+      _fullScreenBT.querySelector('iron-icon').setAttribute('icon','icons:fullscreen');
+    }
+    _fullScreenBT.setAttribute('open',-1*_open);
+  }
+
+  openAudioPlayer(){
+    this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
   }
 
   setMediadevicesToSoundIn() {
@@ -793,11 +839,11 @@ class PedalBoard extends HTMLElement {
 
   openMediaDevices() {
     this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden")
-    if (this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) {
-      this.shadowRoot.querySelector("#microDevices").classList.add("mic_open");
-    } else {
-      this.shadowRoot.querySelector("#microDevices").classList.remove("mic_open");
-    }
+    // if (this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) {
+    //   this.shadowRoot.querySelector("#microDevices").classList.add("mic_open");
+    // } else {
+    //   this.shadowRoot.querySelector("#microDevices").classList.remove("mic_open");
+    // }
   }
 
   mouseMoveDraggable(e) {
@@ -948,7 +994,6 @@ class PedalBoard extends HTMLElement {
     }
     return target;
   }
-
 
   // from https://www.html5rocks.com/en/tutorials/webcomponents/imports/
   // A PLACER DANS LE ADD PEDAL : addImportLink => addPedal

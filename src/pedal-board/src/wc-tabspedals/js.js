@@ -89,7 +89,7 @@
       if (div_container.querySelector(`#content-${_data.label}`) == null) {
         // create New Tab
         this.shadowRoot.querySelector('#div_tabs').insertAdjacentHTML('beforeEnd', `<input id='tab-${_data.label}' type='radio' value='${_data.label}' name='input-tab' checked />`);
-        this.shadowRoot.querySelector('#div_tabs').insertAdjacentHTML('beforeEnd', `<label for='tab-${_data.label}'>${_data.label}</label>`);
+        this.shadowRoot.querySelector('#div_tabs').insertAdjacentHTML('beforeEnd', `<label for='tab-${_data.label}'>${_data.label} (${_data.contents.length})</label>`);
         div_container.insertAdjacentHTML('beforeEnd', `<div id='content-${_data.label}' class='content hidden'></div>`);
       }
       for (let i = 0; i < _data.contents.length; i++) {
