@@ -263,7 +263,7 @@
 
     // create preset name
     savePreset() {
-      this.takeScreenshot();
+      //this.takeScreenshot();
       //this.takeScreenshot().then(_screenshot=>{
       //  console.log('_screenshot',_screenshot);
       let _presetName = this.input_presetName.value.trim();
