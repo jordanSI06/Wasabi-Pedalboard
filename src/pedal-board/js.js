@@ -36,7 +36,6 @@ class PedalBoard extends HTMLElement {
     this.currentState = "none";
     this.oldMousePosX = 0;
     this.oldMousePosY = 0;
-    this.zoom = 0;
     this.menuState = 0;
     this.currentDraggablePedal = "";
     this.currentPedalOppened = "";
@@ -47,6 +46,9 @@ class PedalBoard extends HTMLElement {
     this.h = 0;
     this.wO = 0;
     this.hO = 0;
+
+
+    this.zoom = 1;
 
     // factory
     this.factory = new factory();
@@ -64,16 +66,31 @@ class PedalBoard extends HTMLElement {
       monoMediaSourceM: null,
       state: 0
     }
+
+
+    // this.params = {
+    //   newzoom: parseInt(this.getAttribute('data-newzoom'))
+    // }
+    // this.newZoom = this.params.newzoom;
   }
   get is() { return this.nodeName.toLowerCase(); }
 
-
   // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
-  static get observedAttributes() { return ['']; }
+  static get observedAttributes() { return ['data-newzoom']; }
 
   // appelé lorsque l'un des attributs de l'élément personnalisé est ajouté, supprimé ou modifié.
-  attributeChangedCallback() {
+  attributeChangedCallback(name, oldValue, newValue) {
     console.log(`Custom element ${this.is} attributes changed.`);
+    try {
+      console.log(`name: ${name}`);
+      console.log(`oldValue:`, oldValue);
+      console.log(`newValue:`, newValue);
+      this.newZoom = (newValue);
+      console.log('this.newZoom', this.newZoom);
+    }
+    catch (err) {
+      console.log(err);
+    }
   }
 
   // appelé lorsque l'élément personnalisé est déplacé vers un nouveau document
@@ -114,6 +131,8 @@ class PedalBoard extends HTMLElement {
     // create SVG canvas
     PedalBoard.createSVGcanvas(this.w, this.h);
 
+    this.main = this.shadowRoot.querySelector('#mainPedalboard');
+
     // clip detector  
     this.meter1 = createAudioMeter(GlobalContext.context);
     this.meter2 = createAudioMeter(GlobalContext.context);
@@ -131,7 +150,6 @@ class PedalBoard extends HTMLElement {
 
     this.addPedal(this.pIn);
     this.addPedal(this.pOut);
-
 
     this.setMediadevicesToSoundIn();
     this.listeners();
@@ -252,14 +270,17 @@ class PedalBoard extends HTMLElement {
     // For pedals to be draggable
     this.addDraggableListeners();
 
-    this.resizeListener();
+    // Hide menu if the window is resized: toggleMenuOff();
+    // Repositions the pedal located on the right according to the new width
+    window.onresize = (e) => this.resizeElements();
+
 
     this.addChangeAudioListeners();
 
-    this.shadowRoot.querySelector('#slot').ondragover = (e) => {
+    this.shadowRoot.querySelector('#mainPedalboard').ondragover = (e) => {
       this.dragPedalHandler(e);
     }
-    this.shadowRoot.querySelector('#slot').ondrop = (e) => {
+    this.shadowRoot.querySelector('#mainPedalboard').ondrop = (e) => {
       this.dropPedalHandler(e);
     }
 
@@ -278,39 +299,48 @@ class PedalBoard extends HTMLElement {
     this.shadowRoot.querySelector('#bt_hideHeader').onclick = (e) => {
       this.openHeader();
     }
-    
-  }
 
-  openHeader(){
-    let bt_hideHeader=this.shadowRoot.querySelector('#bt_hideHeader').querySelector('iron-icon');
-    let _fullScreenBT=this.shadowRoot.querySelector('#header_settings');
-    let _open=parseInt(_fullScreenBT.getAttribute('open'));
-    console.log('openHeader',_open);
-    if (_open==-1){
-      _fullScreenBT.style.transform='translate(0,0)';
-      bt_hideHeader.setAttribute('icon','icons:expand-less');
-    }else{
-      _fullScreenBT.style.transform='translate(0,-43px)';
-      bt_hideHeader.setAttribute('icon','icons:expand-more');
+    this.shadowRoot.querySelector('#bt_zoom_in').onclick = (e) => {
+      this.zoom= this.zoom/0.9;
+      this.doZoom();
     }
-    _fullScreenBT.setAttribute('open',-1*_open);
+
+    this.shadowRoot.querySelector('#bt_zoom_out').onclick = (e) => {
+      this.zoom = this.zoom*0.9;
+      this.doZoom();
+    }
 
   }
-  
-  openFullScreen(){
-    let _fullScreenBT=this.shadowRoot.querySelector('#bt_fullScreen');
-    let _open=parseInt(_fullScreenBT.getAttribute('open'));
-    if (_open==-1){
+
+  openHeader() {
+    let bt_hideHeader = this.shadowRoot.querySelector('#bt_hideHeader').querySelector('iron-icon');
+    let _fullScreenBT = this.shadowRoot.querySelector('#header_settings');
+    let _open = parseInt(_fullScreenBT.getAttribute('open'));
+    if (_open == -1) {
+      _fullScreenBT.style.transform = 'translate(0,0)';
+      bt_hideHeader.setAttribute('icon', 'icons:expand-less');
+    } else {
+      _fullScreenBT.style.transform = 'translate(0,-43px)';
+      bt_hideHeader.setAttribute('icon', 'icons:expand-more');
+    }
+    _fullScreenBT.setAttribute('open', -1 * _open);
+
+  }
+
+  openFullScreen() {
+    let _fullScreenBT = this.shadowRoot.querySelector('#bt_fullScreen');
+    let _open = parseInt(_fullScreenBT.getAttribute('open'));
+    if (_open == -1) {
       document.body.webkitRequestFullScreen();
-      _fullScreenBT.querySelector('iron-icon').setAttribute('icon','icons:fullscreen-exit');
-    }else{
+      _fullScreenBT.querySelector('iron-icon').setAttribute('icon', 'icons:fullscreen-exit');
+    } else {
       document.webkitExitFullscreen();
-      _fullScreenBT.querySelector('iron-icon').setAttribute('icon','icons:fullscreen');
+      _fullScreenBT.querySelector('iron-icon').setAttribute('icon', 'icons:fullscreen');
     }
-    _fullScreenBT.setAttribute('open',-1*_open);
+    _fullScreenBT.setAttribute('open', -1 * _open);
   }
 
-  openAudioPlayer(){
+  openAudioPlayer() {
     this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
   }
 
@@ -368,7 +398,7 @@ class PedalBoard extends HTMLElement {
 
     // For the jack menu to appear
 
-    this.sleep(300).then(() =>{this.handleJackMenu(p)});
+    this.sleep(300).then(() => { this.handleJackMenu(p) });
   }
 
   removePedal(p) {
@@ -399,7 +429,6 @@ class PedalBoard extends HTMLElement {
   }
 
   connect(p1, p2) {
-    console.log(p1, p2);
     // si p1_Out && p2_In existent (>1) alors la connexion est possible
     if (this.isConnexionPossible(p1.nbNodeOut, p2.nbNodeIn)) {
       let j = new Jack();
@@ -444,6 +473,17 @@ class PedalBoard extends HTMLElement {
     }
   }
 
+
+  doZoom() {
+    console.log('{{{{ this.newZoom }}}}', this.zoom);
+    this.main.style.zoom = this.zoom;
+    //this.resizeElements();
+    this.updateSVGcanvas(this.w/this.zoom,this.h/this.zoom);
+
+    this.pIn.setPosition(-20/this.zoom, (this.h / 2)/this.zoom);
+    this.pOut.setPosition(this.w/this.zoom, (this.h / 2)/this.zoom);
+  }
+
   getPedalFromHtmlElem(elem) {
     for (var i = 0; i < this.pedals.length; i++) {
       var p = this.pedals[i];
@@ -452,19 +492,22 @@ class PedalBoard extends HTMLElement {
     return undefined;
   }
 
-  move(dx, dy) {
-    if (this.zoom == 1) {
-      this.style.transition = '';
-      this.pedalboardOrigin.x += dx / 50;
-      this.pedalboardOrigin.y += dy / 50;
-      this.style.transform = "scale(2,2) translate(" + this.pedalboardOrigin.x + "px," + this.pedalboardOrigin
-        .y +
-        "px)";
-    }
+  // move(dx, dy) {
+  //   if (this.zoom == 1) {
+  //     this.style.transition = '';
+  //     this.pedalboardOrigin.x += dx / 50;
+  //     this.pedalboardOrigin.y += dy / 50;
+  //     this.style.transform = "scale(2,2) translate(" + this.pedalboardOrigin.x + "px," + this.pedalboardOrigin
+  //       .y +
+  //       "px)";
+  //   }
+  // }
 
-  }
+  mouseMove(e) {
+    let rect = this.getBoundingClientRect();
+    let x = (e.x - rect.left);
+    let y = (e.y - rect.top);
 
-  findClosestIO(x, y) {
     this.pedals.forEach((p) => {
       //console.log("eske t allume",p.inputHighlighted);
       /*
@@ -475,7 +518,11 @@ class PedalBoard extends HTMLElement {
       */
       let iPos = p.getInputPos();
       let oPos = p.getOutputPos();
-      //console.log("ipos", iPos);
+
+      iPos.xpos[0] = iPos.xpos[0] * this.zoom;
+      iPos.ypos[0] = iPos.ypos[0] * this.zoom;
+      oPos.xpos[0] = oPos.xpos[0] * this.zoom;
+      oPos.ypos[0] = oPos.ypos[0] * this.zoom;
 
       let distInput = [];
       let distMinToInputForHighlight = 20;
@@ -500,7 +547,7 @@ class PedalBoard extends HTMLElement {
       for (var i = 0; i < oPos.xpos.length; i++) {
         distOutput[i] = this.distance(x, y, oPos.xpos[i], oPos.ypos[i]);
       }
-      
+
       // It depends if we're trying to plug a jack or not
       let bestInputDistance = 100;
       for (var i = 0; i < distInput.length; i++) {
@@ -510,7 +557,7 @@ class PedalBoard extends HTMLElement {
         }
       }
       if (bestInputDistance < distMinToInputForHighlight) {
-        if (!p.inputHighlighted){p.highLightInput(p.bestInputNumber, true);} 
+        if (!p.inputHighlighted) { p.highLightInput(p.bestInputNumber, true); }
       } else {
         if (p.inputHighlighted) p.highLightInput(p.bestInputNumber, false);
       }
@@ -524,9 +571,9 @@ class PedalBoard extends HTMLElement {
         }
       }
       if (bestOutputDistance < 40) {
-        if (!p.outputHighlighted) p.highLightOutput(p.bestOutputNumber,true);
+        if (!p.outputHighlighted) p.highLightOutput(p.bestOutputNumber, true);
       } else {
-        if (p.outputHighlighted) p.highLightOutput(p.bestOutputNumber,false);
+        if (p.outputHighlighted) p.highLightOutput(p.bestOutputNumber, false);
       }
     });
   }
@@ -545,94 +592,86 @@ class PedalBoard extends HTMLElement {
     }
   }
 
-  rescale(s) {
-    this.style = 'transform(' + s + ',' + s + ')';
-  }
 
-  dblclickHandler(e) {
-    e.preventDefault();
-    let boardWid = parseInt(window.getComputedStyle(this).width, 10);
-    let boardHei = parseInt(window.getComputedStyle(this).height, 10);
-    let zoomPosH = "bottom";
-    let zoomPosW = "right";
-    let animationName = "dezoomeffect";
-    if (this.zoom == 0) {
-      if (e.clientX <= (boardWid / 3)) zoomPosW = "left";
-      else if (e.clientX > (boardWid / 3) && e.clientX < ((2 * boardWid) / 3)) zoomPosW = "center";
+  // dblclickHandler(e) {
+  //   e.preventDefault();
 
-      if (e.clientY <= (boardHei / 3)) zoomPosH = "top";
-      else if (e.clientY > (boardHei / 3) && e.clientY < ((2 * boardHei) / 3)) zoomPosH = "center";
+  //   let boardWid = parseInt(window.getComputedStyle(this).width, 10);
+  //   let boardHei = parseInt(window.getComputedStyle(this).height, 10);
+  //   let zoomPosH = "bottom";
+  //   let zoomPosW = "right";
+  //   let animationName = "dezoomeffect";
+  //   if (this.zoom == 0) {
+  //     if (e.clientX <= (boardWid / 3)) zoomPosW = "left";
+  //     else if (e.clientX > (boardWid / 3) && e.clientX < ((2 * boardWid) / 3)) zoomPosW = "center";
 
-      this.style.transformOrigin = zoomPosW + " " + zoomPosH;
-      animationName = "zoomeffect";
-      this.zoom = 1;
-    } else {
-      this.zoom = 0;
-    }
-    this.style.animation = animationName + ' 0.1s ease-out';
-    this.style.animationFillMode = 'forwards';
-  }
+  //     if (e.clientY <= (boardHei / 3)) zoomPosH = "top";
+  //     else if (e.clientY > (boardHei / 3) && e.clientY < ((2 * boardHei) / 3)) zoomPosH = "center";
+
+  //     this.style.transformOrigin = zoomPosW + " " + zoomPosH;
+  //     animationName = "zoomeffect";
+  //     this.zoom = 1;
+  //   } else {
+  //     this.zoom = 0;
+  //   }
+  //   this.style.animation = animationName + ' 0.1s ease-out';
+  //   this.style.animationFillMode = 'forwards';
+  // }
 
 
-  mouseWheelHandler(e) {
-    e.preventDefault();
+  // mouseWheelHandler(e) {
+  //   e.preventDefault();
 
-    let board = document.querySelector('#pedalboard');
-    let boardC = document.querySelector('#pedalboard-container');
-    let boardWid = parseInt(window.getComputedStyle(board).width, 10);
-    let boardHei = parseInt(window.getComputedStyle(board).height, 10);
+  //   let board = document.querySelector('#pedalboard');
+  //   let boardC = document.querySelector('#pedalboard-container');
+  //   let boardWid = parseInt(window.getComputedStyle(board).width, 10);
+  //   let boardHei = parseInt(window.getComputedStyle(board).height, 10);
 
-    let delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+  //   let delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
 
-    if (delta == 1) {
-      this.zoom = 1;
-      board.style.transform = 'scale(2,2)';
-      board.style.transition = 'transform 0.5s ease-in';
+  //   if (delta == 1) {
+  //     this.zoom = 1;
+  //     board.style.transform = 'scale(2,2)';
+  //     board.style.transition = 'transform 0.5s ease-in';
 
-      if (e.clientY < boardHei / 3) {
-        if (e.clientX < boardWid / 3) {
-          board.style.transformOrigin = 'left top';
-        } else if (e.clientX < 2 * (boardWid / 3)) {
-          board.style.transformOrigin = 'center top';
-        } else {
-          board.style.transformOrigin = 'right top';
-        }
-      } else if (e.clientY < 2 * (boardHei / 3)) {
-        if (e.clientX < boardWid / 3) {
-          board.style.transformOrigin = 'left center';
-        } else if (e.clientX < 2 * (boardWid / 3)) {
-          board.style.transformOrigin = 'center center';
-        } else {
-          board.style.transformOrigin = 'right center';
-        }
-      } else {
-        if (e.clientX < boardWid / 3) {
-          board.style.transformOrigin = 'left bottom';
-        } else if (e.clientX < 2 * (boardWid / 3)) {
-          board.style.transformOrigin = 'center bottom';
-        } else {
-          board.style.transformOrigin = 'right bottom';
-        }
-      }
-    }
+  //     if (e.clientY < boardHei / 3) {
+  //       if (e.clientX < boardWid / 3) {
+  //         board.style.transformOrigin = 'left top';
+  //       } else if (e.clientX < 2 * (boardWid / 3)) {
+  //         board.style.transformOrigin = 'center top';
+  //       } else {
+  //         board.style.transformOrigin = 'right top';
+  //       }
+  //     } else if (e.clientY < 2 * (boardHei / 3)) {
+  //       if (e.clientX < boardWid / 3) {
+  //         board.style.transformOrigin = 'left center';
+  //       } else if (e.clientX < 2 * (boardWid / 3)) {
+  //         board.style.transformOrigin = 'center center';
+  //       } else {
+  //         board.style.transformOrigin = 'right center';
+  //       }
+  //     } else {
+  //       if (e.clientX < boardWid / 3) {
+  //         board.style.transformOrigin = 'left bottom';
+  //       } else if (e.clientX < 2 * (boardWid / 3)) {
+  //         board.style.transformOrigin = 'center bottom';
+  //       } else {
+  //         board.style.transformOrigin = 'right bottom';
+  //       }
+  //     }
+  //   }
 
-    if (delta == -1) {
-      this.zoom = 0;
-      board.style.transform = 'scale(1,1)';
-      board.style.transition = 'transform 0.5s ease-in';
-      pedalboard.pedalboardOrigin.x = 0;
-      pedalboard.pedalboardOrigin.y = 0;
-    }
-  }
+  //   if (delta == -1) {
+  //     this.zoom = 0;
+  //     board.style.transform = 'scale(1,1)';
+  //     board.style.transition = 'transform 0.5s ease-in';
+  //     pedalboard.pedalboardOrigin.x = 0;
+  //     pedalboard.pedalboardOrigin.y = 0;
+  //   }
+  // }
 
-  highlightInputsOutputs(e) {
-    let rect = this.getBoundingClientRect();
-    let mouseX = e.x - rect.left;
-    let mouseY = e.y - rect.top;
-    let closest = this.findClosestIO(mouseX, mouseY);
-  }
 
-  addInputOpenClass(p,i,input){
+  addInputOpenClass(p, i, input) {
     p.inputP[i].addEventListener("click", (e) => {
       e.preventDefault();
 
@@ -644,7 +683,8 @@ class PedalBoard extends HTMLElement {
         input.setAttribute("open", true);
       }
       if (p.inputJacks.length > 1) {
-        this.createMenuItems(p.inputJacks, input.getAttribute("open") === 'true');
+        // createMenuItems = repositionnement des jacks
+        p.inputJacks.forEach((j, numJack) => j.repositionJack((input.getAttribute("open") === 'true'), numJack));
       }
     });
   }
@@ -653,24 +693,12 @@ class PedalBoard extends HTMLElement {
     // clic on an input
     var input = "";
     try {
-      for(var i=0;i<p.inputP.length;i++){
-        this.addInputOpenClass(p,i,input);
-      }      
-
+      for (var i = 0; i < p.inputP.length; i++) {
+        this.addInputOpenClass(p, i, input);
+      }
     } catch (error) {
       console.log("the plugin has no input", error)
     }
-
-  }
-  createMenuItems(jacks, open) {
-    let len = jacks.length;
-    let offsetY = 0;
-
-    jacks.forEach((j) => {
-      j.repositionJack(offsetY, open);
-      if (open) offsetY += 20;
-      else offsetY -= 0;
-    })
 
   }
 
@@ -681,11 +709,11 @@ class PedalBoard extends HTMLElement {
       svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("id", "svg-canvas");
       svg.setAttribute('style', 'position:absolute;top:0px;left:0px');
+      svg.setAttribute("viewBox",`0 0 ${w} ${h}`);
       // Should use here pedalboard
       svg.setAttribute('width', w);
       svg.setAttribute('height', h);
       svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
-
       pedalboard.prepend(svg);
     }
     return svg;
@@ -695,11 +723,12 @@ class PedalBoard extends HTMLElement {
     let svg = document.getElementById("svg-canvas");
     svg.setAttribute('width', w);
     svg.setAttribute('height', h);
+    svg.setAttribute("viewBox",`0 0 ${w} ${h}`);
   }
 
   distance(x1, y1, x2, y2) {
-    var dx = x1 - x2;
-    var dy = y1 - y2;
+    var dx = (x1 - x2);
+    var dy = (y1 - y2);
 
     return Math.sqrt(dx * dx + dy * dy);
   }
@@ -709,14 +738,16 @@ class PedalBoard extends HTMLElement {
     window.addEventListener('mousedown', this.mouseDownDraggable.bind(this), false);
     window.addEventListener('mouseup', this.mouseUpDraggable.bind(this), false);
     // detect proximity to I/O
-    this.addEventListener('mousemove', this.highlightInputsOutputs.bind(this), false);
+    this.addEventListener('mousemove', this.mouseMove.bind(this), false);
   }
 
   cursorPoint(evt) {
     let svg = document.querySelector('#svg-canvas');
     let pt = svg.createSVGPoint();
-    pt.x = evt.clientX;
-    pt.y = evt.clientY;
+    pt.x = (evt.clientX);
+    pt.y = (evt.clientY);
+    // pt.x = (evt.clientX);
+    // pt.y = (evt.clientY);
     return pt.matrixTransform(svg.getScreenCTM().inverse());
   }
 
@@ -727,7 +758,8 @@ class PedalBoard extends HTMLElement {
       x1: x1,
       y1: y1,
       x2: loc.x,
-      y2: loc.y
+      y2: loc.y,
+      zoom: this.zoom
     }
 
     let j = new Jack();
@@ -819,10 +851,10 @@ class PedalBoard extends HTMLElement {
 
     this.pedals.forEach((pedal) => {
       //pedal = _p.getPedalFromHtmlElem(d);
-      if (loc.x > pedal.x && loc.x < pedal.x + pedal.w * 1.25 && loc.y > pedal.y && loc.y < pedal.y +
-        pedal.h * 1.25) {
+      // if (loc.x > pedal.x && loc.x < pedal.x + pedal.w * 1.25 && loc.y > pedal.y && loc.y < pedal.y +
+      //   pedal.h * 1.25) {
         result = true;
-      }
+      // }
     });
     return result;
   }
@@ -836,7 +868,8 @@ class PedalBoard extends HTMLElement {
       case "drawingNewJack":
         {
           // Remove current tmp jack
-          for (var i = 1; i <= 4; i++) {
+          //for (var i = 1; i <= 4; i++)
+          for (var i = 1; i <= 2; i++) {
             var elem = document.querySelector("#tmpJack_" + i);
             elem.parentNode.removeChild(elem);
           }
@@ -867,16 +900,9 @@ class PedalBoard extends HTMLElement {
     this.currentState = "none";
   }
 
-  openMediaDevices() {
-    this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden")
-    // if (this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) {
-    //   this.shadowRoot.querySelector("#microDevices").classList.add("mic_open");
-    // } else {
-    //   this.shadowRoot.querySelector("#microDevices").classList.remove("mic_open");
-    // }
-  }
-
   mouseMoveDraggable(e) {
+    console.log('this.zoom', this.zoom);
+
     // Computes the location of the mouse in the SVG canvas
     var loc = this.cursorPoint(e);
     // incremental mouse movement
@@ -889,10 +915,10 @@ class PedalBoard extends HTMLElement {
           let _pos = {
             x1: jackWeAreDragging.x1,
             y1: jackWeAreDragging.y1,
-            x2: loc.x,
-            y2: loc.y
+            x2: loc.x/this.zoom,
+            y2: loc.y/this.zoom,
+            zoom: this.zoom
           };
-         // console.log('===>pos', _pos);
           jackWeAreDragging.reviewSVGJack(_pos);
         }
         break;
@@ -909,44 +935,42 @@ class PedalBoard extends HTMLElement {
         break;
       case "draggingPedalboard":
         {
-          this.move(dx, dy);
+          //this.move(dx, dy);
         }
         break;
     }
   }
-  resizeListener() {
-    let dx, dy;
-    window.onresize = (e) => {
-      // Hide menu if the window is resized
-      //toggleMenuOff();
 
-      // Repositions the pedal located on the right 
-      // according to the new width
 
-      /*
-      let pdbW = parseInt(window.getComputedStyle(pdb).width, 10);
-      let pdbH = parseInt(window.getComputedStyle(pdb).height, 10);
-      this.pedals[1].move(pdbW, -20 + (pdbH / 2));
-      */
-      this.w = this.offsetWidth;
-      this.h = this.offsetHeight;
-      this.pOut.setPosition(this.w, (this.h / 2));
 
-      // produit en croix
-      this.pedals.forEach((p, i) => {
-        if (i > 1) {
-          dx = ((p.offsetLeft) * (this.w)) / (this.wO);
-          dy = ((p.offsetTop) * (this.h)) / (this.hO);
-          p.move(dx, dy);
-        }
-      });
 
-      this.wO = this.w;
-      this.hO = this.h;
 
-      this.updateSVGcanvas(this.w, this.h);
-    }
+
+  openMediaDevices() {
+    this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
   }
+
+  resizeElements() {
+    let dx, dy;
+    this.w = this.offsetWidth;
+    this.h = this.offsetHeight;
+    this.pOut.setPosition(this.w, (this.h / 2));
+
+    // produit en croix
+    this.pedals.forEach((p, i) => {
+      if (i > 1) {
+        dx = ((p.offsetLeft) * (this.w)) / (this.wO);
+        dy = ((p.offsetTop) * (this.h)) / (this.hO);
+        p.move(dx, dy);
+      }
+    });
+
+    this.wO = this.w;
+    this.hO = this.h;
+
+    this.updateSVGcanvas(this.w, this.h);
+  }
+
   eventFire(el, etype) {
     if (el.fireEvent) {
       el.fireEvent('on' + etype);
@@ -956,6 +980,7 @@ class PedalBoard extends HTMLElement {
       el.dispatchEvent(evObj);
     }
   }
+
   // drawloop method for clip meter canvas
   drawLoop() {
     this.canvasInputContext1.clearRect(0, 0, 100, 20);
@@ -987,11 +1012,6 @@ class PedalBoard extends HTMLElement {
 
     // set up the next visual callback
     let rafID = window.requestAnimationFrame(this.drawLoop.bind(this));
-  }
-
-  dragPedalHandler(e) {
-    e.preventDefault();
-    return false;
   }
 
 
@@ -1026,6 +1046,12 @@ class PedalBoard extends HTMLElement {
     return target;
   }
 
+
+  dragPedalHandler(e) {
+    e.preventDefault();
+    return false;
+  }
+
   // from https://www.html5rocks.com/en/tutorials/webcomponents/imports/
   // A PLACER DANS LE ADD PEDAL : addImportLink => addPedal
   dropPedalHandler(e) {
@@ -1051,8 +1077,6 @@ class PedalBoard extends HTMLElement {
       // - position
       let _pos = { x: p.position.x, y: p.position.y };
 
-
-
       let _promise = new Promise((_resolve, _reject) => {
         // script was already loaded
         if (document.querySelector(`script[src="${target.baseUrl}/main.js"]`)) _resolve(true);
@@ -1064,9 +1088,6 @@ class PedalBoard extends HTMLElement {
           script.onload = (e) => {
             // create webcomponent plugin + setSettings
             this.factory.createPedal(_tagName, target.classname, target.baseUrl)
-            // .then(res=>{
-            //   console.log('RES',res);
-            // })
             _resolve(true);
           };
           document.head.appendChild(script);
@@ -1078,8 +1099,10 @@ class PedalBoard extends HTMLElement {
         plug.id = _id;
         plug.setPosition(_pos.x, _pos.y);
         this.addPedal(plug);
-        await this.sleep(300).then(e => console.log(e));
-        console.log('finished to sleep');
+        await this.sleep(300).then(e => {
+          //console.log(e);
+        });
+        //console.log('finished to sleep');
         resolve(plug);
       });
     })
@@ -1115,7 +1138,7 @@ class PedalBoard extends HTMLElement {
 
 
 
-  /***** PART SOUND *****/
+  /***** II> PART SOUND *****/
   addChangeAudioListeners() {
     // régler les gains entrée et sortie
     this.shadowRoot.querySelector("#knob_In").addEventListener('change', (e) => {
@@ -1287,6 +1310,7 @@ class PedalBoard extends HTMLElement {
       window.stream = stream;
     });
   }
+
   // Michel BUFFA : somme comments would be welcomed here!
   soundNodeConnection(p1, p2) {
     if (p1.id == "pedalIn" && p2.id == "pedalOut") {

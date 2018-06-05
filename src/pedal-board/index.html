@@ -17,10 +17,11 @@
   </style>
 
   <div id="div_app">
-    <header id="header" >
-        <button id="bt_hideHeader">
-          <iron-icon id="icon_view" icon="icons:expand-less"></iron-icon>
-        </button>
+    
+    <header id="header">
+      <button id="bt_hideHeader">
+        <iron-icon id="icon_view" icon="icons:expand-less"></iron-icon>
+      </button>
 
       <div id="header_settings" class="row" open=1>
         <!-- MICRO + I/O LEVEL -->
@@ -73,12 +74,21 @@
             <iron-icon icon="icons:book"></iron-icon>
           </a>
 
-          <a class="a_title" title="Source Code on Github" href="https://github.com/guizmo2000/TER-Pedalboard-creation/tree/dynamicLoading" target='_blank'>
+          <a class="a_title" title="Source Code on Github" href="https://github.com/guizmo2000/TER-Pedalboard-creation/tree/dynamicLoading"
+            target='_blank'>
             <iron-icon icon="social:share"></iron-icon>
           </a>
 
           <button id="bt_fullScreen" title="App in fullscreen" open="-1">
             <iron-icon icon="icons:fullscreen"></iron-icon>
+          </button>
+
+          <button id="bt_zoom_in" title="Zoom in">
+            <iron-icon icon="icons:zoom-in"></iron-icon>
+          </button>
+
+          <button id="bt_zoom_out" title="Zoom out">
+            <iron-icon icon="icons:zoom-out"></iron-icon>
           </button>
 
         </div>
@@ -110,7 +120,10 @@
       </div>
     </header>
 
-    <slot id="slot"></slot>
+    <div id="div_distance"></div>
+    <main id='mainPedalboard'>
+      <slot id="slot"></slot>
+    </main>
 
     <footer>
       <wc-tabspedals data-pedallist=""></wc-tabspedals>

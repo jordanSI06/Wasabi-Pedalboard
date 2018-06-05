@@ -121,7 +121,6 @@
 
               // the WC is added to the pbplugin wrapper
               wrapper.appendChild(elem);
-              console.log('nnnnnn NODE', node);
               this.runBehaviorMethods();
 
               // _pluginInfos.node = node;
@@ -133,7 +132,7 @@
               */
               // if settings already exists, we loaded it
               if (Object.keys(this.paramsLoaded).length > 0) {
-                console.log('changeSettings', this.paramsLoaded)
+                //console.log('changeSettings', this.paramsLoaded)
                 this.node.setState((this.paramsLoaded));
               }
 

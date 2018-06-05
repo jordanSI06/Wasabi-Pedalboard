@@ -16,3 +16,10 @@ html,
 body {
   height: 100%;
 }
+
+svg path {
+  fill: none;
+  stroke: purple;
+  stroke-width: 10;
+  stroke-linejoin: round;
+}

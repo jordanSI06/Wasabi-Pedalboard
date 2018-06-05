@@ -35,7 +35,6 @@ html,body{
   box-sizing: border-box;
   vertical-align: top;
 
-  transform: scale(1, 1);
   font-family: 'Quicksand', cursive;
 
   position: absolute;
@@ -52,7 +51,7 @@ html,body{
   justify-content: flex-start;
   align-items: stretch;
   user-select: none;
-  overflow: hidden
+  overflow: hidden;
 }
 /***** header *****/
 

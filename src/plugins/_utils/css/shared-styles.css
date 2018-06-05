@@ -35,13 +35,13 @@
   background-image: url("../../../../img/output.png");
 
   width: 90px;
-  right: -65px;
+  right: -91px;
 }
 .input {
   background-image: url("../../../../img/input.png");
 
   width: 20px;
-  left: -15px;
+  left: -16px;
 }
 
 /***** div_menuPanel *****/
