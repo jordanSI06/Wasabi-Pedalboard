@@ -475,13 +475,18 @@ class PedalBoard extends HTMLElement {
 
 
   doZoom() {
-    console.log('{{{{ this.newZoom }}}}', this.zoom);
     this.main.style.zoom = this.zoom;
     //this.resizeElements();
     this.updateSVGcanvas(this.w/this.zoom,this.h/this.zoom);
 
-    this.pIn.setPosition(-20/this.zoom, (this.h / 2)/this.zoom);
+    this.pIn.setPosition(-20, (this.h / 2)/this.zoom);
     this.pOut.setPosition(this.w/this.zoom, (this.h / 2)/this.zoom);
+
+
+    // repositionnement des jacks
+    for (var i = 0; i < this.pedals.length; i++) {
+      this.pedals[i].updateJackPosition();
+    }
   }
 
   getPedalFromHtmlElem(elem) {
@@ -757,9 +762,8 @@ class PedalBoard extends HTMLElement {
     let _pos = {
       x1: x1,
       y1: y1,
-      x2: loc.x,
-      y2: loc.y,
-      zoom: this.zoom
+      x2: loc.x/this.zoom,
+      y2: loc.y/this.zoom
     }
 
     let j = new Jack();
@@ -767,8 +771,8 @@ class PedalBoard extends HTMLElement {
     // currentDraggableJack
     let cDJ = j.reviewSVGJack(_pos, "tmpJack");
     cDJ.sourcePedal = sourcePedal;
-    cDJ.end.setAttribute("x", loc.x - 7);
-    cDJ.end.setAttribute("y", loc.y - 10);
+    cDJ.end.setAttribute("x", _pos.x2 - 10);
+    cDJ.end.setAttribute("y", _pos.y2 - 10);
     cDJ.x1 = x1;
     cDJ.y1 = y1;
 
@@ -901,8 +905,6 @@ class PedalBoard extends HTMLElement {
   }
 
   mouseMoveDraggable(e) {
-    console.log('this.zoom', this.zoom);
-
     // Computes the location of the mouse in the SVG canvas
     var loc = this.cursorPoint(e);
     // incremental mouse movement
@@ -916,8 +918,7 @@ class PedalBoard extends HTMLElement {
             x1: jackWeAreDragging.x1,
             y1: jackWeAreDragging.y1,
             x2: loc.x/this.zoom,
-            y2: loc.y/this.zoom,
-            zoom: this.zoom
+            y2: loc.y/this.zoom
           };
           jackWeAreDragging.reviewSVGJack(_pos);
         }
@@ -940,12 +941,7 @@ class PedalBoard extends HTMLElement {
         break;
     }
   }
-
-
-
-
-
-
+  
   openMediaDevices() {
     this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
   }
@@ -1046,7 +1042,6 @@ class PedalBoard extends HTMLElement {
     return target;
   }
 
-
   dragPedalHandler(e) {
     e.preventDefault();
     return false;
@@ -1058,7 +1053,7 @@ class PedalBoard extends HTMLElement {
     let p = {
       id: `p_${Date.now()}`,
       type: e.dataTransfer.getData("pedalId"),
-      position: { x: e.clientX - 30, y: event.clientY - 10 },
+      position: { x: (e.clientX - 3)/this.zoom, y: (event.clientY - 10)/this.zoom },
       settings: {}
     }
     this.loadPlugin(p);
