@@ -489,6 +489,31 @@ class PedalBoard extends HTMLElement {
     }
   }
 
+  resizeElements() {
+    let dx, dy;
+    this.w = this.offsetWidth;
+    this.h = this.offsetHeight;
+    this.pOut.setPosition(this.w, (this.h / 2));
+
+    // produit en croix
+    this.pedals.forEach((p, i) => {
+      if (i > 1) {
+        dx = ((p.offsetLeft) * (this.w)) / (this.wO);
+        dy = ((p.offsetTop) * (this.h)) / (this.hO);
+        p.move(dx, dy);
+      }
+    });
+
+    this.wO = this.w;
+    this.hO = this.h;
+
+    this.updateSVGcanvas(this.w, this.h);
+
+
+    
+    this.doZoom();
+  }
+
   getPedalFromHtmlElem(elem) {
     for (var i = 0; i < this.pedals.length; i++) {
       var p = this.pedals[i];
@@ -944,27 +969,6 @@ class PedalBoard extends HTMLElement {
   
   openMediaDevices() {
     this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
-  }
-
-  resizeElements() {
-    let dx, dy;
-    this.w = this.offsetWidth;
-    this.h = this.offsetHeight;
-    this.pOut.setPosition(this.w, (this.h / 2));
-
-    // produit en croix
-    this.pedals.forEach((p, i) => {
-      if (i > 1) {
-        dx = ((p.offsetLeft) * (this.w)) / (this.wO);
-        dy = ((p.offsetTop) * (this.h)) / (this.hO);
-        p.move(dx, dy);
-      }
-    });
-
-    this.wO = this.w;
-    this.hO = this.h;
-
-    this.updateSVGcanvas(this.w, this.h);
   }
 
   eventFire(el, etype) {
