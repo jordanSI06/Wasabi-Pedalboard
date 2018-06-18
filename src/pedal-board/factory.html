@@ -4,6 +4,7 @@
   </div>
 </template>
 <script>UseWebAudioControlsMidi = 1</script>
+<script src="https://wasabi.i3s.unice.fr/WebAudioPluginBank/sdk/WebAudioSDK.js"></script>
 <script>
 
   const _currentdoc = document.currentScript.ownerDocument;
@@ -91,7 +92,14 @@
           var wrapper = this.shadowRoot.querySelector(".laPedale");
 
           // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
-          this.plugin = new WAPlugin[_pluginName](GlobalContext.context, _pluginUrl);
+          try {
+            this.plugin = new window[_pluginName](GlobalContext.context, _pluginUrl);
+
+          } catch (error) {
+            console.warn("WAP plugin implementation changes : replace your module definition by window.mymodule");
+            this.plugin = new WAPlugin[_pluginName](GlobalContext.context, _pluginUrl);
+
+          }
 
           // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
           // LOAD NODE
@@ -141,9 +149,9 @@
 
             if (this.nbNodeIn > 0) {
               // connect the node to the I/O of the pbplugin 
-              if (node instanceof AudioWorkletNode) pedal.soundNodeIn.connect(node);
+              /*if (node instanceof AudioWorkletNode)*/ pedal.soundNodeIn.connect(node);
               // case the node is pure JS graph     ---> is resolved in PingPongDelay3, soon we'll keep the first way for everything
-              else pedal.soundNodeIn.connect(node.getInput(0));
+              //else pedal.soundNodeIn.connect(node.getInput(0));
             }
             node.connect(pedal.soundNodeOut);
           });
