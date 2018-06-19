@@ -277,6 +277,7 @@ class PedalBoard extends HTMLElement {
 
     this.addChangeAudioListeners();
 
+
     this.shadowRoot.querySelector('#mainPedalboard').ondragover = (e) => {
       this.dragPedalHandler(e);
     }
@@ -285,10 +286,13 @@ class PedalBoard extends HTMLElement {
     }
 
     this.shadowRoot.querySelector('#bt_openMicroDevices').onclick = (e) => {
+      if(!this.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden"))this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
+
       this.openMediaDevices();
     }
 
     this.shadowRoot.querySelector('#bt_openAudio').onclick = (e) => {
+      if(!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
       this.openAudioPlayer();
     }
 
