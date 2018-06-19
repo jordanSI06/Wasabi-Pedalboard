@@ -11,16 +11,17 @@
 
   <!-- See https://goo.gl/OOhYW5 -->
   <link rel="manifest" href="./manifest.json">
-
   <script src="./bower_components/webcomponentsjs/webcomponents-loader.js"></script>
-<link href="https://fonts.googleapis.com/css?family=PT+Sans|Quicksand|Roboto" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=PT+Sans|Quicksand|Roboto" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand">
   <link rel="stylesheet" href="./css/css.css">
+  <link rel="stylesheet" href="./pastyle.css">
 
 
 
   <!-- Link to factory and its components -->
-  <link rel="import" href="./src/pedal-board/factory.html"></script>
+  <link rel="import" href="./src/pedal-board/factory.html">
+  </script>
   <script src="./src/plugins/_utils/js/pedal-behavior.js"></script>
 
   <!-- A DEGAGER ? : START -->
@@ -46,10 +47,10 @@
   <link rel="import" href="./src/plugins/amp-sim"> 
   -->
   <!-- 'type synths -->
-<!--  
+  <!--  
   <link rel="import"  href="https://wasabi.i3s.unice.fr/WebAudioPluginBank/PluginLoader/wasabi-host.html">
   <link rel="import" href="https://wasabi.i3s.unice.fr/WebAudioPluginBank/PluginLoader/wam-host.html"> -->
-  
+
   <!-- <link rel="import" href="./src/plugins/pedal-alike-dx7"> -->
   <!-- <link rel="import" href="./src/plugins/pedal-alike-obx"> -->
   <!-- <link rel="import" href="./src/plugins/pedal-alike-dexed"> -->
@@ -66,10 +67,19 @@
 
   <!-- pedal-board -->
   <link rel="import" href="./src/pedal-board">
+  <script src="./index.js"></script>
+
 </head>
 
 <body>
-  <pedal-board id="pedalboard"></pedal-board>
+  <ul id="ul_container" class="div_container">
+    <li id="li_1">
+      <pedal-board id="pedalboard"></pedal-board>
+    </li>
+    <li id="li_2">
+      <div id="div_2">div_2</div>
+    </li>
+  </ul>
 </body>
 
 </html>
