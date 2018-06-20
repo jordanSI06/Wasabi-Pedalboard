@@ -76,6 +76,7 @@
       //
       if (localStorage.getItem('banks')) this.banks = JSON.parse(localStorage.getItem('banks'));
       else this.banks = [];
+      console.log(this.banks);
       localStorage.setItem('banks', JSON.stringify(this.banks));
       this.loadBanks();
 
@@ -84,28 +85,28 @@
 
     takeScreenshot() {
       console.log('takeScreenshot');
-      html2canvas(this.pedalboard,{
-        allowTaint:true,
+      html2canvas(this.pedalboard, {
+        allowTaint: true,
         // foreignObjectRendering:true
-      }).then(canvas=>{
-          console.log('onrendered',canvas);
-          // var tempcanvas = document.createElement('canvas');
-          // tempcanvas.width = 350;
-          // tempcanvas.height = 350;
+      }).then(canvas => {
+        console.log('onrendered', canvas);
+        // var tempcanvas = document.createElement('canvas');
+        // tempcanvas.width = 350;
+        // tempcanvas.height = 350;
 
-          // var context = tempcanvas.getContext('2d');
-          // context.drawImage(canvas, 112, 0, 288, 200, 0, 0, 350, 350);
+        // var context = tempcanvas.getContext('2d');
+        // context.drawImage(canvas, 112, 0, 288, 200, 0, 0, 350, 350);
 
-          let img=document.createElement('img');
-          img.src=canvas.toDataURL('image/png');
-          img.style.width="400px";
-          this.pedalboard.appendChild(img);
+        let img = document.createElement('img');
+        img.src = canvas.toDataURL('image/png');
+        img.style.width = "400px";
+        this.pedalboard.appendChild(img);
 
 
-          // var link = document.createElement("a");
-          // link.href = canvas.toDataURL('image/jpg');   //function blocks CORS
-          // link.download = 'screenshot.jpg';
-          // link.click();
+        // var link = document.createElement("a");
+        // link.href = canvas.toDataURL('image/jpg');   //function blocks CORS
+        // link.download = 'screenshot.jpg';
+        // link.click();
       })
     }
 
@@ -154,6 +155,7 @@
       this.plugsConnexions = bankSelected.presets.find(item => item._id == this.presetSelected).connexions;
       //console.log('LOADING',bankSelected.presets.find(item => item._id == this.presetSelected));
       //console.log(`START: LOAD PRESET ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
+      console.log("plugconnexions", this.plugsConnexions);
 
       this.nbPluginTraitee = 0;
 
@@ -170,14 +172,24 @@
         console.log('NEXT : -----{{{{ this.nbPluginTraitee----- }}}}}', this.nbPluginTraitee);
         this.nbPluginTraitee += 1;
         if (this.nbPluginTraitee < this.plugs.length) this.loadNewPlugin(this.plugs[this.nbPluginTraitee]);
-        else this.loadConnexions();
+
+        else { this.loadConnexions(); }
       })
     }
 
     async loadConnexions() {
       console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
       for (let i = 0; i < this.plugsConnexions.length; i++) {
-        this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in}`));
+        let tabId = []; console.log(this.plugsConnexions[i].in);
+        console.log(this.pedalboard.pedals[this.pedalboard.pedals.length - 1].id);
+        for (let i = 0; i < this.pedalboard.pedals.length; i++) {
+          tabId.push(this.pedalboard.pedals[i].id);
+        }
+        console.log(this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`).nodeintab[this.plugsConnexions[i].in.inputnumber]);
+
+       // this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`).nodeintab[this.plugsConnexions[i].in.inputnumber]);
+        this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`),this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`) ,this.plugsConnexions[i].in.inputnumber);
+
       }
       await this.sleep(1000);
       console.log('finished to sleep');
@@ -236,6 +248,7 @@
 
     saveBank() {
       localStorage.setItem('banks', JSON.stringify(this.banks));
+      console.log(JSON.parse(localStorage.getItem('banks')));
     }
 
     clearBanks() {
@@ -271,6 +284,7 @@
 
       let _currentPlugs = [];
       let _currentConnexions = this.pedalboard.pluginConnected;
+      console.log(_currentConnexions); // OK pour le gainnode
 
       let _plugin = '';
       let _plugsToSave = {};
@@ -307,6 +321,7 @@
           //"screenshot":_screenshot
         }
         bankSelected.presets.push(_newPreset);
+        console.log(_newPreset)// ok pour le gainNode
       } else {
         //console.log('preset exist', bankSelected.presets.find(item => item.label == _presetName));
         // Not every plugin have an "params" getter, you need to try catch when using it

@@ -20,8 +20,8 @@ PBPlugin = function (superClass) {
       this.nbNodeIn = "";
       this.nbNodeOut = "";
 
-      this.bestInputNumber = 0;
-      this.bestOutputNumber = 0;
+      this.bestInputNumber =0 ;
+      this.bestOutputNumber =0;
 
       // this.inputHighlighted = [];
       // this.outputHighlighted = [];
@@ -37,8 +37,12 @@ PBPlugin = function (superClass) {
       // }
 
       this.isOn = false;
+      this.nodeintab = [];
       this.soundNodeIn = GlobalContext.context.createGain();
       this.soundNodeOut = GlobalContext.context.createGain();
+      this.nodeintab.push(this.soundNodeIn);
+
+     
     }
     // get isOn() {
     //   return false;
@@ -72,8 +76,10 @@ PBPlugin = function (superClass) {
 
       //console.log("this.nbNodeIn", this.nbNodeIn);
       for (var i = 0; i < this.nbNodeIn; i++) {
+        // let tmp = "nodein"+i;
+        // this.nodeintab.push([tmp]);
         this.inputP[i] = document.createElement("div");
-        this.inputP[i].style = 'margin-top :' + 20 * i + 'px';
+        this.inputP[i].style = 'margin-top :' + 40 * i + 'px';
         this.inputP[i].classList.add("input");
         if (typeof this.nbNodeIn == "undefined" || (this.nbNodeIn > 0)) elem.appendChild(this.inputP[i]);
       }
@@ -83,7 +89,7 @@ PBPlugin = function (superClass) {
 
       for (var i = 0; i < this.nbNodeOut; i++) {
         this.outputP[i] = document.createElement("div");
-        this.outputP[i].style = 'margin-top :' + 20 * i + 'px';
+        this.outputP[i].style = 'margin-top :' + 40 * i + 'px';
         this.outputP[i].classList.add("output");
         if (typeof this.nbNodeOut == "undefined" || (this.nbNodeOut > 0)) elem.appendChild(this.outputP[i]);
       }
@@ -277,7 +283,7 @@ PBPlugin = function (superClass) {
       var ypos = [];
       for (var i = 0; i < this.nbNodeIn; i++) {
         xpos[i] = (_zoom * this.x) + this.IOsize / 2 + (-this.IOsize / 2);
-        ypos[i] = ((_zoom * this.y) + this.IOsize / 2 + (this.IOsize - 4) + 12) + 20 * i;
+        ypos[i] = ((_zoom * this.y) + this.IOsize / 2 + (this.IOsize - 4) + 12) + 40 * i;
       }
       return { xpos, ypos }
     }
@@ -322,9 +328,15 @@ PBPlugin = function (superClass) {
     highLightInput(i, flag) {
       if (flag) {
         this.inputP[i].style.backgroundColor = "red";
+        this.inputP[i].style.borderColor = "red";
+        this.inputP[i].style.borderWidth = "5px";
+        this.inputP[i].style.borderStyle = "solid";
       }
       else {
         this.inputP[i].style.backgroundColor = null;
+        this.inputP[i].style.borderColor = "red";
+        this.inputP[i].style.borderWidth = "5px";
+        this.inputP[i].style.borderStyle = null;
       }
       this.inputHighlighted = flag;
     }

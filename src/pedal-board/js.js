@@ -286,13 +286,13 @@ class PedalBoard extends HTMLElement {
     }
 
     this.shadowRoot.querySelector('#bt_openMicroDevices').onclick = (e) => {
-      if(!this.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden"))this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
+      if (!this.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
 
       this.openMediaDevices();
     }
 
     this.shadowRoot.querySelector('#bt_openAudio').onclick = (e) => {
-      if(!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
+      if (!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
       this.openAudioPlayer();
     }
 
@@ -305,12 +305,12 @@ class PedalBoard extends HTMLElement {
     }
 
     this.shadowRoot.querySelector('#bt_zoom_in').onclick = (e) => {
-      this.zoom= this.zoom/0.9;
+      this.zoom = this.zoom / 0.9;
       this.doZoom();
     }
 
     this.shadowRoot.querySelector('#bt_zoom_out').onclick = (e) => {
-      this.zoom = this.zoom*0.9;
+      this.zoom = this.zoom * 0.9;
       this.doZoom();
     }
 
@@ -432,18 +432,25 @@ class PedalBoard extends HTMLElement {
     return ((typeof _nbNodeOut == "undefined" || (_nbNodeOut > 0)) && (typeof _nbNodeIn == "undefined" || (_nbNodeIn > 0)));
   }
 
-  connect(p1, p2) {
+  connect(p1, p2,inputNumber) {
     // si p1_Out && p2_In existent (>1) alors la connexion est possible
     if (this.isConnexionPossible(p1.nbNodeOut, p2.nbNodeIn)) {
       let j = new Jack();
-      j.connexion(p1, p2);
+      if(inputNumber)j.connexion(p1, p2, inputNumber);
+      else j.connexion(p1,p2,p2.bestInputNumber);
       p1.addJackAtOutput(j);
       p2.addJackAtInput(j);
-      this.soundNodeConnection(p1, p2);
+      if(inputNumber)this.soundNodeConnection(p1, p2, inputNumber);
+      else this.soundNodeConnection(p1, p2);
 
       // add connexion for "this.pluginConnected"
-      this.pluginConnected.push({ in: p2.id, out: p1.id });
+      this.pluginConnected.push({
+
+        in: {id:p2.id,inputnumber:p2.bestInputNumber}, out: p1.id
+      });
     }
+    console.log(this.pluginConnected);
+
   }
 
   disconnect(p1, p2) {
@@ -481,10 +488,10 @@ class PedalBoard extends HTMLElement {
   doZoom() {
     this.main.style.zoom = this.zoom;
     //this.resizeElements();
-    this.updateSVGcanvas(this.w/this.zoom,this.h/this.zoom);
+    this.updateSVGcanvas(this.w / this.zoom, this.h / this.zoom);
 
-    this.pIn.setPosition(-20, (this.h / 2)/this.zoom);
-    this.pOut.setPosition(this.w/this.zoom, (this.h / 2)/this.zoom);
+    this.pIn.setPosition(-20, (this.h / 2) / this.zoom);
+    this.pOut.setPosition(this.w / this.zoom, (this.h / 2) / this.zoom);
 
 
     // repositionnement des jacks
@@ -514,7 +521,7 @@ class PedalBoard extends HTMLElement {
     this.updateSVGcanvas(this.w, this.h);
 
 
-    
+
     this.doZoom();
   }
 
@@ -543,6 +550,7 @@ class PedalBoard extends HTMLElement {
     let y = (e.y - rect.top);
 
     this.pedals.forEach((p) => {
+
       //console.log("eske t allume",p.inputHighlighted);
       /*
       be careful here this is not the pedalboard,
@@ -743,7 +751,7 @@ class PedalBoard extends HTMLElement {
       svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("id", "svg-canvas");
       svg.setAttribute('style', 'position:absolute;top:0px;left:0px');
-      svg.setAttribute("viewBox",`0 0 ${w} ${h}`);
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
       // Should use here pedalboard
       svg.setAttribute('width', w);
       svg.setAttribute('height', h);
@@ -757,7 +765,7 @@ class PedalBoard extends HTMLElement {
     let svg = document.getElementById("svg-canvas");
     svg.setAttribute('width', w);
     svg.setAttribute('height', h);
-    svg.setAttribute("viewBox",`0 0 ${w} ${h}`);
+    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
   }
 
   distance(x1, y1, x2, y2) {
@@ -791,8 +799,8 @@ class PedalBoard extends HTMLElement {
     let _pos = {
       x1: x1,
       y1: y1,
-      x2: loc.x/this.zoom,
-      y2: loc.y/this.zoom
+      x2: loc.x / this.zoom,
+      y2: loc.y / this.zoom
     }
 
     let j = new Jack();
@@ -886,7 +894,7 @@ class PedalBoard extends HTMLElement {
       //pedal = _p.getPedalFromHtmlElem(d);
       // if (loc.x > pedal.x && loc.x < pedal.x + pedal.w * 1.25 && loc.y > pedal.y && loc.y < pedal.y +
       //   pedal.h * 1.25) {
-        result = true;
+      result = true;
       // }
     });
     return result;
@@ -946,8 +954,8 @@ class PedalBoard extends HTMLElement {
           let _pos = {
             x1: jackWeAreDragging.x1,
             y1: jackWeAreDragging.y1,
-            x2: loc.x/this.zoom,
-            y2: loc.y/this.zoom
+            x2: loc.x / this.zoom,
+            y2: loc.y / this.zoom
           };
           jackWeAreDragging.reviewSVGJack(_pos);
         }
@@ -970,7 +978,7 @@ class PedalBoard extends HTMLElement {
         break;
     }
   }
-  
+
   openMediaDevices() {
     this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
   }
@@ -1061,7 +1069,7 @@ class PedalBoard extends HTMLElement {
     let p = {
       id: `p_${Date.now()}`,
       type: e.dataTransfer.getData("pedalId"),
-      position: { x: (e.clientX - 3)/this.zoom, y: (event.clientY - 10)/this.zoom },
+      position: { x: (e.clientX - 3) / this.zoom, y: (event.clientY - 10) / this.zoom },
       settings: {}
     }
     this.loadPlugin(p);
@@ -1315,7 +1323,7 @@ class PedalBoard extends HTMLElement {
   }
 
   // Michel BUFFA : somme comments would be welcomed here!
-  soundNodeConnection(p1, p2) {
+  soundNodeConnection(p1, p2,inputnumber) {
     if (p1.id == "pedalIn" && p2.id == "pedalOut") {
       if (this.sound.state == 0) {
         this.sound.gainNodeIn.connect(this.sound.gainNodeOut);
@@ -1326,15 +1334,19 @@ class PedalBoard extends HTMLElement {
       }
     } else if (p1.id == "pedalIn") {
       if (this.sound.state == 0) {
-        this.sound.gainNodeIn.connect(p2.soundNodeIn);
+        if(inputnumber)this.sound.gainNodeIn.connect(p2.nodeintab[inputnumber])
+        else this.sound.gainNodeIn.connect(p2.nodeintab[p2.bestInputNumber]);
       } else {
-        this.sound.gainNodeInMid.connect(p2.soundNodeIn);
+        if(inputnumber)this.sound.gainNodeInMid.connect(p2.nodeintab[inputnumber])
+        else this.sound.gainNodeInMid.connect(p2.nodeintab[p2.bestInputNumber]);
       }
     } else if (p2.id == "pedalOut") {
       p1.soundNodeOut.connect(this.sound.gainNodeOut);
       this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
     } else {
-      p1.soundNodeOut.connect(p2.soundNodeIn);
+      p1.soundNodeOut.connect(p2.nodeintab[p2.bestInputNumber]);
+      if(inputnumber)p1.soundNodeOut.connect(p2.nodeintab[inputnumber])
+      else p1.soundNodeOut.connect(p2.nodeintab[p2.bestInputNumber]);
     }
   }
 

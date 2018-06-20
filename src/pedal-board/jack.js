@@ -6,12 +6,14 @@ class Jack {
     this.end = "";
     this.offsetX = 0;
     this.offsetY = 0;
+    this.temp;
   }
 
-  connexion(pedal1, pedal2) {
+  connexion(pedal1, pedal2, pedal2inputNumber) {
     this.p1 = pedal1;
     this.p2 = pedal2;
     this.id = `jack_${this.p1.id}_${this.p2.id}`;
+    this.temp = pedal2inputNumber;
 
     this.update(this.id);
   }
@@ -31,8 +33,8 @@ class Jack {
     let _pos = {
       x1: oPos.xpos[this.p1.bestOutputNumber],
       y1: oPos.ypos[this.p1.bestOutputNumber],
-      x2: (iPos.xpos[this.p2.bestInputNumber] + this.offsetX),
-      y2: (iPos.ypos[this.p2.bestInputNumber] + this.offsetY)
+      x2: (iPos.xpos[this.temp] + this.offsetX),
+      y2: (iPos.ypos[this.temp] + this.offsetY)
     }
     this.reviewSVGJack(_pos, _id);
   }
@@ -47,7 +49,7 @@ class Jack {
       // you can use "makeSVG" from: http://stackoverflow.com/questions/6701705/programmatically-creating-an-svg-image-element-with-javascript
       this.end = document.createElementNS('http://www.w3.org/2000/svg', 'image');
       this.end.setAttribute('class', `map-tile`);
-      this.end.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `../img/rightJack.png`); // '../pedalboard/img/rightJack.png'
+      this.end.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `https://wasabi.i3s.unice.fr/dynamicPedalboard/img/rightJack.png`); // '../pedalboard/img/rightJack.png'
       this.end.setAttribute('width', `${100}px`);
       this.end.setAttribute('height', `${20}px`);
       this.end.setAttribute('id', `${_id}_2`);

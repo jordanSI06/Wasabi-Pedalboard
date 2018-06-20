@@ -45,7 +45,7 @@
         static get observedAttributes() { return ['params']; }
 
         // appelé lorsque l'un des attributs de l'élément personnalisé est ajouté, supprimé ou modifié.
-        attributeChangedCallback(name, oldValue, newValue) {
+        attributeChangedCallback(name, oldValue, newValue, nbNodeIn) {
           console.log(`Custom element ${this.is} attributes changed.`);
           try {
             console.log(`name: ${name}`);
@@ -59,6 +59,8 @@
           catch (err) {
             console.log(err);
           }
+
+          console.log(this.plugin);
         }
 
         // called when the plugin is moved to another document
@@ -146,12 +148,26 @@
 
               //resolve({ params: node.params, node: node });
             });
+            console.log(pedal.nodeintab);
+            for (var i = 1; i < this.nbNodeIn; i++) {
+              let tmp = "nodein" + i;
+              pedal[tmp] = GlobalContext.context.createGain();
+              pedal.nodeintab.push(pedal[tmp]);
+            }
+
 
             if (this.nbNodeIn > 0) {
-              // connect the node to the I/O of the pbplugin 
-              /*if (node instanceof AudioWorkletNode)*/ pedal.soundNodeIn.connect(node);
-              // case the node is pure JS graph     ---> is resolved in PingPongDelay3, soon we'll keep the first way for everything
-              //else pedal.soundNodeIn.connect(node.getInput(0));
+              if (this.nbNodeIn > 1) {
+                // console.log(pedal.nodeintab);
+                // console.log(node.inputs)
+
+                for (let i = 0; i < pedal.nodeintab.length; i++) {
+                  pedal.nodeintab[i].connect(node.inputs[i]);
+                }
+              } else {
+                pedal.soundNodeIn.connect(node);
+
+              }
             }
             node.connect(pedal.soundNodeOut);
           });
