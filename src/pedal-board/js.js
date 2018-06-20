@@ -416,8 +416,11 @@ class PedalBoard extends HTMLElement {
         }
       }
       if (jacksOut.length > 0) {
+
         for (let i = jacksOut.length - 1; i >= 0; i--) {
-          this.disconnect(jacksOut[i].p1, jacksOut[i].p2);
+          console.log(jacksOut[i].p1,jacksOut[i].p2);
+
+          this.disconnect(jacksOut[i].p1, jacksOut[i].p2,jacksOut[i].pedal2inputNumber);
         }
       }
 
@@ -453,7 +456,7 @@ class PedalBoard extends HTMLElement {
 
   }
 
-  disconnect(p1, p2) {
+  disconnect(p1, p2,inputNumber) {
     let j;
     for (j in p1.outputJacks) {
       if (p1.outputJacks[j].p2 == p2) {
@@ -473,7 +476,7 @@ class PedalBoard extends HTMLElement {
       if (elem != null) elem.parentNode.removeChild(elem);
     }
 
-    this.soundNodeDisconnection(p1, p2);
+    this.soundNodeDisconnection(p1, p2,inputNumber);
 
     // remove connexion from "this.pluginConnected"
     for (let i = 0; i < this.pluginConnected.length; i++) {
@@ -1350,7 +1353,7 @@ class PedalBoard extends HTMLElement {
     }
   }
 
-  soundNodeDisconnection(p1, p2) {
+  soundNodeDisconnection(p1, p2, inputnumber) {
     if (p1.id == "pedalIn" && p2.id == "pedalOut") {
       if (this.sound.state == 0) {
         this.sound.gainNodeIn.disconnect(this.sound.gainNodeOut);
@@ -1359,14 +1362,18 @@ class PedalBoard extends HTMLElement {
       }
     } else if (p1.id == "pedalIn") {
       if (this.sound.state == 0) {
-        this.sound.gainNodeIn.disconnect(p2.soundNodeIn);
+        if(inputnumber)this.sound.gainNodeIn.disconnect(p2.nodeintab[inputnumber]);
+        else this.sound.gainNodeIn.disconnect(p2.soundNodeIn);
+        
       } else {
+        if(inputnumber)this.sound.gainNodeInMid.disconnect(p2.nodeintab[inputnumber]);
         this.sound.gainNodeInMid.disconnect(p2.soundNodeIn);
       }
     } else if (p2.id == "pedalOut") {
       p1.soundNodeOut.disconnect(this.sound.gainNodeOut);
     } else {
-      p1.soundNodeOut.disconnect(p2.soundNodeIn);
+      if(inputnumber)p1.soundNodeOut.disconnect(p2.nodeintab[inputnumber]);
+      else p1.soundNodeOut.disconnect(p2.soundNodeIn);
     }
   }
 }

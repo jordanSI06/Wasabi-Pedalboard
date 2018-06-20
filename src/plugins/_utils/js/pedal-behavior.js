@@ -76,8 +76,6 @@ PBPlugin = function (superClass) {
 
       //console.log("this.nbNodeIn", this.nbNodeIn);
       for (var i = 0; i < this.nbNodeIn; i++) {
-        // let tmp = "nodein"+i;
-        // this.nodeintab.push([tmp]);
         this.inputP[i] = document.createElement("div");
         this.inputP[i].style = 'margin-top :' + 40 * i + 'px';
         this.inputP[i].classList.add("input");

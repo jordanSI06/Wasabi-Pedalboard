@@ -13,7 +13,7 @@ class Jack {
     this.p1 = pedal1;
     this.p2 = pedal2;
     this.id = `jack_${this.p1.id}_${this.p2.id}`;
-    this.temp = pedal2inputNumber;
+    this.pedal2inputNumber = pedal2inputNumber;
 
     this.update(this.id);
   }
@@ -33,8 +33,8 @@ class Jack {
     let _pos = {
       x1: oPos.xpos[this.p1.bestOutputNumber],
       y1: oPos.ypos[this.p1.bestOutputNumber],
-      x2: (iPos.xpos[this.temp] + this.offsetX),
-      y2: (iPos.ypos[this.temp] + this.offsetY)
+      x2: (iPos.xpos[this.pedal2inputNumber] + this.offsetX),
+      y2: (iPos.ypos[this.pedal2inputNumber] + this.offsetY)
     }
     this.reviewSVGJack(_pos, _id);
   }
