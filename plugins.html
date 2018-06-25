@@ -141,7 +141,24 @@
                 })
             }
           )
+        });
+        fetch('https://webaudiomodules.org/repository.json')
+        .then(res => res.json())
+        .then(data => {
+          Object.keys(data.plugs).map(
+            (elem, index) => {
+              fetch(data.plugs[elem] + "/main.json")
+                .then(tab => tab.json())
+                .then(plugs => {
+                  //console.log("plugs", plugs);
+                  _mainPlugins.insertAdjacentHTML('beforeEnd', render(data.plugs[elem], plugs));
+                })
+            }
+          )
         })
+
+
+
     }
 
     function render(_url, _json) {

@@ -22,6 +22,7 @@ class PedalBoard extends HTMLElement {
     this.pluginSettings = [];
 
     this.pIn;
+    this.pIn2;
     this.pOut;
 
 
@@ -61,6 +62,7 @@ class PedalBoard extends HTMLElement {
       gainNodeIn: null,
       gainNodeOut: null,
       gainNodeInMid: null,
+      gainNodeInMid2: null,
       mediaSource: null,
       mediaSourceM: null,
       monoMediaSourceM: null,
@@ -123,7 +125,12 @@ class PedalBoard extends HTMLElement {
     this.hO = this.h;
 
     this.pIn = document.createElement('pedal-in');
-    this.pIn.id = "pedalIn";
+    this.pIn.id = "pedalIn1";
+    this.pIn.classList.add("pedalIn");
+    // for the second channel of usermedia input
+    this.pIn2 = document.createElement('pedal-in');
+    this.pIn2.id = "pedalIn2";
+    console.log(this.pIn.classList);
 
     this.pOut = document.createElement('pedal-out');
     this.pOut.id = "pedalOut";
@@ -314,6 +321,10 @@ class PedalBoard extends HTMLElement {
       this.doZoom();
     }
 
+    this.shadowRoot.querySelector('#bt_stereo').onclick = (e) => {
+      this.changetomono();
+    }
+
   }
 
   openHeader() {
@@ -391,7 +402,7 @@ class PedalBoard extends HTMLElement {
   }
 
   addPedal(p) {
-    if (p.id != "pedalIn" && p.id != "pedalOut") p.className = "draggable";
+    if (!p.classList.contains("pedalIn") && p.id != "pedalOut") p.className = "draggable";
 
     this.pedals.push(p);
 
@@ -418,9 +429,9 @@ class PedalBoard extends HTMLElement {
       if (jacksOut.length > 0) {
 
         for (let i = jacksOut.length - 1; i >= 0; i--) {
-          console.log(jacksOut[i].p1,jacksOut[i].p2);
+          console.log(jacksOut[i].p1, jacksOut[i].p2);
 
-          this.disconnect(jacksOut[i].p1, jacksOut[i].p2,jacksOut[i].pedal2inputNumber);
+          this.disconnect(jacksOut[i].p1, jacksOut[i].p2, jacksOut[i].pedal2inputNumber);
         }
       }
 
@@ -435,28 +446,29 @@ class PedalBoard extends HTMLElement {
     return ((typeof _nbNodeOut == "undefined" || (_nbNodeOut > 0)) && (typeof _nbNodeIn == "undefined" || (_nbNodeIn > 0)));
   }
 
-  connect(p1, p2,inputNumber) {
+  connect(p1, p2, inputNumber) {
+
     // si p1_Out && p2_In existent (>1) alors la connexion est possible
     if (this.isConnexionPossible(p1.nbNodeOut, p2.nbNodeIn)) {
       let j = new Jack();
-      if(inputNumber)j.connexion(p1, p2, inputNumber);
-      else j.connexion(p1,p2,p2.bestInputNumber);
+      if (inputNumber) j.connexion(p1, p2, inputNumber);
+      else j.connexion(p1, p2, p2.bestInputNumber);
       p1.addJackAtOutput(j);
       p2.addJackAtInput(j);
-      if(inputNumber)this.soundNodeConnection(p1, p2, inputNumber);
+      if (inputNumber) this.soundNodeConnection(p1, p2, inputNumber);
       else this.soundNodeConnection(p1, p2);
 
       // add connexion for "this.pluginConnected"
       this.pluginConnected.push({
 
-        in: {id:p2.id,inputnumber:p2.bestInputNumber}, out: p1.id
+        in: { id: p2.id, inputnumber: p2.bestInputNumber }, out: p1.id
       });
     }
     console.log(this.pluginConnected);
 
   }
 
-  disconnect(p1, p2,inputNumber) {
+  disconnect(p1, p2, inputNumber) {
     let j;
     for (j in p1.outputJacks) {
       if (p1.outputJacks[j].p2 == p2) {
@@ -476,7 +488,7 @@ class PedalBoard extends HTMLElement {
       if (elem != null) elem.parentNode.removeChild(elem);
     }
 
-    this.soundNodeDisconnection(p1, p2,inputNumber);
+    this.soundNodeDisconnection(p1, p2, inputNumber);
 
     // remove connexion from "this.pluginConnected"
     for (let i = 0; i < this.pluginConnected.length; i++) {
@@ -494,6 +506,7 @@ class PedalBoard extends HTMLElement {
     this.updateSVGcanvas(this.w / this.zoom, this.h / this.zoom);
 
     this.pIn.setPosition(-20, (this.h / 2) / this.zoom);
+    if (this.pIn2) this.pIn2.setPosition(-20, (this.h / 4) / this.zoom);
     this.pOut.setPosition(this.w / this.zoom, (this.h / 2) / this.zoom);
 
 
@@ -1196,6 +1209,8 @@ class PedalBoard extends HTMLElement {
     this.sound.gainNodeIn.connect(this.meter1);
     this.sound.gainNodeInMid.connect(this.meter3);
 
+
+
     if (navigator.mediaDevices.getUserMedia) {
       var constraints = {
         audio: {
@@ -1229,6 +1244,8 @@ class PedalBoard extends HTMLElement {
     }
 
 
+
+
     // link to clip detector
     this.drawLoop();
 
@@ -1238,8 +1255,21 @@ class PedalBoard extends HTMLElement {
       // 1 : connected
       if (e.target.value) {
 
+
         if (this.pedals[0].outputJacks.length != 0) {
           this.pedals[0].outputJacks.forEach((j) => {
+            // this.sound.state goes back to 0 for the next disconnect
+            this.sound.state = 0;
+            this.soundNodeDisconnection(j.p1, j.p2);
+
+            this.sound.state = 1;
+            this.soundNodeConnection(j.p1, j.p2);
+          })
+        }
+
+
+        if (this.pIn2.outputJacks.length != 0) {
+          this.pIn2.outputJacks.forEach((j) => {
             // this.sound.state goes back to 0 for the next disconnect
             this.sound.state = 0;
             this.soundNodeDisconnection(j.p1, j.p2);
@@ -1278,6 +1308,7 @@ class PedalBoard extends HTMLElement {
     // When you play for 4 seconds, the input gain is adjusted depending on the max measured value 
     bt_learn.addEventListener("click", (e) => {
       this.sound.gainNodeInMid.gain.value = 1;
+      this.sound.gainNodeInMid2.gain.value = 1;
 
       _tabVolume = [];
       i = 4000;
@@ -1300,6 +1331,33 @@ class PedalBoard extends HTMLElement {
         }
       }, 100);
     });
+  }
+
+  changetomono() {
+    console.log(this.querySelector("#pedalIn2"))
+    if (!this.querySelector("#pedalIn2")) {
+      console.log("changetomono")
+      this.sound.gainNodeInMid2 = this.sound.context.createGain();
+      this.splitter.disconnect();
+      this.splitter.connect(this.sound.gainNodeInMid, 0);
+      this.splitter.connect(this.sound.gainNodeInMid2, 1);
+      this.sound.gainNodeInMid2.connect(this.meter3);
+      this.pIn2.classList.add("pedalIn");
+      this.pIn2.setPosition(-20, (this.h / 4));
+      this.addPedal(this.pIn2);
+    }
+    else {
+      console.log("backtostereo")
+      this.splitter.disconnect();
+      this.splitter.connect(this.monoMediaSourceM, 0, 0);
+      this.splitter.connect(this.monoMediaSourceM, 0, 1);
+      this.splitter.connect(this.monoMediaSourceM, 1, 0);
+      this.splitter.connect(this.monoMediaSourceM, 1, 1);
+      this.removePedal(this.pIn2);
+
+     }
+
+
   }
 
   changeStreamAsInputInGraph(id) {
@@ -1326,53 +1384,93 @@ class PedalBoard extends HTMLElement {
   }
 
   // Michel BUFFA : somme comments would be welcomed here!
-  soundNodeConnection(p1, p2,inputnumber) {
-    if (p1.id == "pedalIn" && p2.id == "pedalOut") {
+  soundNodeConnection(p1, p2, inputnumber) {
+
+    if (p1.classList.contains("pedalIn") && p2.id == "pedalOut") {
+      console.log("here1")
+
+
       if (this.sound.state == 0) {
         this.sound.gainNodeIn.connect(this.sound.gainNodeOut);
         this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
+
       } else {
-        this.sound.gainNodeInMid.connect(this.sound.gainNodeOut);
-        this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
+        if (p1.id == 'pedalIn1') {
+          this.sound.gainNodeInMid.connect(this.sound.gainNodeOut);
+          this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
+        } else if (p1.id == 'pedalIn2') {
+          console.log("yes");
+          this.sound.gainNodeInMid2.connect(this.sound.gainNodeOut);
+          this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
+        }
       }
-    } else if (p1.id == "pedalIn") {
+    }
+
+
+
+    else if (p1.classList.contains("pedalIn")) {
       if (this.sound.state == 0) {
-        if(inputnumber)this.sound.gainNodeIn.connect(p2.nodeintab[inputnumber])
+        if (inputnumber) this.sound.gainNodeIn.connect(p2.nodeintab[inputnumber])
         else this.sound.gainNodeIn.connect(p2.nodeintab[p2.bestInputNumber]);
       } else {
-        if(inputnumber)this.sound.gainNodeInMid.connect(p2.nodeintab[inputnumber])
-        else this.sound.gainNodeInMid.connect(p2.nodeintab[p2.bestInputNumber]);
+        if (p1.id == 'pedalIn1') {
+          console.log("heregood")
+          if (inputnumber) this.sound.gainNodeInMid.connect(p2.nodeintab[inputnumber])
+          else this.sound.gainNodeInMid.connect(p2.nodeintab[p2.bestInputNumber]);
+        } else if (p1.id == 'pedalIn2') {
+          if (inputnumber) this.sound.gainNodeInMid2.connect(p2.nodeintab[inputnumber])
+          else this.sound.gainNodeInMid2.connect(p2.nodeintab[p2.bestInputNumber]);
+        }
       }
-    } else if (p2.id == "pedalOut") {
+    }
+
+
+    else if (p2.id == "pedalOut") {
       p1.soundNodeOut.connect(this.sound.gainNodeOut);
       this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
     } else {
-      p1.soundNodeOut.connect(p2.nodeintab[p2.bestInputNumber]);
-      if(inputnumber)p1.soundNodeOut.connect(p2.nodeintab[inputnumber])
+      if (inputnumber) p1.soundNodeOut.connect(p2.nodeintab[inputnumber])
       else p1.soundNodeOut.connect(p2.nodeintab[p2.bestInputNumber]);
     }
   }
 
+  //TAFF gérer les cas de déconnexion
+
   soundNodeDisconnection(p1, p2, inputnumber) {
-    if (p1.id == "pedalIn" && p2.id == "pedalOut") {
+    if (p1.classList.contains("pedalIn") && p2.id == "pedalOut") {
       if (this.sound.state == 0) {
         this.sound.gainNodeIn.disconnect(this.sound.gainNodeOut);
+
       } else {
-        this.sound.gainNodeInMid.disconnect(this.sound.gainNodeOut);
+        if (p1.id == "pedalIn1") this.sound.gainNodeInMid.disconnect(this.sound.gainNodeOut);
+        else if (p1.id == "pedalIn2") this.sound.gainNodeInMid2.disconnect(this.sound.gainNodeOut);
       }
-    } else if (p1.id == "pedalIn") {
+    }
+
+    else if (p1.classList.contains("pedalIn")) {
       if (this.sound.state == 0) {
-        if(inputnumber)this.sound.gainNodeIn.disconnect(p2.nodeintab[inputnumber]);
+        if (inputnumber) this.sound.gainNodeIn.disconnect(p2.nodeintab[inputnumber]);
         else this.sound.gainNodeIn.disconnect(p2.soundNodeIn);
-        
+
       } else {
-        if(inputnumber)this.sound.gainNodeInMid.disconnect(p2.nodeintab[inputnumber]);
-        this.sound.gainNodeInMid.disconnect(p2.soundNodeIn);
+        if (p1.id == "pedalIn1") {
+          if (inputnumber) this.sound.gainNodeInMid.disconnect(p2.nodeintab[inputnumber]);
+          else this.sound.gainNodeInMid.disconnect(p2.soundNodeIn);
+        }
+        else if (p1.id == "pedalIn2") {
+          if (inputnumber) this.sound.gainNodeInMid2.disconnect(p2.nodeintab[inputnumber]);
+          else this.sound.gainNodeInMid2.disconnect(p2.soundNodeIn);
+        }
+
       }
-    } else if (p2.id == "pedalOut") {
+    }
+
+    else if (p2.id == "pedalOut") {
       p1.soundNodeOut.disconnect(this.sound.gainNodeOut);
-    } else {
-      if(inputnumber)p1.soundNodeOut.disconnect(p2.nodeintab[inputnumber]);
+    }
+
+    else {
+      if (inputnumber) p1.soundNodeOut.disconnect(p2.nodeintab[inputnumber]);
       else p1.soundNodeOut.disconnect(p2.soundNodeIn);
     }
   }

@@ -185,7 +185,8 @@
         for (let i = 0; i < this.pedalboard.pedals.length; i++) {
           tabId.push(this.pedalboard.pedals[i].id);
         }
-        console.log(this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`).nodeintab[this.plugsConnexions[i].in.inputnumber]);
+       // console.log(this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`).nodeintab[this.plugsConnexions[i].in.inputnumber]);
+        if(this.plugsConnexions[i].out == 'pedalIn2') this.pedalboard.changetomono();
 
        // this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`).nodeintab[this.plugsConnexions[i].in.inputnumber]);
         this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`),this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`) ,this.plugsConnexions[i].in.inputnumber);
@@ -292,7 +293,7 @@
       for (let i = 0; i < this.pedalboard.pedals.length; i++) {
         _plugin = this.pedalboard.pedals[i];
         _settings = [];
-        if (_plugin.id != "pedalIn" && _plugin.id != "pedalOut") {
+        if (_plugin.id != "pedalIn1"&& _plugin.id != "pedalIn2" && _plugin.id != "pedalOut") {
           _settings = _plugin.params;
           console.log(`#${_plugin.id}`, _settings);
 

@@ -45,10 +45,16 @@
       console.log(`Custom element ${this.is} added to page.`);
 
       // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
-      const shadowRoot = this.attachShadow({ mode: `open` });
-      const template = _currentDoc.querySelector(`template`);
-      const instance = template.content.cloneNode(true);
-      shadowRoot.appendChild(instance);
+      try {
+        const shadowRoot = this.attachShadow({ mode: `open` });
+        const template = _currentDoc.querySelector(`template`);
+        const instance = template.content.cloneNode(true);
+        shadowRoot.appendChild(instance);
+      } catch (error) {
+        console.log(error);
+        
+      } 
+     
 
       this.runBehaviorMethods();
     }
