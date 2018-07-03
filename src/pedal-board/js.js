@@ -1268,16 +1268,14 @@ class PedalBoard extends HTMLElement {
       GlobalContext.context.resume();
       // 1 : connected
       if (e.target.value) {
-
-
         if (this.pedals[0].outputJacks.length != 0) {
           this.pedals[0].outputJacks.forEach((j) => {
             // this.sound.state goes back to 0 for the next disconnect
             this.sound.state = 0;
-            this.soundNodeDisconnection(j.p1, j.p2);
+            this.soundNodeDisconnection(j.p1, j.p2,j.pedal2inputNumber);
 
             this.sound.state = 1;
-            this.soundNodeConnection(j.p1, j.p2);
+            this.soundNodeConnection(j.p1, j.p2,j.pedal2inputNumber);
           })
         }
 
