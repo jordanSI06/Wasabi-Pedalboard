@@ -30,6 +30,7 @@ class PedalBoard extends HTMLElement {
     this.meter1;
     this.meter2;
     this.meter3;
+    this.meter4;
     this.canvasInputContext1;
     this.canvasInputContext2;
     this.canvasInputContext3;
@@ -108,7 +109,7 @@ class PedalBoard extends HTMLElement {
   // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
   // appelé lorsque l'élément personnalisé est connecté pour la première fois au DOM du document
   connectedCallback() {
-    console.log(`Custom element ${this.is} added to page.`);
+ //  console.log(`Custom element ${this.is} added to page.`);
 
     // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
     const shadowRoot = this.attachShadow({ mode: `open` });
@@ -130,7 +131,6 @@ class PedalBoard extends HTMLElement {
     // for the second channel of usermedia input
     this.pIn2 = document.createElement('pedal-in');
     this.pIn2.id = "pedalIn2";
-    console.log(this.pIn.classList);
 
     this.pOut = document.createElement('pedal-out');
     this.pOut.id = "pedalOut";
@@ -144,9 +144,12 @@ class PedalBoard extends HTMLElement {
     this.meter1 = createAudioMeter(GlobalContext.context);
     this.meter2 = createAudioMeter(GlobalContext.context);
     this.meter3 = createAudioMeter(GlobalContext.context);
+    this.meter4 = createAudioMeter(GlobalContext.context);
     this.canvasInputContext1 = shadowRoot.querySelector("#meter1").getContext("2d");
     this.canvasInputContext2 = shadowRoot.querySelector("#meter2").getContext("2d");
     this.canvasInputContext3 = shadowRoot.querySelector("#meter3").getContext("2d");
+    this.canvasInputContext4 = shadowRoot.querySelector("#meter4").getContext("2d");
+
 
     // Handles the WebAudio graph initialization
     this.soundHandler();
@@ -1014,6 +1017,8 @@ class PedalBoard extends HTMLElement {
     this.canvasInputContext1.clearRect(0, 0, 100, 20);
     this.canvasInputContext2.clearRect(0, 0, 100, 20);
     this.canvasInputContext3.clearRect(0, 0, 100, 20);
+    this.canvasInputContext4.clearRect(0, 0, 100, 20);
+
 
     // check if we're currently clipping
     if (this.meter1.checkClipping())
@@ -1033,10 +1038,18 @@ class PedalBoard extends HTMLElement {
       this.canvasInputContext3.fillStyle = "green";
 
 
+    if (this.meter4.checkClipping())
+      this.canvasInputContext4.fillStyle = "red";
+    else
+      this.canvasInputContext4.fillStyle = "green";
+
+
     // draw a bar based on the current volume
     this.canvasInputContext1.fillRect(0, 0, this.meter1.volume * 100 * 1.4, 20);
     this.canvasInputContext2.fillRect(0, 0, this.meter2.volume * 100 * 1.4, 20);
     this.canvasInputContext3.fillRect(0, 0, this.meter3.volume * 100 * 1.4, 20);
+    this.canvasInputContext4.fillRect(0, 0, this.meter4.volume * 100 * 1.4, 20);
+
 
     // set up the next visual callback
     let rafID = window.requestAnimationFrame(this.drawLoop.bind(this));
@@ -1126,6 +1139,7 @@ class PedalBoard extends HTMLElement {
         plug.id = _id;
         plug.setPosition(_pos.x, _pos.y);
         this.addPedal(plug);
+        //console.log(plug);
         await this.sleep(300).then(e => {
           //console.log(e);
         });
@@ -1341,7 +1355,7 @@ class PedalBoard extends HTMLElement {
       this.splitter.disconnect();
       this.splitter.connect(this.sound.gainNodeInMid, 0);
       this.splitter.connect(this.sound.gainNodeInMid2, 1);
-      this.sound.gainNodeInMid2.connect(this.meter3);
+      this.sound.gainNodeInMid2.connect(this.meter4);
       this.pIn2.classList.add("pedalIn");
       this.pIn2.setPosition(-20, (this.h / 4));
       this.addPedal(this.pIn2);
@@ -1355,7 +1369,7 @@ class PedalBoard extends HTMLElement {
       this.splitter.connect(this.monoMediaSourceM, 1, 1);
       this.removePedal(this.pIn2);
 
-     }
+    }
 
 
   }
@@ -1399,7 +1413,6 @@ class PedalBoard extends HTMLElement {
           this.sound.gainNodeInMid.connect(this.sound.gainNodeOut);
           this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
         } else if (p1.id == 'pedalIn2') {
-          console.log("yes");
           this.sound.gainNodeInMid2.connect(this.sound.gainNodeOut);
           this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
         }
@@ -1413,11 +1426,15 @@ class PedalBoard extends HTMLElement {
         if (inputnumber) this.sound.gainNodeIn.connect(p2.nodeintab[inputnumber])
         else this.sound.gainNodeIn.connect(p2.nodeintab[p2.bestInputNumber]);
       } else {
+        console.log("sound state 1");
         if (p1.id == 'pedalIn1') {
-          console.log("heregood")
+          console.log("p1.id : (normalement pedalIn1)",p1.id);
+
           if (inputnumber) this.sound.gainNodeInMid.connect(p2.nodeintab[inputnumber])
           else this.sound.gainNodeInMid.connect(p2.nodeintab[p2.bestInputNumber]);
         } else if (p1.id == 'pedalIn2') {
+          console.log("p1.id : (normalement pedalIn2)",p1.id);
+
           if (inputnumber) this.sound.gainNodeInMid2.connect(p2.nodeintab[inputnumber])
           else this.sound.gainNodeInMid2.connect(p2.nodeintab[p2.bestInputNumber]);
         }

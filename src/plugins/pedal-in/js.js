@@ -42,7 +42,7 @@
     // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
     // appelé lorsque l'élément personnalisé est connecté pour la première fois au DOM du document
     connectedCallback() {
-      console.log(`Custom element ${this.is} added to page.`);
+     // console.log(`Custom element ${this.is} added to page.`);
 
       // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
       try {

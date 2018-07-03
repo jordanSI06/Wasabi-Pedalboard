@@ -54,13 +54,12 @@
             this.paramsLoaded = JSON.parse(newValue);
             console.log('this.paramsLoaded', this.paramsLoaded);
             console.log('thisNODE', this.node);
-            this.node.setState((this.paramsLoaded));
+            this.node.setState(this.paramsLoaded);
           }
           catch (err) {
             console.log(err);
           }
 
-          console.log(this.plugin);
         }
 
         // called when the plugin is moved to another document
@@ -75,7 +74,7 @@
 
         // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
         connectedCallback() {
-          console.log(`Custom element ${this.is} added to page.`);
+        //  console.log(`Custom element ${this.is} added to page.`);
 
           // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
           const shadowRoot = this.attachShadow({ mode: `open` });
@@ -92,6 +91,7 @@
 
           var pedal = this;
           var wrapper = this.shadowRoot.querySelector(".laPedale");
+
 
           // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
           try {
@@ -148,7 +148,7 @@
 
               //resolve({ params: node.params, node: node });
             });
-            console.log(pedal.nodeintab);
+           // console.log(pedal.nodeintab);
             for (var i = 1; i < this.nbNodeIn; i++) {
               let tmp = "nodein" + i;
               pedal[tmp] = GlobalContext.context.createGain();
