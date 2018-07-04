@@ -51,7 +51,7 @@
     // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
     // appelé lorsque l'élément personnalisé est connecté pour la première fois au DOM du document
     connectedCallback() {
-     // console.log(`Custom element ${this.is} added to page.`);
+      // console.log(`Custom element ${this.is} added to page.`);
 
       // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
       const shadowRoot = this.attachShadow({ mode: `open` });
@@ -160,14 +160,13 @@
       this.nbPluginTraitee = 0;
 
       //this.pedalboard.loadPresets(this.plugs);
+      console.log(this.plugs)
       this.loadNewPlugin(this.plugs[0]);
     }
 
     loadNewPlugin(p) {
+      console.log(p);
       this.pedalboard.loadPlugin(p).then(plugin => {
-        // console.log('plugin',plugin);
-        // console.log('p.settings',p.settings);
-        // plugin.setAttribute('params', JSON.stringify(p.settings));
         console.log('----- !!!! PLUGIN LOADED !!!!! -----', plugin);
         console.log('NEXT : -----{{{{ this.nbPluginTraitee----- }}}}}', this.nbPluginTraitee);
         this.nbPluginTraitee += 1;
@@ -185,15 +184,11 @@
         for (let i = 0; i < this.pedalboard.pedals.length; i++) {
           tabId.push(this.pedalboard.pedals[i].id);
         }
-       // console.log(this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`).nodeintab[this.plugsConnexions[i].in.inputnumber]);
-        if(this.plugsConnexions[i].out == 'pedalIn2') this.pedalboard.changetomono();
-
-       // this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`).nodeintab[this.plugsConnexions[i].in.inputnumber]);
-        this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`),this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`) ,this.plugsConnexions[i].in.inputnumber);
+        if (this.plugsConnexions[i].out == 'pedalIn2') this.pedalboard.changetomono();
+        this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`), this.plugsConnexions[i].in.inputnumber);
 
       }
-      await this.sleep(1000);
-      console.log('finished to sleep');
+      //await this.sleep(100);
       for (let i = 0; i < this.plugs.length; i++) {
         console.log(this.plugs[i]);
         this.pedalboard.querySelector(`#${this.plugs[i].id}`).setAttribute('params', JSON.stringify(this.plugs[i].settings));
@@ -276,7 +271,7 @@
     }
 
     // create preset name
-    savePreset() {
+   async  savePreset() {
       //this.takeScreenshot();
       //this.takeScreenshot().then(_screenshot=>{
       //  console.log('_screenshot',_screenshot);
@@ -293,21 +288,22 @@
       for (let i = 0; i < this.pedalboard.pedals.length; i++) {
         _plugin = this.pedalboard.pedals[i];
         _settings = [];
-        if (_plugin.id != "pedalIn1"&& _plugin.id != "pedalIn2" && _plugin.id != "pedalOut") {
-          _settings = _plugin.params;
-          console.log(`#${_plugin.id}`, _settings);
-
-          _plugsToSave = {
-            id: _plugin.id,
-            type: _plugin.tagName.toLowerCase(),
-            position: {
-              x: _plugin.x,
-              y: _plugin.y
-            },
-            settings: _settings
-          }
-
-          _currentPlugs.push(_plugsToSave);
+        if (_plugin.id != "pedalIn1" && _plugin.id != "pedalIn2" && _plugin.id != "pedalOut") {
+          
+          // Await from the plugin to return its state so save the preset
+          await _plugin.node.getState().then((params) => {
+            _settings = params;
+            _plugsToSave = {
+              id: _plugin.id,
+              type: _plugin.tagName.toLowerCase(),
+              position: {
+                x: _plugin.x,
+                y: _plugin.y
+              },
+              settings: _settings
+            }
+            _currentPlugs.push(_plugsToSave);
+          });
         }
       }
       if (!bankSelected.presets.find(item => item.label == _presetName)) {

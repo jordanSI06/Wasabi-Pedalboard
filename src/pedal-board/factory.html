@@ -7,30 +7,31 @@
 <script src="https://wasabi.i3s.unice.fr/WebAudioPluginBank/sdk/WebAudioSDK.js"></script>
 <script>
 
+  // Current document needs to be defined to get DOM access to imported HTML
   const _currentdoc = document.currentScript.ownerDocument;
+  const template = _currentdoc.querySelector(`template`);
+  /**
+   * This is a pedal factory. it creates a pedal === a PBPlugin using when the createPedal methode is called
+   * 
+  */
   class factory {
-
+    /**
+     * The createPedal function create an audio modules with a GUI that can be used in the Pedalboard. It needs :
+     * @param {String} _tagname 
+     * @param {String} _pluginName
+     * @param {URL} _pluginUrl
+     *  to : 
+     * - Import a distant audioNode;
+     * - Import and link its GUI;
+     * - Wrap it in a PBPlugin
+    */
     createPedal(_tagName, _pluginName, _pluginUrl) {
-      // var _tagName = _pluginInfos.type;
-      // var _pluginName = _pluginInfos.target.classname;
-      // var _pluginUrl = _pluginInfos.target.baseUrl;
-
-      // console.log('1- createPedal', { tagName: _tagName, pluginName: _pluginName, pluginUrl: _pluginUrl });
-      // console.log('2- document exist ?', document.querySelector(_tagName));
-
-      // Current document needs to be defined to get DOM access to imported HTML
-      const template = _currentdoc.querySelector(`template`);
-
-      // Register the x-custom element with the browser
+      // Register the x-custom element with the browser and associate the class created
       customElements.define(_tagName, class extends PBPlugin(HTMLElement) {
-
-        // ----- METHODS: DEFAULT -----
-        // is called when an instance of the element is created
         constructor() {
-          // super() reference to HTMLElemenent constructor
           super();
 
-          // Default values if non specified width/heigth nbinput/nboutput for pedal
+          // Default values if non specified width/heigth nbinput/nboutput for pedal (fix wor wam DX7);
           this.w = 825;
           this.h = 115;
 
@@ -44,7 +45,7 @@
         // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
         static get observedAttributes() { return ['params']; }
 
-        // appelé lorsque l'un des attributs de l'élément personnalisé est ajouté, supprimé ou modifié.
+        // Called if one of the observed attribute changed.
         attributeChangedCallback(name, oldValue, newValue, nbNodeIn) {
           console.log(`Custom element ${this.is} attributes changed.`);
           try {
@@ -74,26 +75,22 @@
 
         // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
         connectedCallback() {
-        //  console.log(`Custom element ${this.is} added to page.`);
-
+          //  console.log(`Custom element ${this.is} added to page.`);
           // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
           const shadowRoot = this.attachShadow({ mode: `open` });
           const instance = template.content.cloneNode(true);
           shadowRoot.appendChild(instance);
 
-          // runBehavior is related to the I/O detection, and graphic behavior (drag and drop) for each pedals.
-          this.createAllInternNodes();
+
+          this.loadandBuildPlugin();
         }
 
-        // ----- METHODS: CUSTOM -----
-        createAllInternNodes() {
-
-
+        /**
+         * Intanciate the fetched plugin, its GUI and make it available into the PDB by wrapping it into the PBPlugin model
+         * */
+        loadandBuildPlugin() {
           var pedal = this;
           var wrapper = this.shadowRoot.querySelector(".laPedale");
-
-
-          // The global variable WAPlugin is defined in SDK, it allows to instanciate dynamically plugins
           try {
             this.plugin = new window[_pluginName](GlobalContext.context, _pluginUrl);
 
@@ -106,12 +103,23 @@
           // Load and loadGUI are defined in the SDK, it makes the audio part being the main part and the WC part just a connected wrap
           // LOAD NODE
           this.plugin.load().then((node) => {
-            this.nbNodeIn = node.numberOfInputs;
-            this.nbNodeOut = node.numberOfOutputs;
-
-
             // LOAD GUI
             this.plugin.loadGui().then((elem) => {
+              
+              //Store the node as a field of the PBPlugin
+              this.node = node;
+
+              // Get the I/O numbers of the plugin
+              this.nbNodeIn = node.numberOfInputs;
+              this.nbNodeOut = node.numberOfOutputs;
+
+              // Push the Inputs to the Inputs array 
+              for (var i = 1; i < this.nbNodeIn; i++) {
+                let tmp = "nodein" + i;
+                pedal[tmp] = GlobalContext.context.createGain();
+                pedal.nodeintab.push(pedal[tmp]);
+              }
+
               try {
                 // the "properties" method is recommended to set width and height of your wc
                 this.w = elem.properties.dataWidth.value;
@@ -126,55 +134,38 @@
                   console.log("the dx7 has not proper width", error);
                 }
               }
-              this.node = node;
-              this.params = node.params;
-
               // the WC is added to the pbplugin wrapper
               wrapper.appendChild(elem);
+
+              // We now run the methods wich allows the node to be usable in this pedalboard (add graphical I/O, draggable class)
               this.runBehaviorMethods();
 
-              // _pluginInfos.node = node;
-              //this.pedalboard.setPluginInfos('ok');
-
-
-              /*
-                !!!!!!!! POUR SETTER LES PARAMS AUX PLUGINS !!!!!!!! (à faire une fois que les plugs sont TOUS chargés et connectés)
-              */
-              // if settings already exists, we loaded it
+              // Set plugin state (if it's restored)
               if (Object.keys(this.paramsLoaded).length > 0) {
-                //console.log('changeSettings', this.paramsLoaded)
                 this.node.setState((this.paramsLoaded));
               }
-
-              //resolve({ params: node.params, node: node });
-            });
-           // console.log(pedal.nodeintab);
-            for (var i = 1; i < this.nbNodeIn; i++) {
-              let tmp = "nodein" + i;
-              pedal[tmp] = GlobalContext.context.createGain();
-              pedal.nodeintab.push(pedal[tmp]);
-            }
-
-
-            if (this.nbNodeIn > 0) {
-              if (this.nbNodeIn > 1) {
-                // console.log(pedal.nodeintab);
-                // console.log(node.inputs)
-
-                for (let i = 0; i < pedal.nodeintab.length; i++) {
-                  pedal.nodeintab[i].connect(node.inputs[i]);
+              // Connection between the node instanciated and it's PBPlugin wrapper
+              if (this.nbNodeIn > 0) {
+                // If the plugin has Input(s)
+                if (this.nbNodeIn > 1) {
+                  // If it has more than one each node input is connected to an input of the wrapper
+                  for (let i = 0; i < pedal.nodeintab.length; i++) {
+                    pedal.nodeintab[i].connect(node.inputs[i]);
+                  }
+                } else {
+                  // If node has only one input the default soundNodeIn of the PBPlugin wrapper is connected
+                  pedal.soundNodeIn.connect(node);
                 }
-              } else {
-                pedal.soundNodeIn.connect(node);
-
               }
-            }
-            node.connect(pedal.soundNodeOut);
+              // Currently we manage only one output by node so we automatically connect the node output to the default PBPlugin soundnodeout
+              node.connect(pedal.soundNodeOut);
+            });
           });
         }
 
       });
     };
-
   }
+
+
 </script>

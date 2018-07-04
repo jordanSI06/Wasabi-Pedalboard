@@ -70,11 +70,6 @@ class PedalBoard extends HTMLElement {
       state: 0
     }
 
-
-    // this.params = {
-    //   newzoom: parseInt(this.getAttribute('data-newzoom'))
-    // }
-    // this.newZoom = this.params.newzoom;
   }
   get is() { return this.nodeName.toLowerCase(); }
 
@@ -1268,6 +1263,7 @@ class PedalBoard extends HTMLElement {
       GlobalContext.context.resume();
       // 1 : connected
       if (e.target.value) {
+        console.log(e.target.value);
         if (this.pedals[0].outputJacks.length != 0) {
           this.pedals[0].outputJacks.forEach((j) => {
             // this.sound.state goes back to 0 for the next disconnect
@@ -1284,10 +1280,10 @@ class PedalBoard extends HTMLElement {
           this.pIn2.outputJacks.forEach((j) => {
             // this.sound.state goes back to 0 for the next disconnect
             this.sound.state = 0;
-            this.soundNodeDisconnection(j.p1, j.p2);
+            this.soundNodeDisconnection(j.p1, j.p2,j.pedal2inputNumber);
 
             this.sound.state = 1;
-            this.soundNodeConnection(j.p1, j.p2);
+            this.soundNodeConnection(j.p1, j.p2,j.pedal2inputNumber);
           })
         }
         this.monoMediaSourceM.connect(this.meter1);
@@ -1300,14 +1296,25 @@ class PedalBoard extends HTMLElement {
           this.pedals[0].outputJacks.forEach((j) => {
             // this.sound.state goes back to 1 for the next disconnect
             this.sound.state = 1;
-            this.soundNodeDisconnection(j.p1, j.p2);
+            this.soundNodeDisconnection(j.p1, j.p2,j.pedal2inputNumber);
 
             this.sound.state = 0;
-            this.soundNodeConnection(j.p1, j.p2);
+            this.soundNodeConnection(j.p1, j.p2,j.pedal2inputNumber);
+          })
+
+        }
+        if (this.pIn2.outputJacks.length != 0) {
+          this.pIn2.outputJacks.forEach((j) => {
+            // this.sound.state goes back to 1 for the next disconnect
+            this.sound.state = 1;
+            this.soundNodeDisconnection(j.p1, j.p2,j.pedal2inputNumber);
+
+            this.sound.state = 0;
+            this.soundNodeConnection(j.p1, j.p2,j.pedal2inputNumber);
           })
         }
         this.sound.state = 0;
-        this.sound.monoMediaSourceM.disconnect(this.meter1);
+        //this.sound.monoMediaSourceM.disconnect(this.meter1);
       }
     })
 
