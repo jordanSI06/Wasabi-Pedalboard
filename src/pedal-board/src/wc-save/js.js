@@ -1,23 +1,20 @@
 (function () {
 
-  // Current document needs to be defined to get DOM access to imported HTML
+  /**
+   * This WC is about save/load presets
+   * the actual storage is the localstorage.
+   * the save system has a banks/presets/plugin/settings tree architecture
+   */
   const _currentDoc = document.currentScript.ownerDocument;
-
-  // Register the x-custom element with the browser
   customElements.define('wc-save', class extends HTMLElement {
-
-    // ----- METHODS: DEFAULT -----
-    // is called when an instance of the element is created
     constructor() {
-      // Toujours appeler "super" d'abord dans le constructeur
       super();
-
-      // Ecrire la fonctionnalité de l'élément ici
       this.pedalboard = document.querySelector('pedal-board');
-
       this.params = {
         dataSave: this.getAttribute('dataSave') || null,
       }
+      this.isAPresetSlected = false;
+      this.bankSelected;
     }
 
     get is() { return this.nodeName.toLowerCase(); }
@@ -38,18 +35,14 @@
       }
     }
 
-    // appelé lorsque l'élément personnalisé est déplacé vers un nouveau document
     adoptedCallback() {
       console.log(`Custom element ${this.is} moved to new page.`);
     }
-
-    // appelé lorsque l'élément personnalisé est déconnecté du DOM du document 
     disconnectedCallback() {
       console.log(`Custom element ${this.is} removed from page.`);
     }
 
     // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
-    // appelé lorsque l'élément personnalisé est connecté pour la première fois au DOM du document
     connectedCallback() {
       // console.log(`Custom element ${this.is} added to page.`);
 
@@ -60,6 +53,7 @@
       shadowRoot.appendChild(instance);
 
       // Extract the attribute from our element. 
+      this.bt_loadPreset = this.shadowRoot.querySelector('#bt_loadPreset');
       this.div_dialog = this.shadowRoot.querySelector('#div_dialog');
       this.bt_openDialog = this.shadowRoot.querySelector('#bt_openDialog');
       this.bt_saveBank = this.shadowRoot.querySelector('#bt_saveBank');
@@ -69,47 +63,46 @@
       this.nav_presets = this.shadowRoot.querySelector('#nav_presets');
       this.img_screenshot = this.shadowRoot.querySelector('#img_screenshot');
 
-      // customListeners
       this.bankSelected = '';
       this.plugsConnexions = '';
 
-      //
       if (localStorage.getItem('banks')) this.banks = JSON.parse(localStorage.getItem('banks'));
       else this.banks = [];
-      //console.log(this.banks);
       localStorage.setItem('banks', JSON.stringify(this.banks));
       this.loadBanks();
-
       this.listeners();
     }
 
-    takeScreenshot() {
-      console.log('takeScreenshot');
-      html2canvas(this.pedalboard, {
-        allowTaint: true,
-        // foreignObjectRendering:true
-      }).then(canvas => {
-        console.log('onrendered', canvas);
-        // var tempcanvas = document.createElement('canvas');
-        // tempcanvas.width = 350;
-        // tempcanvas.height = 350;
+    // takeScreenshot() {
+    //   console.log('takeScreenshot');
+    //   html2canvas(this.pedalboard, {
+    //     allowTaint: true,
+    //     // foreignObjectRendering:true
+    //   }).then(canvas => {
+    //     console.log('onrendered', canvas);
+    //     // var tempcanvas = document.createElement('canvas');
+    //     // tempcanvas.width = 350;
+    //     // tempcanvas.height = 350;
 
-        // var context = tempcanvas.getContext('2d');
-        // context.drawImage(canvas, 112, 0, 288, 200, 0, 0, 350, 350);
+    //     // var context = tempcanvas.getContext('2d');
+    //     // context.drawImage(canvas, 112, 0, 288, 200, 0, 0, 350, 350);
 
-        let img = document.createElement('img');
-        img.src = canvas.toDataURL('image/png');
-        img.style.width = "400px";
-        this.pedalboard.appendChild(img);
+    //     let img = document.createElement('img');
+    //     img.src = canvas.toDataURL('image/png');
+    //     img.style.width = "400px";
+    //     this.pedalboard.appendChild(img);
 
 
-        // var link = document.createElement("a");
-        // link.href = canvas.toDataURL('image/jpg');   //function blocks CORS
-        // link.download = 'screenshot.jpg';
-        // link.click();
-      })
-    }
+    //     // var link = document.createElement("a");
+    //     // link.href = canvas.toDataURL('image/jpg');   //function blocks CORS
+    //     // link.download = 'screenshot.jpg';
+    //     // link.click();
+    //   })
+    // }
 
+    /**
+     * First step : load and render the bank stage
+     */
     loadBanks() {
       this.nav_banks.innerHTML = '';
       Object.keys(this.banks).map(
@@ -120,11 +113,30 @@
       this.selectBanksListeners();
     }
 
+    /**
+     * Listeners for the different elements
+     * TODO: add LOAD button
+     */
     listeners() {
-      // button savePreset
-      this.bt_openDialog.onclick = (e) => this.openDialog();
+      // Load presets only if a preset is selected
+      this.bt_loadPreset.onclick = (e) => {
+        if (this.isAPresetSlected) this.loadPreset();
+        else alert("Select a preset first");
+      }
+      this.bt_openDialog.onclick = (e) => {
+        if(!this.pedalboard.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.pedalboard.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
+        if(!this.pedalboard.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.pedalboard.shadowRoot.querySelector('#divSoundIn').classList.toggle('hidden');
+        this.openDialog();
+      };
       this.bt_saveBank.onclick = (e) => this.addNewBank();
-      this.bt_savePreset.onclick = (e) => this.savePreset();
+
+      // save presets only if a bank is selected and (a name written or a preset selected)
+      this.bt_savePreset.onclick = (e) => {
+        if (this.bankSelected) {
+          if (this.isAPresetSlected || this.input_presetName.value) this.savePreset();
+          else alert("Tape name of choose a preset to overwrite")
+        }
+      }
     }
 
     openDialog() {
@@ -132,8 +144,8 @@
     }
 
     loadPresets() {
-      let bankSelected = this.banks.find(item => item._id == this.bankSelected);
-      let _presets = bankSelected.presets;
+      this.bankSelected = this.banks.find(item => item._id == this.bankSelected);
+      let _presets = this.bankSelected.presets;
       this.nav_presets.innerHTML = '';
       Object.keys(_presets).map(
         (elem, index) => {
@@ -188,7 +200,6 @@
         this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`), this.plugsConnexions[i].in.inputnumber);
 
       }
-      //await this.sleep(100);
       for (let i = 0; i < this.plugs.length; i++) {
         console.log(this.plugs[i]);
         this.pedalboard.querySelector(`#${this.plugs[i].id}`).setAttribute('params', JSON.stringify(this.plugs[i].settings));
@@ -232,6 +243,7 @@
     selectPreset(_id) {
       this.nav_presets.querySelectorAll('a').forEach(e => {
         if (e.id == _id) {
+          this.isAPresetSlected = true;
           e.classList.add('a_selected');
           this.presetSelected = e.id;
           this.input_presetName.value = e.getAttribute('value');
@@ -271,7 +283,7 @@
     }
 
     // create preset name
-   async  savePreset() {
+    async  savePreset() {
       //this.takeScreenshot();
       //this.takeScreenshot().then(_screenshot=>{
       //  console.log('_screenshot',_screenshot);
@@ -289,7 +301,7 @@
         _plugin = this.pedalboard.pedals[i];
         _settings = [];
         if (_plugin.id != "pedalIn1" && _plugin.id != "pedalIn2" && _plugin.id != "pedalOut") {
-          
+
           // Await from the plugin to return its state so save the preset
           await _plugin.node.getState().then((params) => {
             _settings = params;

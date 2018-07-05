@@ -290,15 +290,24 @@ class PedalBoard extends HTMLElement {
       this.dropPedalHandler(e);
     }
 
+    //Listeners for well working tabs
     this.shadowRoot.querySelector('#bt_openMicroDevices').onclick = (e) => {
       if (!this.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
-
+      if (!this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.contains("hidden")) this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
       this.openMediaDevices();
     }
 
     this.shadowRoot.querySelector('#bt_openAudio').onclick = (e) => {
       if (!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
+      if (!this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.contains("hidden")) this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
       this.openAudioPlayer();
+    }
+
+    this.querySelector('#svg-canvas').onclick = (e) =>{
+      if (!this.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
+      if (!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
+      if (!this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.contains("hidden")) this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
+      
     }
 
     this.shadowRoot.querySelector('#bt_fullScreen').onclick = (e) => {
