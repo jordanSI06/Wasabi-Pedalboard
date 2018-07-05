@@ -296,6 +296,9 @@ class PedalBoard extends HTMLElement {
       if (!this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.contains("hidden")) this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
       this.openMediaDevices();
     }
+    this.shadowRoot.querySelector('#bt_openMicroDevices').onmouseover = (e) => {
+      
+    }
 
     this.shadowRoot.querySelector('#bt_openAudio').onclick = (e) => {
       if (!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
@@ -522,6 +525,7 @@ class PedalBoard extends HTMLElement {
   }
 
   resizeElements() {
+    console.log("resize");
     let dx, dy;
     this.w = this.offsetWidth;
     this.h = this.offsetHeight;
@@ -879,7 +883,7 @@ class PedalBoard extends HTMLElement {
         // first we disconnect the jack before immediatly creating
         // a new one to drag
         this.currentState = "drawingNewJack";
-        this.disconnect(sourcePedal, p);
+        this.disconnect(sourcePedal, p,p.inputJacks[0].pedal2inputNumber);
         this.currentDraggableJack = this.removeJack(loc, sourcePedal);
       }
     } else if (this.clickInPedal(e)) {
@@ -971,6 +975,7 @@ class PedalBoard extends HTMLElement {
     switch (this.currentState) {
       case "drawingNewJack":
         {
+          console.log("yes");
           let jackWeAreDragging = this.currentDraggableJack;
           let _pos = {
             x1: jackWeAreDragging.x1,

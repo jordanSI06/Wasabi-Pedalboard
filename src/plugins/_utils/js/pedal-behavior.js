@@ -180,13 +180,14 @@ PBPlugin = function (superClass) {
      * Return the position of each input on the PBPlugin
      */
     getInputPos() {
-      let _zoom = 1;// That is why when zoom is under 1, the input pos a bad calculated !!!!!!!
+      let _zoom = this.pedalboard.zoom;// That is why when zoom is under 1, the input pos a bad calculated !!!!!!!
       var xpos = [];
       var ypos = [];
       for (var i = 0; i < this.nbNodeIn; i++) {
-        xpos[i] = (_zoom * this.x) + this.IOsize / 2 + (-this.IOsize / 2);
-        ypos[i] = ((_zoom * this.y) + this.IOsize / 2 + (this.IOsize - 4) + 12) + 40 * i;
+        xpos[i] = ((this.x) + this.IOsize / 2 + (-this.IOsize / 2));
+        ypos[i] = (((this.y) + this.IOsize / 2 + (this.IOsize - 4) + 12) + 40 * i) ;
       }
+      
       return { xpos, ypos }
     }
 
@@ -194,14 +195,16 @@ PBPlugin = function (superClass) {
     * Return the position of each output on the PBPlugin
     */
     getOutputPos() {
-      let _zoom = 1;// That is why when zoom is under 1, the input pos a bad calculated !!!!!!!
+      let _zoom = this.pedalboard.zoom;// That is why when zoom is under 1, the input pos a bad calculated !!!!!!!
 
       var xpos = [];
       var ypos = [];
       for (var i = 0; i < this.nbNodeOut; i++) {
-        xpos[i] = (_zoom * this.x) + this.IOsize / 2 + (this.w + 2 * this.IOsize - 2),
-          ypos[i] = (_zoom * (this.y) + this.IOsize / 2 + (this.IOsize) + 8) + 20 * i;
+        xpos[i] = ((this.x) + this.IOsize / 2 + (this.w + 2 * this.IOsize - 2)),
+        ypos[i] = (((this.y) + this.IOsize / 2 + (this.IOsize) + 8) + 20 * i);
+
       }
+      console.log(xpos, ypos)
       return { xpos, ypos }
     }
 

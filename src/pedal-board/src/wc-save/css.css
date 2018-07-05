@@ -194,3 +194,35 @@
 #bt_openDialog iron-icon{
   width: 20px;
 }
+
+
+.helper{
+  padding-top: 5px;
+  font-family: 'Open Sans', sans-serif;
+  color:#fff;
+
+}
+hr{
+  color:#000;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 3px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  
+  top: 20%;
+  left: 55%;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}

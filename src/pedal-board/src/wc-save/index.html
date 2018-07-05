@@ -2,13 +2,15 @@
   <link rel="stylesheet" href="./src/pedal-board/src/wc-save/css.css">
 
   <div id="div_app">
-    <button id='bt_openDialog'>
+    <button id='bt_openDialog' class="tooltip">
       <iron-icon icon="icons:save"></iron-icon>
+      <span class="tooltiptext">Save/load presets</span>
+
     </button>
   </div>
 
   <div id='div_dialog' class='hidden'>
-
+      
     <footer>
       <input id='input_presetName' type='text' placeholder='Save as: tape name preset here...'>
       <button id='bt_savePreset'>save</button>
@@ -16,10 +18,12 @@
       <button id='bt_saveBank'>create new bank</button>
     </footer>
     <main>
-        <section>
-          <nav id='nav_presets'></nav>
-        </section>
+      <section>
+        <span class="helper">Presets</span>
+        <nav id='nav_presets'></nav>
+      </section>
       <aside>
+        <span class="helper">Banks</span>
         <nav id='nav_banks'></nav>
       </aside>
     </main>

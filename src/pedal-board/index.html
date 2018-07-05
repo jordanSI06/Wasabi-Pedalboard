@@ -60,44 +60,58 @@
             <iron-icon icon="image:landscape"></iron-icon>
           </button> -->
           <!-- pdb -->
-          <button id="bt_stereo" title="Pedalboard" class="headerbutton">
+          <button id="bt_stereo"  class="tooltip">
             <iron-icon icon="icons:settings-input-component"></iron-icon>
+            <span class="tooltiptext">Add or remove the second input</span>
           </button>
           <!-- AudioPlayer -->
-          <button id="bt_openAudio" title="Play music" class="headerbutton">
+          <button id="bt_openAudio" title="Play music"  class="tooltip">
             <iron-icon icon="image:music-note"></iron-icon>
+            <span class="tooltiptext">Manage user media</span>
           </button>
           <!-- MIC -->
-          <button id="bt_openMicroDevices" title="Micro" class="headerbutton">
+          <button id="bt_openMicroDevices" title="Micro"  class="tooltip">
             <iron-icon icon="icons:settings-voice"></iron-icon>
+            <span class="tooltiptext">Activate user media</span>
           </button>
           <!-- Save/Load -->
-          <wc-save></wc-save>
+          <wc-save>
+              <button class="tooltip">
+                  <span class="tooltiptext">Activate user media</span>
+              </button>
+          </wc-save>
           <span>-</span>
 
-          <a href='./plugins.html' id="bt_viewPlugins" title="Plugin Gallery" target='_blank'>
+          <a href='./plugins.html' id="bt_viewPlugins" title="Plugin Gallery" target='_blank' class="tooltip">
             <iron-icon icon="icons:extension"></iron-icon>
+            <span class="tooltiptext">See plugins available</span>
           </a>
 
-          <a title="More information" href='http://sparks-vm31.i3s.unice.fr/toolsdemos/' id="bt_viewBlog" title="More infos" target='_blank'>
+          <a title="More information" href='http://sparks-vm31.i3s.unice.fr/toolsdemos/' id="bt_viewBlog" title="More infos" target='_blank'
+            class="tooltip">
             <iron-icon icon="icons:book"></iron-icon>
+            <span class="tooltiptext">More infos</span>
           </a>
 
-          <a class="a_title" title="Source Code on Github" href="https://github.com/guizmo2000/TER-Pedalboard-creation/tree/dynamicLoading"
-            target='_blank'>
+          <a  title="Source Code on Github" href="https://github.com/guizmo2000/TER-Pedalboard-creation/tree/dynamicLoading"
+            target='_blank' class="tooltip">
             <iron-icon icon="social:share"></iron-icon>
+            <span class="tooltiptext">Source code</span>
           </a>
 
-          <button id="bt_fullScreen" title="App in fullscreen" open="-1">
+          <button id="bt_fullScreen" title="App in fullscreen" open="-1" class="tooltip">
             <iron-icon icon="icons:fullscreen"></iron-icon>
+            <span class="tooltiptext">Fullscreen</span>
           </button>
 
-          <button id="bt_zoom_in" title="Zoom in">
+          <button id="bt_zoom_in" title="Zoom in" class="tooltip">
             <iron-icon icon="icons:zoom-in"></iron-icon>
+            <span class="tooltiptext">Zoom in</span>
           </button>
 
-          <button id="bt_zoom_out" title="Zoom out">
+          <button id="bt_zoom_out" title="Zoom out" class="tooltip">
             <iron-icon icon="icons:zoom-out"></iron-icon>
+            <span class="tooltiptext">Zoom out</span>
           </button>
 
         </div>

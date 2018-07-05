@@ -381,3 +381,28 @@ footer {
 .div_settings button iron-icon{
   width: 20px;
 }
+
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 3px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  
+  top: 20%;
+  left: 55%;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+
+
