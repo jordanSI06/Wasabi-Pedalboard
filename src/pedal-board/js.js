@@ -9,7 +9,6 @@ class PedalBoard extends HTMLElement {
   // ----- METHODS: DEFAULT -----
   // is called when an instance of the element is created
   constructor() {
-    // Toujours appeler "super" d'abord dans le constructeur
     super();
     window.PedalBoard = this;
 
@@ -34,6 +33,7 @@ class PedalBoard extends HTMLElement {
     this.canvasInputContext1;
     this.canvasInputContext2;
     this.canvasInputContext3;
+    this.canvasInputContext4;
 
     this.currentState = "none";
     this.oldMousePosX = 0;
@@ -62,11 +62,11 @@ class PedalBoard extends HTMLElement {
       audioDestination: null,
       gainNodeIn: null,
       gainNodeOut: null,
-      gainNodeInMid: null,
-      gainNodeInMid2: null,
+      gainUserMedia: null,
+      gainUserMedia2: null,
       mediaSource: null,
-      mediaSourceM: null,
-      monoMediaSourceM: null,
+      userMediaSource: null,
+      monouserMediaSource: null,
       state: 0
     }
 
@@ -407,8 +407,6 @@ class PedalBoard extends HTMLElement {
     p.pedalboard = this;
 
     this.appendChild(p);
-    //this.insertAdjacentElement('beforeEnd',p);
-
     // For the jack menu to appear
 
     this.sleep(300).then(() => { this.handleJackMenu(p) });
@@ -1052,7 +1050,10 @@ class PedalBoard extends HTMLElement {
 
 
 
-
+/**
+ * Get with the id pedal target infos as baseUrl, Thumbnail and classname
+ * @param {*} id 
+ */
   getTarget(id) {
     var liste;
     GlobalContext.context.resume();
@@ -1088,7 +1089,7 @@ class PedalBoard extends HTMLElement {
   }
 
   // from https://www.html5rocks.com/en/tutorials/webcomponents/imports/
-  // A PLACER DANS LE ADD PEDAL : addImportLink => addPedal
+  // Set the id, type, position, and settings (param values) of a PBPlugin
   dropPedalHandler(e) {
     let p = {
       id: `p_${Date.now()}`,
@@ -1098,6 +1099,7 @@ class PedalBoard extends HTMLElement {
     }
     this.loadPlugin(p);
   }
+
 
   loadPlugin(p) {
     return new Promise((resolve, reject) => {
@@ -1176,22 +1178,24 @@ class PedalBoard extends HTMLElement {
 
   /***** II> PART SOUND *****/
   addChangeAudioListeners() {
-    // régler les gains entrée et sortie
+    // Listener for input gain knob
     this.shadowRoot.querySelector("#knob_In").addEventListener('change', (e) => {
       this.shadowRoot.querySelector("#knob_In").title = "" + e.target.value;
       this.sound.gainNodeIn.gain.value = e.target.value;
-      this.sound.gainNodeInMid.gain.value = e.target.value;
-      this.shadowRoot.querySelector("#knob_In_midi").setValue(e.target.value)
+      this.sound.gainUserMedia.gain.value = e.target.value;
+      this.shadowRoot.querySelector("#knob_In_UserMedia").setValue(e.target.value)
     });
 
+    // Listener for output gain knob
     this.shadowRoot.querySelector("#knob_Out").addEventListener('change', (e) => {
       this.shadowRoot.querySelector("#knob_Out").title = "" + e.target.value;
       this.sound.gainNodeOut.gain.value = e.target.value;
     });
 
-    this.shadowRoot.querySelector("#knob_In_midi").addEventListener('change', (e) => {
-      this.shadowRoot.querySelector("#knob_In_midi").title = "" + e.target.value;
-      this.sound.gainNodeInMid.gain.value = e.target.value;
+    // Listener for usermedia gain knob
+    this.shadowRoot.querySelector("#knob_In_UserMedia").addEventListener('change', (e) => {
+      this.shadowRoot.querySelector("#knob_In_UserMedia").title = "" + e.target.value;
+      this.sound.gainUserMedia.gain.value = e.target.value;
       this.sound.gainNodeIn.gain.value = e.target.value;
       this.shadowRoot.querySelector("#knob_In").setValue(e.target.value);
     });
@@ -1201,22 +1205,25 @@ class PedalBoard extends HTMLElement {
     this.gc = GlobalContext;
     this.sound.context = this.gc.context;
 
+    // first gain of the pdb audio graph
     this.sound.gainNodeIn = this.sound.context.createGain();
+    // last gain of the pdb audio graph
     this.sound.gainNodeOut = this.sound.context.createGain();
     this.sound.gainNodeOut.gain.value = 0.25;
-    this.sound.gainNodeInMid = this.sound.context.createGain();
-
+    // gain for the user media (micro or external sound card)
+    this.sound.gainUserMedia = this.sound.context.createGain();
+    // Player mediasource
     this.sound.mediaSource = this.sound.context.createMediaElementSource(this.soundSample);
     this.sound.audioDestination = this.sound.context.destination;
 
-    //connexion (reste le midi à faire !)
     this.sound.mediaSource.connect(this.sound.gainNodeIn);
-    this.sound.mediaSource.connect(this.sound.gainNodeInMid);
-
+    // here we put player into usermediagain... investigation needed
+    this.sound.mediaSource.connect(this.sound.gainUserMedia);
     this.sound.gainNodeOut.connect(this.sound.audioDestination);
-
+    // The meter1 (input) display the sound amplitude of the gainNodeIn
     this.sound.gainNodeIn.connect(this.meter1);
-    this.sound.gainNodeInMid.connect(this.meter3);
+    // The meter3 (user media on mic wc-audio) display the sound amplitude of gainUserMedia
+    this.sound.gainUserMedia.connect(this.meter3);
 
 
 
@@ -1228,54 +1235,51 @@ class PedalBoard extends HTMLElement {
           mozAutoGainControl: false
         }
       };
+      // Streal the UserMedia input
       navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
         window.stream = stream;
-        this.sound.mediaSourceM = this.sound.context.createMediaStreamSource(stream);
-
+        this.sound.userMediaSource = this.sound.context.createMediaStreamSource(stream);
+        // split the two potential inputs of the soundcaard
         this.splitter = this.sound.context.createChannelSplitter(2);
-        this.sound.mediaSourceM.connect(this.splitter);
-
-        this.monoMediaSourceM = this.sound.context.createChannelMerger(2);
-
-        //connexion monoMediaSourceM Midi
-        this.sound.mediaSourceM.connect(this.sound.gainNodeInMid);
-        //this.sound.gainNodeInMid.connect(this.splitter);
-        this.splitter.connect(this.monoMediaSourceM, 0, 0);
-        this.splitter.connect(this.monoMediaSourceM, 0, 1);
-        //this.monoMediaSourceM.connect(GlobalContext.context.destination)
-        this.splitter.connect(this.monoMediaSourceM, 1, 0);
-        this.splitter.connect(this.monoMediaSourceM, 1, 1);
-        this.monoMediaSourceM.connect(this.sound.gainNodeInMid);
+        this.sound.userMediaSource.connect(this.splitter);
+        // Merger for the 2 soundcard inputs
+        this.monouserMediaSource = this.sound.context.createChannelMerger(2);
+        //UserMedia connected to its gain 
+        this.sound.userMediaSource.connect(this.sound.gainUserMedia); // is it useful ?
+        //Merge the two inputs to a stereo channel 
+        this.splitter.connect(this.monouserMediaSource, 0, 0);
+        this.splitter.connect(this.monouserMediaSource, 0, 1);
+        this.splitter.connect(this.monouserMediaSource, 1, 0);
+        this.splitter.connect(this.monouserMediaSource, 1, 1);
+        // Merger connect to the usermedia gain
+        this.monouserMediaSource.connect(this.sound.gainUserMedia);
       }).catch(function (err) {
         // handle the error
         console.log(err.name + ": " + err.message);
       });
     }
 
-
-
-
     // link to clip detector
     this.drawLoop();
 
-    // CHANGE STATE MIC(1) -> DEMO SOUND (0)
+    // Switch sound state : 0 for the player, 1 for the usermedia
     this.shadowRoot.querySelector("#mic").addEventListener("change", (e) => {
       GlobalContext.context.resume();
-      // 1 : connected
+      // State 1: usermedia
       if (e.target.value) {
-        console.log(e.target.value);
+        // If the mode is one stereo input
         if (this.pedals[0].outputJacks.length != 0) {
           this.pedals[0].outputJacks.forEach((j) => {
             // this.sound.state goes back to 0 for the next disconnect
             this.sound.state = 0;
             this.soundNodeDisconnection(j.p1, j.p2,j.pedal2inputNumber);
-
+            // each state change is a new connection of the graph
             this.sound.state = 1;
             this.soundNodeConnection(j.p1, j.p2,j.pedal2inputNumber);
           })
         }
 
-
+        // If the mode is two mono inputs
         if (this.pIn2.outputJacks.length != 0) {
           this.pIn2.outputJacks.forEach((j) => {
             // this.sound.state goes back to 0 for the next disconnect
@@ -1286,12 +1290,12 @@ class PedalBoard extends HTMLElement {
             this.soundNodeConnection(j.p1, j.p2,j.pedal2inputNumber);
           })
         }
-        this.monoMediaSourceM.connect(this.meter1);
+        this.monouserMediaSource.connect(this.meter1);
         this.sound.state = 1;
 
-        // 0 : disconnected
+        // State 0: player only
       } else {
-
+        // If the mode is one stereo input
         if (this.pedals[0].outputJacks.length != 0) {
           this.pedals[0].outputJacks.forEach((j) => {
             // this.sound.state goes back to 1 for the next disconnect
@@ -1303,6 +1307,7 @@ class PedalBoard extends HTMLElement {
           })
 
         }
+        // If the mode is two mono inputs
         if (this.pIn2.outputJacks.length != 0) {
           this.pIn2.outputJacks.forEach((j) => {
             // this.sound.state goes back to 1 for the next disconnect
@@ -1314,9 +1319,9 @@ class PedalBoard extends HTMLElement {
           })
         }
         this.sound.state = 0;
-        //this.sound.monoMediaSourceM.disconnect(this.meter1);
+        //this.sound.monouserMediaSource.disconnect(this.meter1);
       }
-    })
+    });
 
     var bt_learn = this.shadowRoot.querySelector("#bt_learn");
     var span_time = this.shadowRoot.querySelector("#span_time");
@@ -1326,8 +1331,8 @@ class PedalBoard extends HTMLElement {
     let volumeMax = 0;
     // When you play for 4 seconds, the input gain is adjusted depending on the max measured value 
     bt_learn.addEventListener("click", (e) => {
-      this.sound.gainNodeInMid.gain.value = 1;
-      this.sound.gainNodeInMid2.gain.value = 1;
+      this.sound.gainUserMedia.gain.value = 1;
+      this.sound.gainUserMedia2.gain.value = 1;
 
       _tabVolume = [];
       i = 4000;
@@ -1339,11 +1344,11 @@ class PedalBoard extends HTMLElement {
           span_time.textContent = "4s";
           volumeMax = Math.max(..._tabVolume);
 
-          this.sound.gainNodeInMid.gain.value = (1 / volumeMax) / 2.;
-          this.sound.gainNodeIn.gain.value = this.sound.gainNodeInMid.gain.value;
-          this.maxInputGain = this.sound.gainNodeInMid.gain.value;
-          this.shadowRoot.querySelector("#knob_In_midi").max = 2 * this.maxInputGain;
-          this.shadowRoot.querySelector("#knob_In_midi").setValue(this.maxInputGain, true);
+          this.sound.gainUserMedia.gain.value = (1 / volumeMax) / 2.;
+          this.sound.gainNodeIn.gain.value = this.sound.gainUserMedia.gain.value;
+          this.maxInputGain = this.sound.gainUserMedia.gain.value;
+          this.shadowRoot.querySelector("#knob_In_UserMedia").max = 2 * this.maxInputGain;
+          this.shadowRoot.querySelector("#knob_In_UserMedia").setValue(this.maxInputGain, true);
           this.shadowRoot.querySelector("#knob_In").max = 2 * this.maxInputGain;
           this.shadowRoot.querySelector("#knob_In").setValue(this.maxInputGain, true);
           window.clearInterval(_interval);
@@ -1352,31 +1357,36 @@ class PedalBoard extends HTMLElement {
     });
   }
 
+  /**
+   * Allow user tu use the 2 soundcard inputs separatey 
+   * - Add an "pedal-in" PBPlugin to begin a new audio subgraph
+   * - disconnect the merger
+   * --> user has to choose the right input mode (his soundcard and not the "default" mode)
+   */
   changetomono() {
-    console.log(this.querySelector("#pedalIn2"))
+    // if the current mode is one stereo input
     if (!this.querySelector("#pedalIn2")) {
       console.log("changetomono")
-      this.sound.gainNodeInMid2 = this.sound.context.createGain();
+      this.sound.gainUserMedia2 = this.sound.context.createGain();
       this.splitter.disconnect();
-      this.splitter.connect(this.sound.gainNodeInMid, 0);
-      this.splitter.connect(this.sound.gainNodeInMid2, 1);
-      this.sound.gainNodeInMid2.connect(this.meter4);
+      this.splitter.connect(this.sound.gainUserMedia, 0);
+      this.splitter.connect(this.sound.gainUserMedia2, 1);
+      this.sound.gainUserMedia2.connect(this.meter4);
       this.pIn2.classList.add("pedalIn");
       this.pIn2.setPosition(-20, (this.h / 4));
       this.addPedal(this.pIn2);
     }
     else {
+      // if the current mode is two mono inputs
       console.log("backtostereo")
       this.splitter.disconnect();
-      this.splitter.connect(this.monoMediaSourceM, 0, 0);
-      this.splitter.connect(this.monoMediaSourceM, 0, 1);
-      this.splitter.connect(this.monoMediaSourceM, 1, 0);
-      this.splitter.connect(this.monoMediaSourceM, 1, 1);
+      this.splitter.connect(this.monouserMediaSource, 0, 0);
+      this.splitter.connect(this.monouserMediaSource, 0, 1);
+      this.splitter.connect(this.monouserMediaSource, 1, 0);
+      this.splitter.connect(this.monouserMediaSource, 1, 1);
       this.removePedal(this.pIn2);
 
     }
-
-
   }
 
   changeStreamAsInputInGraph(id) {
@@ -1395,102 +1405,132 @@ class PedalBoard extends HTMLElement {
     };
 
     navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
-      this.sound.mediaSourceM = this.sound.context.createMediaStreamSource(stream);
-      this.sound.mediaSourceM.connect(this.splitter);
+      this.sound.userMediaSource = this.sound.context.createMediaStreamSource(stream);
+      this.sound.userMediaSource.connect(this.splitter);
       //alert("changed input stream in graph");
       window.stream = stream;
     });
   }
 
-  // Michel BUFFA : somme comments would be welcomed here!
+  /**
+   * Manage all the connection cases
+   * @param {*} p1 the PBPlugin that initiate the connection
+   * @param {*} p2 the PBPlugin that recieve the connection
+   * @param {int} inputnumber the optionnal number of the input targeted on p2.
+   */
   soundNodeConnection(p1, p2, inputnumber) {
+    /**
+     * there are 4 cases : 
+     * - direct link between a pedalboard input and THE pedalboard output
+     * - Link between a pedalboard input and a PBPlugin
+     * - Link between a PBPlugin and the pedalboard output
+     * - Link between 2 PBPlugin
+     * 
+     * For each of there cases, we look at the sound state (0:player, 1:usermedia)
+     */
 
+    // Case 1: direct link between a pedalboard input and THE pedalboard output
     if (p1.classList.contains("pedalIn") && p2.id == "pedalOut") {
-      console.log("here1")
-
-
       if (this.sound.state == 0) {
         this.sound.gainNodeIn.connect(this.sound.gainNodeOut);
-        this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
+        this.sound.gainNodeOut.connect(this.meter2); 
 
       } else {
         if (p1.id == 'pedalIn1') {
-          this.sound.gainNodeInMid.connect(this.sound.gainNodeOut);
+          this.sound.gainUserMedia.connect(this.sound.gainNodeOut);
           this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
         } else if (p1.id == 'pedalIn2') {
-          this.sound.gainNodeInMid2.connect(this.sound.gainNodeOut);
+          this.sound.gainUserMedia2.connect(this.sound.gainNodeOut);
           this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
         }
       }
     }
 
 
-
+    //Case 2:Link between a pedalboard input and a PBPlugin
     else if (p1.classList.contains("pedalIn")) {
       if (this.sound.state == 0) {
         if (inputnumber) this.sound.gainNodeIn.connect(p2.nodeintab[inputnumber])
         else this.sound.gainNodeIn.connect(p2.nodeintab[p2.bestInputNumber]);
       } else {
-        console.log("sound state 1");
+        // pdb input selected is pedalIn1
         if (p1.id == 'pedalIn1') {
-          console.log("p1.id : (normalement pedalIn1)",p1.id);
-
-          if (inputnumber) this.sound.gainNodeInMid.connect(p2.nodeintab[inputnumber])
-          else this.sound.gainNodeInMid.connect(p2.nodeintab[p2.bestInputNumber]);
-        } else if (p1.id == 'pedalIn2') {
-          console.log("p1.id : (normalement pedalIn2)",p1.id);
-
-          if (inputnumber) this.sound.gainNodeInMid2.connect(p2.nodeintab[inputnumber])
-          else this.sound.gainNodeInMid2.connect(p2.nodeintab[p2.bestInputNumber]);
+          if (inputnumber) this.sound.gainUserMedia.connect(p2.nodeintab[inputnumber])
+          else this.sound.gainUserMedia.connect(p2.nodeintab[p2.bestInputNumber]);
+        } 
+        // pdb input selected is pedalIn2
+        else if (p1.id == 'pedalIn2') {
+          if (inputnumber) this.sound.gainUserMedia2.connect(p2.nodeintab[inputnumber])
+          else this.sound.gainUserMedia2.connect(p2.nodeintab[p2.bestInputNumber]);
         }
       }
     }
 
-
+    //Case 3:Link between a PBPlugin and the pedalboard output
     else if (p2.id == "pedalOut") {
       p1.soundNodeOut.connect(this.sound.gainNodeOut);
-      this.sound.gainNodeOut.connect(this.meter2); // M.BUFFA
-    } else {
+      this.sound.gainNodeOut.connect(this.meter2);
+    }
+    // Case 4: Link between 2 PBPlugin
+    else {
       if (inputnumber) p1.soundNodeOut.connect(p2.nodeintab[inputnumber])
       else p1.soundNodeOut.connect(p2.nodeintab[p2.bestInputNumber]);
     }
   }
 
-  //TAFF gérer les cas de déconnexion
 
+  /**
+   * Manage all the disconnection cases 
+   * @param {*} p1 the PBPlugin which has its output connected
+   * @param {*} p2 the PBPlugin which has input(s) connected
+   * @param {int} inputnumber the optionnal number of the input connected on p2.
+   */
   soundNodeDisconnection(p1, p2, inputnumber) {
+    /**
+     * there are 4 cases : 
+     * - direct link between a pedalboard input and THE pedalboard output
+     * - Link between a pedalboard input and a PBPlugin
+     * - Link between a PBPlugin and the pedalboard output
+     * - Link between 2 PBPlugin
+     * 
+     * For each of there cases, we look at the sound state (0:player, 1:usermedia)
+     */
+
+    // Case 1: direct link between a pedalboard input and THE pedalboard output
     if (p1.classList.contains("pedalIn") && p2.id == "pedalOut") {
       if (this.sound.state == 0) {
         this.sound.gainNodeIn.disconnect(this.sound.gainNodeOut);
-
       } else {
-        if (p1.id == "pedalIn1") this.sound.gainNodeInMid.disconnect(this.sound.gainNodeOut);
-        else if (p1.id == "pedalIn2") this.sound.gainNodeInMid2.disconnect(this.sound.gainNodeOut);
+        if (p1.id == "pedalIn1") this.sound.gainUserMedia.disconnect(this.sound.gainNodeOut);
+        else if (p1.id == "pedalIn2") this.sound.gainUserMedia2.disconnect(this.sound.gainNodeOut);
       }
     }
 
+    //Case 2:Link between a pedalboard input and a PBPlugin
     else if (p1.classList.contains("pedalIn")) {
       if (this.sound.state == 0) {
         if (inputnumber) this.sound.gainNodeIn.disconnect(p2.nodeintab[inputnumber]);
         else this.sound.gainNodeIn.disconnect(p2.soundNodeIn);
-
       } else {
+        // pdb input selected is pedalIn1
         if (p1.id == "pedalIn1") {
-          if (inputnumber) this.sound.gainNodeInMid.disconnect(p2.nodeintab[inputnumber]);
-          else this.sound.gainNodeInMid.disconnect(p2.soundNodeIn);
+          if (inputnumber) this.sound.gainUserMedia.disconnect(p2.nodeintab[inputnumber]);
+          else this.sound.gainUserMedia.disconnect(p2.soundNodeIn);
         }
+        // pdb input selected is pedalIn2 (only on 2 inputs mode)
         else if (p1.id == "pedalIn2") {
-          if (inputnumber) this.sound.gainNodeInMid2.disconnect(p2.nodeintab[inputnumber]);
-          else this.sound.gainNodeInMid2.disconnect(p2.soundNodeIn);
+          if (inputnumber) this.sound.gainUserMedia2.disconnect(p2.nodeintab[inputnumber]);
+          else this.sound.gainUserMedia2.disconnect(p2.soundNodeIn);
         }
 
       }
     }
-
+    //Case 3:Link between a PBPlugin and the pedalboard output
     else if (p2.id == "pedalOut") {
       p1.soundNodeOut.disconnect(this.sound.gainNodeOut);
     }
-
+    
+    // Case 4: Link between 2 PBPlugin
     else {
       if (inputnumber) p1.soundNodeOut.disconnect(p2.nodeintab[inputnumber]);
       else p1.soundNodeOut.disconnect(p2.soundNodeIn);
