@@ -1,3 +1,9 @@
+/**
+ * Jack is our link between PDB plugins, it has main properties:
+ * @param {PBPlugin} pedal1
+ * @param {PBPlugin} pedal2
+ * @param {Int} pedal2inputNumber the number of the input targeted in the pedal2
+ */
 class Jack {
 
   constructor() {
@@ -18,6 +24,12 @@ class Jack {
     this.update(this.id);
   }
 
+  /**
+   * Called when we double click on an input with multiple jacks,
+   * It disconnect graphically the jacks, allow the user to move jacks one by one
+   * @param {boolean} open class of the input 
+   * @param {id} _numJack 
+   */
   repositionJack(open, _numJack) {
     if (open) {
       this.offsetX = -100;
@@ -26,10 +38,14 @@ class Jack {
     this.update();
   }
 
-  // Compute the svg for this jack
+  /**
+   * Get the source and target position for the futur jack to be rendered
+   * @param {id} _id 
+   */
   update(_id) {
     let oPos = this.p1.getOutputPos();
     let iPos = this.p2.getInputPos();
+    // bestOutputNumber is the output which is the nearest of the mouse pointer, it's a PBPlugin field
     let _pos = {
       x1: oPos.xpos[this.p1.bestOutputNumber],
       y1: oPos.ypos[this.p1.bestOutputNumber],

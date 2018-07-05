@@ -1,63 +1,47 @@
-/** A behavior defining the functions and properties every pedal must have **/
+/**
+ * PBPlugin is a wrapper allows each plugin fethed to the pedalboard to has a common behavior
+ * -it's draggable
+ * -it's connectable
+ */
 PBPlugin = function (superClass) {
   return class extends superClass {
 
     constructor() {
       super();
-      // elem html
+
+      //HTML I/O Arrays
       this.inputP = [];
       this.outputP = [];
 
       this.inputJacks = [];
       this.outputJacks = [];
 
+      // Position and with/heigth 
       this.x = 0;
       this.y = 0;
-
       this.w = 0;
       this.h = 0;
 
+      // Count the I/O
       this.nbNodeIn = "";
       this.nbNodeOut = "";
 
-      this.bestInputNumber =0 ;
-      this.bestOutputNumber =0;
-
-      // this.inputHighlighted = [];
-      // this.outputHighlighted = [];
+      // The nearest I/O
+      this.bestInputNumber = 0;
+      this.bestOutputNumber = 0;
 
       // relative position of input and output
       this.IOsize = 15;
 
-      // this.inputOffset ={}
-      // //this.outputOffsetX = 2*this.IOsize-2;
-      // this.outputOffset = {
-      //   x: this.w + 2 * this.IOsize - 2,
-      //   y: this.IOsize
-      // }
-
-      this.isOn = false;
+      // audio input array
       this.nodeintab = [];
+
+      // The default I/O
       this.soundNodeIn = GlobalContext.context.createGain();
       this.soundNodeOut = GlobalContext.context.createGain();
       this.nodeintab.push(this.soundNodeIn);
-
-     
     }
-    // get isOn() {
-    //   return false;
-    // }
 
-    // set isOn(_isOn) {
-    //   this.isOn = _isOn;
-    // }
-
-    // get inputP(){
-    //   return this.inputP;
-    // }
-    // set inputP(_inputP){
-    //  this.inputP=_inputP;
-    // }
     runBehaviorMethods() {
       /*
       once all is loaded, we create bases elements of pedals :
@@ -67,14 +51,10 @@ PBPlugin = function (superClass) {
       - output
       */
 
-      // console.log("Position jack input / output : ");
-      // console.log(this.elem);
-      // console.log(this.elem.getBoundingClientRect());
-      // console.log(this.elem.pedalboard);
-
+      // Pre-selector 
       let elem = this.shadowRoot.querySelector(".laPedale");
 
-      //console.log("this.nbNodeIn", this.nbNodeIn);
+      //Creation of as much graphic inputs as nbNodeIn. nbNodeIn has been set in factory just before the runbehaviormethod is called
       for (var i = 0; i < this.nbNodeIn; i++) {
         this.inputP[i] = document.createElement("div");
         this.inputP[i].style = 'margin-top :' + 40 * i + 'px';
@@ -82,9 +62,7 @@ PBPlugin = function (superClass) {
         if (typeof this.nbNodeIn == "undefined" || (this.nbNodeIn > 0)) elem.appendChild(this.inputP[i]);
       }
 
-      // - output
-      //console.log("this.nbNodeOut", this.nbNodeOut);
-
+      //Creation of as much graphic outputs as nbNodeOut. nbNodeOut has been set in factory just before the runbehaviormethod is called
       for (var i = 0; i < this.nbNodeOut; i++) {
         this.outputP[i] = document.createElement("div");
         this.outputP[i].style = 'margin-top :' + 40 * i + 'px';
@@ -93,7 +71,7 @@ PBPlugin = function (superClass) {
       }
 
       if (this.classList.contains("draggable")) {
-        // - bouton delete
+        //delete button 
         this.delete = document.createElement("button");
         this.delete.title += 'delete';
         this.delete.className += 'delete';
@@ -101,7 +79,7 @@ PBPlugin = function (superClass) {
         this.delete.addEventListener("click", (e) => {
           this.pedalboard.removePedal(this);
         });
-        // - bouton menu
+        // menu button 
         this.optionMenu = document.createElement("button");
         this.optionMenu.title += 'option menu';
         this.optionMenu.className += 'optionMenu';
@@ -129,27 +107,30 @@ PBPlugin = function (superClass) {
       this.style.top = y + "px";
     }
 
-    // getPosition(){
-    //   return {
-    //     x:this.style.left,
-    //     y:this.style.top
-    //   }
-    // }
 
     /** The abstract functions every pedal must override **/
-    createAllInternNodes() { }
 
-    connectInternNodes() { }
+    // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
+    static get observedAttributes() { }
 
-    setKnobsListeners() { }
+    // Called if one of the observed attribute changed.
+    attributeChangedCallback() { }
 
-    //setRolesToKnobs() {}
+    // called when the plugin is moved to another document
+    adoptedCallback() {
+      console.log(`Custom element ${this.is} moved to new page.`);
+    }
 
-    getDefaultButtonsValues() { }
+    // Called when the pedal is disconnected from the dom 
+    disconnectedCallback() {
+      console.log(`Custom element ${this.is} removed from page.`);
+    }
 
-    bypass() { }
+    // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
+    connectedCallback() { }
+    // Code for fetching/loading/appening the module
+    loadandBuildPlugin() { }
 
-    reactivate() { }
 
     /**Some function common to every pedal **/
 
@@ -158,84 +139,14 @@ PBPlugin = function (superClass) {
     @param src : the source audioNode
     @param destination : the destination audioNode
     **/
+
+    /**
+     * Method used when you do a standard connection (using soundNodeIn, soundNodeOut)
+     */
     connect(src, destination) {
       this.connectIn(src);
       this.connectOut(destination);
     }
-
-    /**
-    Set a listener to the switch to bypass/reactivate the pedal when it is clicked
-    **/
-    // setSwitchListener() {
-    //   this.shadowRoot.querySelector('#switch1').addEventListener('change', (e) => {
-    //     if (this.isOn) this.bypass();
-    //     else this.reactivate();
-
-    //     this.isOn = !this.isOn;
-    //     console.log("this.isOn",this.isOn);
-    //   });
-    // }
-
-    /**
-    *  Set the pedal to an active or bypassed state
-    *  @param active : a Boolean indicating whether the pedal sould be active or not
-    *  if active if undefined, it is considered false
-    **/
-    // setPedalActive(active) {
-    //   if (active == undefined || active == false) {
-    //     this.isOn = false;
-    //     this.bypass();
-    //     this.shadowRoot.querySelector('#switch1').value = 0;
-    //   } else if (active) {
-    //     this.isOn = true;
-    //     this.reactivate();
-    //     this.shadowRoot.querySelector('#switch1').value = 1;
-    //   }
-    // }
-
-    /**
-    * Set values to the knobs
-    * @param options : the values that must be set, if it undefined the default values are used
-    **/
-    setValuesToKnobs(options) {
-      var defaultValues = options == undefined ? this.getDefaultButtonsValues() : options;
-      for (var key in defaultValues) {
-        this.shadowRoot.querySelector("[data-role='" + key + "']").value = defaultValues[key];
-      }
-    }
-
-    /**
-    * Retrieves the current knob values of the pedal
-    * @return an object containing a list of label : value , the label are the roles of the knobs
-    * defined in setRolesToKnobs
-    **/
-    getCurrentKnobsValues() {
-      var values = {};
-      var knobs = this.getElementsByTagName("webaudio-knob");
-      var i, l = knobs.length;
-      for (i = 0; i < l; i++) {
-        if (knobs[i].dataset.role)
-          values[knobs[i].dataset.role] = knobs[i].value;
-      }
-      return values;
-    }
-
-    /**
-    * Reset all the knobs values, giving them the NaN value
-    **/
-    resetKnobs() {
-      var knobs = this.getElementsByTagName("webaudio-knob");
-      for (var i = 0; i < knobs.length; i++)
-        knobs[i].value = NaN;
-    }
-
-    /**
-    * Disconnect the out node of the pedal
-    **/
-    disconnectOut() {
-      this.soundNodeOut.disconnect();
-    }
-
     /**
     * Connect the out node of the pedal
     * Updates the new destination of the pedal
@@ -244,14 +155,6 @@ PBPlugin = function (superClass) {
       this.destination = audioNode;
       this.soundNodeOut.connect(audioNode);
     }
-
-    /**
-    * Disconnect the in node of the pedal
-    **/
-    disconnectIn() {
-      this.src.disconnect(this.soundNodeIn);
-    }
-
     /**
     * Cconnect the in node of the pedal
     * Updates the new source of the pedal
@@ -273,10 +176,11 @@ PBPlugin = function (superClass) {
       return this.offsetWidth;
     }
 
+    /**
+     * Return the position of each input on the PBPlugin
+     */
     getInputPos() {
-      //let _zoom = this.pedalboard.zoom;
-      let _zoom =1;
-
+      let _zoom = 1;// That is why when zoom is under 1, the input pos a bad calculated !!!!!!!
       var xpos = [];
       var ypos = [];
       for (var i = 0; i < this.nbNodeIn; i++) {
@@ -286,9 +190,12 @@ PBPlugin = function (superClass) {
       return { xpos, ypos }
     }
 
+    /**
+    * Return the position of each output on the PBPlugin
+    */
     getOutputPos() {
-      let _zoom =1;
-      
+      let _zoom = 1;// That is why when zoom is under 1, the input pos a bad calculated !!!!!!!
+
       var xpos = [];
       var ypos = [];
       for (var i = 0; i < this.nbNodeOut; i++) {
@@ -323,6 +230,11 @@ PBPlugin = function (superClass) {
       this.outputJacks.forEach((j) => j.update());
     }
 
+    /**
+     * Transform the style of the bestInput (nearest)
+     * @param {Int} i number of input chosen
+     * @param {boolean} flag active highlight
+     */
     highLightInput(i, flag) {
       if (flag) {
         this.inputP[i].style.backgroundColor = "red";
@@ -338,7 +250,11 @@ PBPlugin = function (superClass) {
       }
       this.inputHighlighted = flag;
     }
-
+    /**
+     * Transform the style of the bestOutput (nearest)
+     * @param {Int} i number of input chosen
+     * @param {boolean} flag active highlight
+     */
     highLightOutput(i, flag) {
       if (flag) this.outputP[i].style.backgroundColor = "red";
       else this.outputP[i].style.backgroundColor = null;
