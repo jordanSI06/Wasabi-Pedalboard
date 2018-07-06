@@ -144,8 +144,8 @@
     }
 
     loadPresets() {
-      this.bankSelected = this.banks.find(item => item._id == this.bankSelected);
-      let _presets = this.bankSelected.presets;
+      let bankSelected = this.banks.find(item => item._id == this.bankSelected);
+      let _presets = bankSelected.presets;
       this.nav_presets.innerHTML = '';
       Object.keys(_presets).map(
         (elem, index) => {
