@@ -204,7 +204,7 @@ PBPlugin = function (superClass) {
         ypos[i] = (((this.y) + this.IOsize / 2 + (this.IOsize) + 8) + 20 * i);
 
       }
-      console.log(xpos, ypos)
+      //console.log(xpos, ypos)
       return { xpos, ypos }
     }
 
