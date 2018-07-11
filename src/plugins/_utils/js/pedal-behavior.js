@@ -42,6 +42,18 @@ PBPlugin = function (superClass) {
       this.nodeintab.push(this.soundNodeIn);
     }
 
+    addInput(rank) {
+      this.inputP[rank] = document.createElement("div");
+      this.inputP[rank].style = 'margin-top :' + 40 * rank + 'px';
+      this.inputP[rank].classList.add("input");
+      if (typeof this.nbNodeIn == "undefined" || (this.nbNodeIn > 0)) this.shadowRoot.querySelector(".laPedale").appendChild(this.inputP[rank]);
+
+      let tmp = "nodein" + rank;
+      this[tmp] = GlobalContext.context.createGain();
+      this.nodeintab.push(this[tmp]);
+      this.nodeintab[rank].connect(this.node.inputs[rank]);
+    }
+
     runBehaviorMethods() {
       /*
       once all is loaded, we create bases elements of pedals :
@@ -180,14 +192,15 @@ PBPlugin = function (superClass) {
      * Return the position of each input on the PBPlugin
      */
     getInputPos() {
-      let _zoom = this.pedalboard.zoom;// That is why when zoom is under 1, the input pos a bad calculated !!!!!!!
+      let _zoom = this.pedalboard.zoom;
       var xpos = [];
       var ypos = [];
       for (var i = 0; i < this.nbNodeIn; i++) {
         xpos[i] = ((this.x) + this.IOsize / 2 + (-this.IOsize / 2));
-        ypos[i] = (((this.y) + this.IOsize / 2 + (this.IOsize - 4) + 12) + 40 * i) ;
+        ypos[i] = (((this.y) + this.IOsize / 2 + (this.IOsize - 4) + 12) + 40 * i);
+
+
       }
-      
       return { xpos, ypos }
     }
 
@@ -195,16 +208,16 @@ PBPlugin = function (superClass) {
     * Return the position of each output on the PBPlugin
     */
     getOutputPos() {
-      let _zoom = this.pedalboard.zoom;// That is why when zoom is under 1, the input pos a bad calculated !!!!!!!
-
+      let _zoom = this.pedalboard.zoom;
+      let IOresized = this.IOsize * _zoom;
+      let offsetforDrag = 10 * _zoom
       var xpos = [];
       var ypos = [];
       for (var i = 0; i < this.nbNodeOut; i++) {
         xpos[i] = ((this.x) + this.IOsize / 2 + (this.w + 2 * this.IOsize - 2)),
-        ypos[i] = (((this.y) + this.IOsize / 2 + (this.IOsize) + 8) + 20 * i);
+          ypos[i] = (((this.y) + this.IOsize / 2 + (this.IOsize) + 8) + 20 * i);
 
       }
-      //console.log(xpos, ypos)
       return { xpos, ypos }
     }
 
@@ -223,7 +236,6 @@ PBPlugin = function (superClass) {
       this.y = y;
       this.style.left = x + "px";
       this.style.top = y + "px";
-
       // Update jacks
       this.updateJackPosition();
     }

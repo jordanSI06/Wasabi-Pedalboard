@@ -43,22 +43,36 @@
         get is() { return this.nodeName.toLowerCase(); }
 
         // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
-        static get observedAttributes() { return ['params']; }
+        static get observedAttributes() { return ['params', 'dynamicparams']; }
+
+
 
         // Called if one of the observed attribute changed.
         attributeChangedCallback(name, oldValue, newValue, nbNodeIn) {
           console.log(`Custom element ${this.is} attributes changed.`);
-          try {
-            console.log(`name: ${name}`);
-            console.log(`oldValue:`, oldValue);
-            console.log(`newValue:`, newValue);
-            this.paramsLoaded = JSON.parse(newValue);
-            console.log('this.paramsLoaded', this.paramsLoaded);
-            console.log('thisNODE', this.node);
-            this.node.setState(this.paramsLoaded);
+            if(name ==="params"){
+            try {
+              console.log(`name: ${name}`);
+              console.log(`oldValue:`, oldValue);
+              console.log(`newValue:`, newValue);
+              this.paramsLoaded = JSON.parse(newValue);
+              console.log('this.paramsLoaded', this.paramsLoaded);
+              console.log('thisNODE', this.node);
+              
+             this.node.setState(this.paramsLoaded);
+            }
+            catch (err) {
+              console.log(err);
+            }
           }
-          catch (err) {
-            console.log(err);
+          else if(name ==="dynamicparams"){
+            console.log(`name: ${name}`);
+            console.log(`newValue:`, newValue);
+              if(newValue == "numberOfInputs"){
+                this.nbNodeIn = this.node.numberOfInputs;
+                console.log(this.nbNodeIn)
+                this.addInput(this.nbNodeIn - 1);
+              }
           }
 
         }
@@ -104,8 +118,9 @@
           // LOAD NODE
           this.plugin.load().then((node) => {
             // LOAD GUI
+
             this.plugin.loadGui().then((elem) => {
-              
+
               //Store the node as a field of the PBPlugin
               this.node = node;
 
@@ -157,6 +172,21 @@
                   pedal.soundNodeIn.connect(node);
                 }
               }
+              // fisrt implementation to catch plugin singularities
+
+              try {
+                node.gui.onchange = () =>{ 
+                  console.log("hzy");
+                  this.setAttribute("dynamicparams", node.dynamicParam.listento);
+                };
+                
+                //this.setAttribute("dynamicParamsValues", JSON.stringify(node[this.attributetolisten]));                
+
+              } catch (error) {
+                console.log(error);
+              }
+
+
               // Currently we manage only one output by node so we automatically connect the node output to the default PBPlugin soundnodeout
               node.connect(pedal.soundNodeOut);
             });

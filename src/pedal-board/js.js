@@ -49,8 +49,9 @@ class PedalBoard extends HTMLElement {
     this.wO = 0;
     this.hO = 0;
 
-
-    this.zoom = 1;
+    this.zoomtab = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
+    this.zoomindex = 9;
+    this.zoom = this.zoomtab[this.zoomindex];
 
     // factory
     this.factory = new factory();
@@ -104,7 +105,7 @@ class PedalBoard extends HTMLElement {
   // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
   // appelé lorsque l'élément personnalisé est connecté pour la première fois au DOM du document
   connectedCallback() {
- //  console.log(`Custom element ${this.is} added to page.`);
+    //  console.log(`Custom element ${this.is} added to page.`);
 
     // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
     const shadowRoot = this.attachShadow({ mode: `open` });
@@ -297,7 +298,7 @@ class PedalBoard extends HTMLElement {
       this.openMediaDevices();
     }
     this.shadowRoot.querySelector('#bt_openMicroDevices').onmouseover = (e) => {
-      
+
     }
 
     this.shadowRoot.querySelector('#bt_openAudio').onclick = (e) => {
@@ -306,11 +307,11 @@ class PedalBoard extends HTMLElement {
       this.openAudioPlayer();
     }
 
-    this.querySelector('#svg-canvas').onclick = (e) =>{
+    this.querySelector('#svg-canvas').onclick = (e) => {
       if (!this.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
       if (!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
       if (!this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.contains("hidden")) this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
-      
+
     }
 
     this.shadowRoot.querySelector('#bt_fullScreen').onclick = (e) => {
@@ -322,12 +323,16 @@ class PedalBoard extends HTMLElement {
     }
 
     this.shadowRoot.querySelector('#bt_zoom_in').onclick = (e) => {
-      this.zoom = this.zoom / 0.9;
+      this.zoomindex++;
+      this.zoom = this.zoomtab[this.zoomindex];
+      console.log(this.zoom)
       this.doZoom();
     }
 
     this.shadowRoot.querySelector('#bt_zoom_out').onclick = (e) => {
-      this.zoom = this.zoom * 0.9;
+      this.zoomindex--;
+      this.zoom = this.zoomtab[this.zoomindex];
+      console.log(this.zoom)
       this.doZoom();
     }
 
@@ -511,11 +516,11 @@ class PedalBoard extends HTMLElement {
   doZoom() {
     this.main.style.zoom = this.zoom;
     //this.resizeElements();
-    this.updateSVGcanvas(this.w / this.zoom, this.h / this.zoom);
 
     this.pIn.setPosition(-20, (this.h / 2) / this.zoom);
     if (this.pIn2) this.pIn2.setPosition(-20, (this.h / 4) / this.zoom);
     this.pOut.setPosition(this.w / this.zoom, (this.h / 2) / this.zoom);
+    this.updateSVGcanvas(this.w / this.zoom, this.h / this.zoom);
 
 
     // repositionnement des jacks
@@ -586,10 +591,16 @@ class PedalBoard extends HTMLElement {
       let iPos = p.getInputPos();
       let oPos = p.getOutputPos();
 
-      iPos.xpos[0] = iPos.xpos[0] * this.zoom;
-      iPos.ypos[0] = iPos.ypos[0] * this.zoom;
-      oPos.xpos[0] = oPos.xpos[0] * this.zoom;
-      oPos.ypos[0] = oPos.ypos[0] * this.zoom;
+      for (let count = 0; count < iPos.xpos.length; count++) {
+        iPos.xpos[count] = iPos.xpos[count] * this.zoom;
+        iPos.ypos[count] = iPos.ypos[count] * this.zoom;
+      }
+
+      for (let count = 0; count < oPos.xpos.length; count++) {
+        oPos.xpos[count] = oPos.xpos[count] * this.zoom;
+        oPos.ypos[count] = oPos.ypos[count] * this.zoom;
+      }
+
 
       let distInput = [];
       let distMinToInputForHighlight = 20;
@@ -883,7 +894,7 @@ class PedalBoard extends HTMLElement {
         // first we disconnect the jack before immediatly creating
         // a new one to drag
         this.currentState = "drawingNewJack";
-        this.disconnect(sourcePedal, p,p.inputJacks[0].pedal2inputNumber);
+        this.disconnect(sourcePedal, p, p.inputJacks[0].pedal2inputNumber);
         this.currentDraggableJack = this.removeJack(loc, sourcePedal);
       }
     } else if (this.clickInPedal(e)) {
@@ -983,6 +994,7 @@ class PedalBoard extends HTMLElement {
             x2: loc.x / this.zoom,
             y2: loc.y / this.zoom
           };
+          console.log(_pos.x2, _pos.y2);
           jackWeAreDragging.reviewSVGJack(_pos);
         }
         break;
@@ -1064,10 +1076,10 @@ class PedalBoard extends HTMLElement {
 
 
 
-/**
- * Get with the id pedal target infos as baseUrl, Thumbnail and classname
- * @param {*} id 
- */
+  /**
+   * Get with the id pedal target infos as baseUrl, Thumbnail and classname
+   * @param {*} id 
+   */
   getTarget(id) {
     var liste;
     GlobalContext.context.resume();
@@ -1286,10 +1298,10 @@ class PedalBoard extends HTMLElement {
           this.pedals[0].outputJacks.forEach((j) => {
             // this.sound.state goes back to 0 for the next disconnect
             this.sound.state = 0;
-            this.soundNodeDisconnection(j.p1, j.p2,j.pedal2inputNumber);
+            this.soundNodeDisconnection(j.p1, j.p2, j.pedal2inputNumber);
             // each state change is a new connection of the graph
             this.sound.state = 1;
-            this.soundNodeConnection(j.p1, j.p2,j.pedal2inputNumber);
+            this.soundNodeConnection(j.p1, j.p2, j.pedal2inputNumber);
           })
         }
 
@@ -1298,10 +1310,10 @@ class PedalBoard extends HTMLElement {
           this.pIn2.outputJacks.forEach((j) => {
             // this.sound.state goes back to 0 for the next disconnect
             this.sound.state = 0;
-            this.soundNodeDisconnection(j.p1, j.p2,j.pedal2inputNumber);
+            this.soundNodeDisconnection(j.p1, j.p2, j.pedal2inputNumber);
 
             this.sound.state = 1;
-            this.soundNodeConnection(j.p1, j.p2,j.pedal2inputNumber);
+            this.soundNodeConnection(j.p1, j.p2, j.pedal2inputNumber);
           })
         }
         this.monouserMediaSource.connect(this.meter1);
@@ -1314,10 +1326,10 @@ class PedalBoard extends HTMLElement {
           this.pedals[0].outputJacks.forEach((j) => {
             // this.sound.state goes back to 1 for the next disconnect
             this.sound.state = 1;
-            this.soundNodeDisconnection(j.p1, j.p2,j.pedal2inputNumber);
+            this.soundNodeDisconnection(j.p1, j.p2, j.pedal2inputNumber);
 
             this.sound.state = 0;
-            this.soundNodeConnection(j.p1, j.p2,j.pedal2inputNumber);
+            this.soundNodeConnection(j.p1, j.p2, j.pedal2inputNumber);
           })
 
         }
@@ -1326,10 +1338,10 @@ class PedalBoard extends HTMLElement {
           this.pIn2.outputJacks.forEach((j) => {
             // this.sound.state goes back to 1 for the next disconnect
             this.sound.state = 1;
-            this.soundNodeDisconnection(j.p1, j.p2,j.pedal2inputNumber);
+            this.soundNodeDisconnection(j.p1, j.p2, j.pedal2inputNumber);
 
             this.sound.state = 0;
-            this.soundNodeConnection(j.p1, j.p2,j.pedal2inputNumber);
+            this.soundNodeConnection(j.p1, j.p2, j.pedal2inputNumber);
           })
         }
         this.sound.state = 0;
@@ -1447,7 +1459,7 @@ class PedalBoard extends HTMLElement {
     if (p1.classList.contains("pedalIn") && p2.id == "pedalOut") {
       if (this.sound.state == 0) {
         this.sound.gainNodeIn.connect(this.sound.gainNodeOut);
-        this.sound.gainNodeOut.connect(this.meter2); 
+        this.sound.gainNodeOut.connect(this.meter2);
 
       } else {
         if (p1.id == 'pedalIn1') {
@@ -1471,7 +1483,7 @@ class PedalBoard extends HTMLElement {
         if (p1.id == 'pedalIn1') {
           if (inputnumber) this.sound.gainUserMedia.connect(p2.nodeintab[inputnumber])
           else this.sound.gainUserMedia.connect(p2.nodeintab[p2.bestInputNumber]);
-        } 
+        }
         // pdb input selected is pedalIn2
         else if (p1.id == 'pedalIn2') {
           if (inputnumber) this.sound.gainUserMedia2.connect(p2.nodeintab[inputnumber])
@@ -1543,7 +1555,7 @@ class PedalBoard extends HTMLElement {
     else if (p2.id == "pedalOut") {
       p1.soundNodeOut.disconnect(this.sound.gainNodeOut);
     }
-    
+
     // Case 4: Link between 2 PBPlugin
     else {
       if (inputnumber) p1.soundNodeOut.disconnect(p2.nodeintab[inputnumber]);
