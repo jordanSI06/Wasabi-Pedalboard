@@ -57,13 +57,12 @@
 
 		listenSubmit()
 		{
-			this.shadowRoot.querySelector('input[name="submitLogin"').addEventListener( "click", () =>
+			this.shadowRoot.querySelector('#submitLogin').addEventListener( "click", () =>
 			{
-				let mail = this.shadowRoot.querySelector('#input[name="mail"]').innerHTML;
-				let password = this.shadowRoot.querySelector('#input[name="password"]').innerHTML;
-				let url = this.shadowRoot.querySelector( "form" ).getAttribute("action");
+				let mail = this.shadowRoot.querySelector('#mail').value;
+				let password = this.shadowRoot.querySelector('#password').value;
 
-				let request = `${url}?mail=${mail}&password=${password}`;
+				let request = `http://localhost:5001/api/auth/local?mail=${mail}&password=${password}`;
 
 				let xmlhttp = new XMLHttpRequest();
 
@@ -72,16 +71,17 @@
 					if(xmlhttp.readyState == XMLHttpRequest.DONE)
 					{
 						if(xmlhttp.status == 200)
-							console.log('ok' + xmlhttp.responseText);
-						else if(xmlhttp.status == 400 || xmlhttp.status == 403)
-							console.log('400' + xmlhttp.responseText);
+							localStorage.setItem('token', xmlhttp.responseText);
+						else
+							console.log(("An error occured"));
 					}
+
+					console.log(localStorage.getItem('token'));
 				}
 
 				xmlhttp.open("GET", request, true);
 				xmlhttp.send();
 			});
 		}
-
 	} );
 } )();

@@ -1,13 +1,13 @@
 <template>
 	<link rel="stylesheet" href="./src/pedal-board/src/wc-login/css.css">
 
-	<div id="div_app">
+	<div id="theForm">
 
-		<form action="localhost:5001/api/auth/local" method="GET">
+		<form method="GET">
 
-			<input type="text" name="mail" placeholder="mail">
-			<input type="password" name="password" placeholder="password">
-			<input type="submit" name="submitLogin" value="Login">
+			<input type="text" id="mail" placeholder="mail">
+			<input type="password" id="password" placeholder="password">
+			<input type="button" id="submitLogin" value="Login">
 
 		</form>
 
