@@ -1,164 +1,173 @@
 <link rel="import" href="./src/wc-tabspedals">
 <link rel="import" href="./src/wc-audio">
 <link rel="import" href="./src/wc-save">
+<link rel="import" href="./src/wc-login">
 <template>
-  <link rel="stylesheet" href="./src/pedal-board/css.css">
-  <style>
-    :host {
-      position: absolute;
-      top: 0px;
-      right: 0px;
-      left: 0px;
-      bottom: 0px;
+	<link rel="stylesheet" href="./src/pedal-board/css.css">
+	<style>
+		:host {
+			position: absolute;
+			top: 0px;
+			right: 0px;
+			left: 0px;
+			bottom: 0px;
 
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+			width: 100%;
+			height: 100%;
+		}
+	</style>
 
-  <div id="div_app">
+	<div id="div_app">
 
-    <header id="header">
-      <button id="bt_hideHeader">
-        <iron-icon id="icon_view" icon="icons:expand-less"></iron-icon>
-      </button>
+		<header id="header">
+			<button id="bt_hideHeader">
+				<iron-icon id="icon_view" icon="icons:expand-less"></iron-icon>
+			</button>
 
-      <div id="header_settings" class="row" open=1>
-        <!-- MICRO + I/O LEVEL -->
-        <div id="div_setIO">
-          <!-- I : width="40" height="40"  diameter="24" -->
-          <div class="row">
-            <webaudio-knob id="knob_In" class="knob" min="0" max="1" sprites="99" value="100" step="0.01" midilearn="true" src="./img/knobs/nux_black_white_stripe.png"
-              width="30" height="30" diameter="24"></webaudio-knob>
-            <div class="column" title="gain">
-              <span class="span_gainLevel">input</span>
-              <canvas id="meter1" width="100" height="10"></canvas>
-            </div>
+			<div id="header_settings" class="row" open=1>
+				<!-- MICRO + I/O LEVEL -->
+				<div id="div_setIO">
+					<!-- I : width="40" height="40"  diameter="24" -->
+					<div class="row">
+						<webaudio-knob id="knob_In" class="knob" min="0" max="1" sprites="99" value="100" step="0.01" midilearn="true" src="./img/knobs/nux_black_white_stripe.png"
+						 width="30" height="30" diameter="24"></webaudio-knob>
+						<div class="column" title="gain">
+							<span class="span_gainLevel">input</span>
+							<canvas id="meter1" width="100" height="10"></canvas>
+						</div>
 
-          </div>
-          <!-- O -->
-          <div class="row">
-            <webaudio-knob id="knob_Out" class="knob" min="0" max="1" value="0.25" sprites="99" value="100" step="0.01" midilearn="true"
-              src="./img/knobs/nux_black_white_stripe.png" width="30" height="30" diameter="24"></webaudio-knob>
-            <div class="column" title="gain">
-              <span class="span_gainLevel">output</span>
-              <canvas id="meter2" width="100" height="10"></canvas>
-            </div>
-          </div>
-        </div>
-        <!-- TITLE + VERSION -->
-        <div class="div_title">
-          <span title="V.2.2 Dev 2018-05-31">PedalBoard</span>
-          <!-- <span id="version">V.2.2 Dev 2018-05-31</span> -->
-        </div>
+					</div>
+					<!-- O -->
+					<div class="row">
+						<webaudio-knob id="knob_Out" class="knob" min="0" max="1" value="0.25" sprites="99" value="100" step="0.01" midilearn="true"
+						 src="./img/knobs/nux_black_white_stripe.png" width="30" height="30" diameter="24"></webaudio-knob>
+						<div class="column" title="gain">
+							<span class="span_gainLevel">output</span>
+							<canvas id="meter2" width="100" height="10"></canvas>
+						</div>
+					</div>
+				</div>
+				<!-- TITLE + VERSION -->
+				<div class="div_title">
+					<span title="V.2.2 Dev 2018-05-31">PedalBoard</span>
+					<!-- <span id="version">V.2.2 Dev 2018-05-31</span> -->
+				</div>
 
-        <div class="div_settings">
+				<div class="div_settings">
 
 
-          <!-- sequencer -->
-          <!-- <button id="bt_seq" title="Sequenceur" class="headerbutton">
+					<!-- sequencer -->
+					<!-- <button id="bt_seq" title="Sequenceur" class="headerbutton">
             <iron-icon icon="image:landscape"></iron-icon>
           </button> -->
-          <!-- pdb -->
-          <button id="bt_stereo"  class="tooltip">
-            <iron-icon icon="icons:settings-input-component"></iron-icon>
-            <span class="tooltiptext">Add or remove the second input</span>
-          </button>
-          <!-- AudioPlayer -->
-          <button id="bt_openAudio" title="Play music"  class="tooltip">
-            <iron-icon icon="image:music-note"></iron-icon>
-            <span class="tooltiptext">Manage user media</span>
-          </button>
-          <!-- MIC -->
-          <button id="bt_openMicroDevices" title="Micro"  class="tooltip">
-            <iron-icon icon="icons:settings-voice"></iron-icon>
-            <span class="tooltiptext">Activate user media</span>
-          </button>
-          <!-- Save/Load -->
-          <wc-save>
-              <button class="tooltip">
-                  <span class="tooltiptext">Activate user media</span>
-              </button>
-          </wc-save>
-          <span>-</span>
+					<!-- pdb -->
+					<button id="choose_login" class="tooltip">
+						<iron-icon icon="icons:account-box"></iron-icon>
+						<span class="tooltiptext">Login to your account or create one</span>
+					</button>
+					<button id="bt_stereo" class="tooltip">
+						<iron-icon icon="icons:settings-input-component"></iron-icon>
+						<span class="tooltiptext">Add or remove the second input</span>
+					</button>
+					<!-- AudioPlayer -->
+					<button id="bt_openAudio" title="Play music" class="tooltip">
+						<iron-icon icon="image:music-note"></iron-icon>
+						<span class="tooltiptext">Manage user media</span>
+					</button>
+					<!-- MIC -->
+					<button id="bt_openMicroDevices" title="Micro" class="tooltip">
+						<iron-icon icon="icons:settings-voice"></iron-icon>
+						<span class="tooltiptext">Activate user media</span>
+					</button>
+					<!-- Save/Load -->
+					<wc-save>
+						<button class="tooltip">
+							<span class="tooltiptext">Activate user media</span>
+						</button>
+					</wc-save>
+					<span>-</span>
 
-          <a href='http://wasabihome.i3s.unice.fr/webaudio-plugin-proposal/' id="bt_Doc" title="Documentation" target='_blank' class="tooltip">
-            <iron-icon icon="icons:help"></iron-icon>
-            <span class="tooltiptext">Documentation en ligne</span>
-          </a>
-          <a href='./plugins.html' id="bt_viewPlugins" title="Plugin Gallery" target='_blank' class="tooltip">
-            <iron-icon icon="icons:extension"></iron-icon>
-            <span class="tooltiptext">See plugins available</span>
-          </a>
+					<a href='http://wasabihome.i3s.unice.fr/webaudio-plugin-proposal/' id="bt_Doc" title="Documentation" target='_blank' class="tooltip">
+						<iron-icon icon="icons:help"></iron-icon>
+						<span class="tooltiptext">Documentation en ligne</span>
+					</a>
+					<a href='./plugins.html' id="bt_viewPlugins" title="Plugin Gallery" target='_blank' class="tooltip">
+						<iron-icon icon="icons:extension"></iron-icon>
+						<span class="tooltiptext">See plugins available</span>
+					</a>
 
-          <a title="More information" href='http://sparks-vm31.i3s.unice.fr/toolsdemos/' id="bt_viewBlog" title="More infos" target='_blank'
-            class="tooltip">
-            <iron-icon icon="icons:book"></iron-icon>
-            <span class="tooltiptext">More infos</span>
-          </a>
+					<a title="More information" href='http://sparks-vm31.i3s.unice.fr/toolsdemos/' id="bt_viewBlog" title="More infos" target='_blank'
+					 class="tooltip">
+						<iron-icon icon="icons:book"></iron-icon>
+						<span class="tooltiptext">More infos</span>
+					</a>
 
-          <a  title="Source Code on Github" href="https://github.com/guizmo2000/TER-Pedalboard-creation/tree/dynamicLoading"
-            target='_blank' class="tooltip">
-            <iron-icon icon="social:share"></iron-icon>
-            <span class="tooltiptext">Source code</span>
-          </a>
+					<a title="Source Code on Github" href="https://github.com/guizmo2000/TER-Pedalboard-creation/tree/dynamicLoading" target='_blank'
+					 class="tooltip">
+						<iron-icon icon="social:share"></iron-icon>
+						<span class="tooltiptext">Source code</span>
+					</a>
 
-          <button id="bt_fullScreen" title="App in fullscreen" open="-1" class="tooltip">
-            <iron-icon icon="icons:fullscreen"></iron-icon>
-            <span class="tooltiptext">Fullscreen</span>
-          </button>
+					<button id="bt_fullScreen" title="App in fullscreen" open="-1" class="tooltip">
+						<iron-icon icon="icons:fullscreen"></iron-icon>
+						<span class="tooltiptext">Fullscreen</span>
+					</button>
 
-          <button id="bt_zoom_in" title="Zoom in" class="tooltip">
-            <iron-icon icon="icons:zoom-in"></iron-icon>
-            <span class="tooltiptext">Zoom in</span>
-          </button>
+					<button id="bt_zoom_in" title="Zoom in" class="tooltip">
+						<iron-icon icon="icons:zoom-in"></iron-icon>
+						<span class="tooltiptext">Zoom in</span>
+					</button>
 
-          <button id="bt_zoom_out" title="Zoom out" class="tooltip">
-            <iron-icon icon="icons:zoom-out"></iron-icon>
-            <span class="tooltiptext">Zoom out</span>
-          </button>
+					<button id="bt_zoom_out" title="Zoom out" class="tooltip">
+						<iron-icon icon="icons:zoom-out"></iron-icon>
+						<span class="tooltiptext">Zoom out</span>
+					</button>
 
-        </div>
+				</div>
 
-        <!-- AUDIO -->
-        <div id="divAudioPlayer" class="hidden">
-          <wc-audio id="wc-audio"></wc-audio>
-        </div>
+				<div id="divChooseLogin">
+					<wc-login id="wc-login"></wc-login>
+				</div>
 
-        <div id="divSoundIn" class="hidden">
-          <span class="span_tuto">Click learn, play loudly, gain will be adjusted</span>
-          <div class="select_devices">
-            <webaudio-switch src="img/switch_toggle.png" class="id" id="mic" height="28" width="40" alt="Activate sound input" title="Click to enable sound input"></webaudio-switch>
-            <span id="span_time" class="span_time">4s</span>
-            <button id="bt_learn">Learn</button>
-            <select id="select_audioinput" title="Devices"></select>
-          </div>
+				<!-- AUDIO -->
+				<div id="divAudioPlayer" class="hidden">
+					<wc-audio id="wc-audio"></wc-audio>
+				</div>
 
-          <div class="row">
-            <webaudio-knob id="knob_In_UserMedia" class="knob" min="0" max="1" sprites="99" value="1" step="0.01" midilearn="true" src="./img/knobs/nux_black_white_stripe.png"
-              width="40" height="40" data-role="time" diameter="24"></webaudio-knob>
-            <div class="column" title="gain">
-              <span class="span_gainLevel">input</span>
-              <canvas id="meter3" width="100" height="10"></canvas>
-              <br>
-              <canvas id="meter4" width="100" height="10"></canvas>
+				<div id="divSoundIn" class="hidden">
+					<span class="span_tuto">Click learn, play loudly, gain will be adjusted</span>
+					<div class="select_devices">
+						<webaudio-switch src="img/switch_toggle.png" class="id" id="mic" height="28" width="40" alt="Activate sound input" title="Click to enable sound input"></webaudio-switch>
+						<span id="span_time" class="span_time">4s</span>
+						<button id="bt_learn">Learn</button>
+						<select id="select_audioinput" title="Devices"></select>
+					</div>
 
-            </div>
-          </div>
+					<div class="row">
+						<webaudio-knob id="knob_In_UserMedia" class="knob" min="0" max="1" sprites="99" value="1" step="0.01" midilearn="true" src="./img/knobs/nux_black_white_stripe.png"
+						 width="40" height="40" data-role="time" diameter="24"></webaudio-knob>
+						<div class="column" title="gain">
+							<span class="span_gainLevel">input</span>
+							<canvas id="meter3" width="100" height="10"></canvas>
+							<br>
+							<canvas id="meter4" width="100" height="10"></canvas>
 
-        </div>
-      </div>
-    </header>
+						</div>
+					</div>
 
-    <div id="div_distance"></div>
-    <main id='mainPedalboard'>
-      <slot id="slot"></slot>
-    </main>
+				</div>
+			</div>
+		</header>
 
-    <footer>
-      <wc-tabspedals data-pedallist=""></wc-tabspedals>
-    </footer>
-  </div>
+		<div id="div_distance"></div>
+		<main id='mainPedalboard'>
+			<slot id="slot"></slot>
+		</main>
+
+		<footer>
+			<wc-tabspedals data-pedallist=""></wc-tabspedals>
+		</footer>
+	</div>
 </template>
 <script src="./jack.js"></script>
 <script src="./js.js"></script>
