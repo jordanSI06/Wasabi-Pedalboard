@@ -1,15 +1,31 @@
 <template>
 	<link rel="stylesheet" href="./src/pedal-board/src/wc-login/css.css">
 
-	<div id="theForm">
+	<div id="container">
 
-		<form method="GET">
+		<div id="oauth">
 
-			<input type="text" id="mail" placeholder="mail">
-			<input type="password" id="password" placeholder="password">
-			<input type="button" id="submitLogin" value="Login">
+			<div id="github">
+				<img src="/img/github-logo.png" height='20' width="20"/> GitHub
+			</div>
 
-		</form>
+			<div id="google">
+				<img src="/img/google-logo.png" height='20' width="20" /> Google
+			</div>
+
+		</div>
+
+		<div id="thForm">
+
+			<form method="GET">
+
+				<input type="text" id="mail" placeholder="mail">
+				<input type="password" id="password" placeholder="password">
+				<input type="button" id="submitLogin" value="Login">
+
+			</form>
+
+		</div>
 
 	</div>
 </template>

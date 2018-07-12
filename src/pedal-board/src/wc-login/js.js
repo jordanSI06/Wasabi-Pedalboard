@@ -72,11 +72,10 @@
 					{
 						if(xmlhttp.status == 200)
 							localStorage.setItem('token', xmlhttp.responseText);
-						else
-							console.log(("An error occured"));
-					}
+						else if(xmlhttp.status == 403)
+							alert(xmlhttp.responseText);
 
-					console.log(localStorage.getItem('token'));
+					}
 				}
 
 				xmlhttp.open("GET", request, true);
