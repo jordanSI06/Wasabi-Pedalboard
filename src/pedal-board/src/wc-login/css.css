@@ -24,7 +24,7 @@
 {
 	background:#222;
 
-	width:40%;
+	width:20%;
 	margin:0 auto;
 	position: absolute;
 	top:44px;
@@ -38,21 +38,22 @@
 
 #oauth
 {
-	background : white;
 	padding: 10px;
 }
 
 #github
 {
+	background : white;
 	cursor: pointer;
 
 	padding: 2px;
-	border-radius: 2px
+	border-radius: 2px;
 }
 
-* #oauth
+#oauth
 {
-	display : inline-flex
+	display: flex;
+	flex-direction: row;
 }
 
 #theForm
@@ -67,5 +68,15 @@
 	cursor: pointer;
 
 	padding: 2px;
-	border-radius: 2px
+	border-radius: 2px;
+
+	margin-left : 80px;
+}
+
+input
+{
+	height : 20px;
+	padding : 3px;
+	margin : 3px;
+	border-radius: 2px;
 }
