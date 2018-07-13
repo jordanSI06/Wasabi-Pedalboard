@@ -1,6 +1,6 @@
-# \<SimplePedalBoard\>
+# WASABI Pedalboard
 
-a full webcomponents / WebAudio pedalboard
+A full webcomponents / WebAudio pedalboard
 
 ## Launch the project
 
