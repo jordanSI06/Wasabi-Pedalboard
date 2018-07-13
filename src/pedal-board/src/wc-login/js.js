@@ -52,10 +52,12 @@
 			const instance = template.content.cloneNode( true );
 			shadowRoot.appendChild( instance );
 
-			this.listenSubmit();
+			this.listenLocalAuth();
+			this.googleConnexion();
+			this.githubConnexion();
 		}
 
-		listenSubmit()
+		listenLocalAuth()
 		{
 			this.shadowRoot.querySelector('#submitLogin').addEventListener( "click", () =>
 			{
@@ -71,16 +73,38 @@
 					if(xmlhttp.readyState == XMLHttpRequest.DONE)
 					{
 						if(xmlhttp.status == 200)
+						{
 							localStorage.setItem('token', xmlhttp.responseText);
-						else if(xmlhttp.status == 403)
-							alert(xmlhttp.responseText);
+							this.shadowRoot.querySelector( '#container' ).classList.toggle( 'hidden' );
+						}
+						else
+						{
+							this.shadowRoot.querySelector('#password').style.color = 'red';
+							this.shadowRoot.querySelector('#mail').style.color = 'red';
+							this.shadowRoot.querySelector('#submitLogin').style.color = 'red';
 
+							this.shadowRoot.querySelector( '#info' ).style.visibility = 'visible';
+							this.shadowRoot.querySelector('#info').innerHTML = xmlhttp.responseText;
+						}
 					}
 				}
 
 				xmlhttp.open("GET", request, true);
 				xmlhttp.send();
 			});
+		}
+
+		googleConnexion()
+		{
+
+		}
+
+		githubConnexion()
+		{
+			this.shadowRoot.querySelector( '#google' ).addEventListener( "click", () =>
+			{
+
+			} );
 		}
 	} );
 } )();

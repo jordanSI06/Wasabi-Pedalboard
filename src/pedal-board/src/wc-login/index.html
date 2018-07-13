@@ -5,13 +5,13 @@
 
 		<div id="oauth">
 
-			<div id="github">
-				<img src="/img/github-logo.png" height='20' width="20"/> GitHub
-			</div>
+			<button id="github">
+				<a href="http://localhost:5001/api/auth/github"><img src="/img/github-logo.png" height='20' width="20" /> GitHub</a>
+			</button>
 
-			<div id="google">
-				<img src="/img/google-logo.png" height='20' width="20" /> Google
-			</div>
+			<buttons id="google">
+				<a href="http://localhost:5001/api/auth/google"><img src="/img/google-logo.png" height='20' width="20" /> Google</a>
+			</button>
 
 		</div>
 
@@ -24,6 +24,8 @@
 				<input type="password" id="password" placeholder="password">
 				<br/>
 				<input type="button" id="submitLogin" value="Login">
+				<br/>
+				<p id='info'></p>
 
 			</form>
 
