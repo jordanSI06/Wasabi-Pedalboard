@@ -14,4 +14,4 @@ You can activate a user input (mic icon) and play in real time with an external 
 
 You can also sav / load  a  pedalboard configuration using the save icon on the header.
 
-##[Online Demo](https://wasabi.i3s.unice.fr/dynamicPedalboard/)
+[Online Demo](https://wasabi.i3s.unice.fr/dynamicPedalboard/)
