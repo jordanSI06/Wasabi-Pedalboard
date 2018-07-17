@@ -52,12 +52,10 @@
 			const instance = template.content.cloneNode( true );
 			shadowRoot.appendChild( instance );
 
-			this.listenLocalAuth();
-			this.googleConnexion();
-			this.githubConnexion();
+			this.listenAuth();
 		}
 
-		listenLocalAuth()
+		listenAuth()
 		{
 			this.shadowRoot.querySelector('#submitLogin').addEventListener( "click", () =>
 			{
@@ -72,12 +70,7 @@
 				{
 					if(xmlhttp.readyState == XMLHttpRequest.DONE)
 					{
-						if(xmlhttp.status == 200)
-						{
-							localStorage.setItem('token', xmlhttp.responseText);
-							this.shadowRoot.querySelector( '#container' ).classList.toggle( 'hidden' );
-						}
-						else
+						if( xmlhttp.status != 200)
 						{
 							this.shadowRoot.querySelector('#password').style.color = 'red';
 							this.shadowRoot.querySelector('#mail').style.color = 'red';
@@ -86,25 +79,16 @@
 							this.shadowRoot.querySelector( '#info' ).style.visibility = 'visible';
 							this.shadowRoot.querySelector('#info').innerHTML = xmlhttp.responseText;
 						}
+						else if( xmlhttp.status == 200)
+						{
+							window.location.replace( xmlhttp.responseURL );
+						}
 					}
 				}
 
 				xmlhttp.open("GET", request, true);
 				xmlhttp.send();
 			});
-		}
-
-		googleConnexion()
-		{
-
-		}
-
-		githubConnexion()
-		{
-			this.shadowRoot.querySelector( '#google' ).addEventListener( "click", () =>
-			{
-
-			} );
 		}
 	} );
 } )();
