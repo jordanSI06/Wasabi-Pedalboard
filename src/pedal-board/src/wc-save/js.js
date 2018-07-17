@@ -83,19 +83,22 @@
 				if( localStorage.getItem('token') == null )
 				{
 					this.banks = [];
+					this.renderBanks();
+					this.listeners();
 				}
 				else
 				{
 					this.getBanksFromAPI().then(
-						(banks) => this.banks = banks,
+						(banks) =>
+						{
+							this.banks = JSON.parse(banks);
+							this.renderBanks();
+							this.listeners();
+						},
 						(error) => alert(error)
 					);
 				}
 			}
-
-			
-			this.loadBanks();
-			this.listeners();
 		}
 
 		// takeScreenshot() {
@@ -149,16 +152,36 @@
 		/**
 		 * First step : load and render the bank stage
 		 */
-		loadBanks()
+		renderBanks()
 		{
-			this.nav_banks.innerHTML = '';
-			Object.keys( this.banks ).map(
-				( elem, index ) =>
-				{
-					this.nav_banks.insertAdjacentHTML( 'beforeEnd', this.renderLink( this.banks[elem] ) );
-				}
-			)
+			this.banks.forEach( bank =>
+			{
+				this.nav_banks.insertAdjacentHTML( 'beforeEnd', this.renderLink( bank.label, ( bank._id ) ) );
+
+			} );
+
 			this.selectBanksListeners();
+		}
+
+		renderPresetsOfBank(bankID)
+		{
+			this.nav_presets.innerHTML = '';
+
+			this.banks.forEach( bank =>
+			{
+				if( bank._id == bankID)
+				{
+					if(bank.presets != null)
+					{
+						bank.presets.forEach( preset =>
+						{
+							this.nav_presets.insertAdjacentHTML( 'beforeEnd', this.renderLink( preset.label, preset._id ) );
+						});
+					}
+				}
+			});
+
+			this.selectPresetsListeners();
 		}
 
 		/**
@@ -197,25 +220,11 @@
 			this.div_dialog.classList.toggle( 'hidden' );
 		}
 
-		loadPresets()
-		{
-			let bankSelected = this.banks.find( item => item._id == this.bankSelected );
-			let _presets = bankSelected.presets;
-			this.nav_presets.innerHTML = '';
-			Object.keys( _presets ).map(
-				( elem, index ) =>
-				{
-					this.nav_presets.insertAdjacentHTML( 'beforeEnd', this.renderLink( _presets[elem] ) );
-				}
-			)
-			this.selectPresetsListeners();
-		}
-
-		renderLink( _json )
+		renderLink( name, id )
 		{
 			//console.log('screenshot', _json.screenshot);
 			// <img src="${_json.screenshot}" width=200>
-			return `<a href='#' id='${_json._id}' value='${_json.label}'>${_json.label}</a>`;
+			return `<a href='#' id='${id}' value='${name}'>${name}</a>`;
 		}
 
 		loadPreset()
@@ -229,7 +238,6 @@
 
 			this.nbPluginTraitee = 0;
 
-			//this.pedalboard.loadPresets(this.plugs);
 			console.log( this.plugs )
 			this.loadNewPlugin( this.plugs[0] );
 		}
@@ -270,34 +278,25 @@
 			}
 		}
 
-		sleep( _mms )
-		{
-			return new Promise( ( resolve, reject ) =>
-			{
-				setTimeout( () => resolve( _mms ), _mms );
-			} )
-		}
-
 		selectBanksListeners()
 		{
 			this.nav_banks.querySelectorAll( 'a' ).forEach( e =>
 			{
-				//console.log('a', e);
 				e.onclick = ( e ) => this.selectBank( e.target.id );
 			} )
 		}
 
 		selectBank( _id )
 		{
-			//console.log('selectBank', _id);
 			this.nav_banks.querySelectorAll( 'a' ).forEach( e =>
 			{
 				if ( e.id == _id )
 				{
 					e.classList.add( 'a_selected' );
 					this.bankSelected = e.id;
-					this.loadPresets();
-				} else
+					this.renderPresetsOfBank(_id);
+				}
+				else
 				{
 					e.classList.remove( 'a_selected' );
 				}
@@ -324,7 +323,6 @@
 					e.classList.add( 'a_selected' );
 					this.presetSelected = e.id;
 					this.input_presetName.value = e.getAttribute( 'value' );
-					//this.loadPresets();
 				} else
 				{
 					e.classList.remove( 'a_selected' );
@@ -361,7 +359,7 @@
 				}
 				this.banks.push( _newBank );
 				this.saveBank();
-				this.loadBanks();
+				this.renderBanks();
 			}
 		}
 
@@ -429,7 +427,7 @@
 			}
 
 			this.saveBank();
-			this.loadPresets();
+			this.renderPresetsOfBank();
 			alert( 'Preset was successfully saved!' );
 			console.log( "preset saved!!!", this.banks );
 
