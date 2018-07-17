@@ -76,9 +76,24 @@
 			this.bankSelected = '';
 			this.plugsConnexions = '';
 
-			if ( localStorage.getItem( 'banks' ) ) this.banks = JSON.parse( localStorage.getItem( 'banks' ) );
-			else this.banks = [];
-			localStorage.setItem( 'banks', JSON.stringify( this.banks ) );
+			if ( localStorage.getItem( 'banks' ) )
+				this.banks = JSON.parse( localStorage.getItem( 'banks' ) );
+			else
+			{
+				if( localStorage.getItem('token') == null )
+				{
+					this.banks = [];
+				}
+				else
+				{
+					this.getBanksFromAPI().then(
+						(banks) => this.banks = banks,
+						(error) => alert(error)
+					);
+				}
+			}
+
+			
 			this.loadBanks();
 			this.listeners();
 		}
@@ -109,6 +124,27 @@
 		//     // link.click();
 		//   })
 		// }
+
+		async getBanksFromAPI()
+		{
+			return new Promise( (resolve, reject) =>
+			{
+				let xmlhttp = new XMLHttpRequest();
+
+				xmlhttp.onreadystatechange = () =>
+				{
+					if ( xmlhttp.readyState == XMLHttpRequest.DONE )
+					{
+						if ( xmlhttp.status == 200 ) resolve( xmlhttp.responseText )
+						else reject( xmlhttp.responseText);
+					}
+				}
+
+				xmlhttp.open( "GET", 'http://localhost:5001/api/bank/', true );
+				xmlhttp.setRequestHeader("Authorization", `Bearer ${localStorage.getItem('token')}`);
+				xmlhttp.send();
+			});
+		}
 
 		/**
 		 * First step : load and render the bank stage
