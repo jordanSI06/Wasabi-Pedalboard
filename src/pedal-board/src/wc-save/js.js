@@ -65,7 +65,7 @@
 			// Extract the attribute from our element.
 			this.bt_loadPreset = this.shadowRoot.querySelector( '#bt_loadPreset' );
 			this.div_dialog = this.shadowRoot.querySelector( '#div_dialog' );
-			this.bt_saveLoad = this.shadowRoot.querySelector( '#bt_saveLoad' );
+			this.bt_openDialog = this.shadowRoot.querySelector( '#bt_openDialog' );
 			this.bt_saveBank = this.shadowRoot.querySelector( '#bt_saveBank' );
 			this.bt_savePreset = this.shadowRoot.querySelector( '#bt_savePreset' );
 			this.input_presetName = this.shadowRoot.querySelector( '#input_presetName' );
@@ -101,6 +101,33 @@
 			}
 		}
 
+		// takeScreenshot() {
+		//   console.log('takeScreenshot');
+		//   html2canvas(this.pedalboard, {
+		//     allowTaint: true,
+		//     // foreignObjectRendering:true
+		//   }).then(canvas => {
+		//     console.log('onrendered', canvas);
+		//     // var tempcanvas = document.createElement('canvas');
+		//     // tempcanvas.width = 350;
+		//     // tempcanvas.height = 350;
+
+		//     // var context = tempcanvas.getContext('2d');
+		//     // context.drawImage(canvas, 112, 0, 288, 200, 0, 0, 350, 350);
+
+		//     let img = document.createElement('img');
+		//     img.src = canvas.toDataURL('image/png');
+		//     img.style.width = "400px";
+		//     this.pedalboard.appendChild(img);
+
+
+		//     // var link = document.createElement("a");
+		//     // link.href = canvas.toDataURL('image/jpg');   //function blocks CORS
+		//     // link.download = 'screenshot.jpg';
+		//     // link.click();
+		//   })
+		// }
+
 		async getBanksFromAPI()
 		{
 			return new Promise( (resolve, reject) =>
@@ -130,6 +157,7 @@
 			this.banks.forEach( bank =>
 			{
 				this.nav_banks.insertAdjacentHTML( 'beforeEnd', this.renderLink( bank.label, ( bank._id ) ) );
+
 			} );
 
 			this.selectBanksListeners();
@@ -168,8 +196,7 @@
 				if ( this.isAPresetSlected ) this.loadPreset();
 				else alert( "Select a preset first" );
 			}
-
-			this.bt_saveLoad.onclick = ( e ) =>
+			this.bt_openDialog.onclick = ( e ) =>
 			{
 				if ( !this.pedalboard.shadowRoot.querySelector( "#divAudioPlayer" ).classList.contains( "hidden" ) ) this.pedalboard.shadowRoot.querySelector( '#divAudioPlayer' ).classList.toggle( 'hidden' );
 				if ( !this.pedalboard.shadowRoot.querySelector( "#divSoundIn" ).classList.contains( "hidden" ) ) this.pedalboard.shadowRoot.querySelector( '#divSoundIn' ).classList.toggle( 'hidden' );
@@ -183,11 +210,7 @@
 				if ( this.bankSelected )
 				{
 					if ( this.isAPresetSlected || this.input_presetName.value ) this.savePreset();
-					else alert( "Tape name or choose a preset to overwrite" )
-				}
-				else
-				{
-					alert("First you need to select a bank");
+					else alert( "Tape name of choose a preset to overwrite" )
 				}
 			}
 		}
@@ -341,29 +364,63 @@
 		}
 
 		// create preset name
-		async savePreset()
+		async  savePreset()
 		{
 			//this.takeScreenshot();
 			//this.takeScreenshot().then(_screenshot=>{
 			//  console.log('_screenshot',_screenshot);
-
 			let _presetName = this.input_presetName.value.trim();
 			let bankSelected = this.banks.find( item => item._id == this.bankSelected );
 
 			let _currentPlugs = [];
 			let _currentConnexions = this.pedalboard.pluginConnected;
-			console.log( 'currentConnexions', _currentConnexions ); // OK pour le gainnode
+			console.log( _currentConnexions ); // OK pour le gainnode
 
 			let _plugin = '';
 			let _plugsToSave = {};
 			let _settings = [];
-
-			await retrievePlugins();
-
-			if ( !doesThePresetAlreadyExists() )
-				addNewPreset();
-			else
+			for ( let i = 0; i < this.pedalboard.pedals.length; i++ )
 			{
+				_plugin = this.pedalboard.pedals[i];
+				_settings = [];
+				if ( _plugin.id != "pedalIn1" && _plugin.id != "pedalIn2" && _plugin.id != "pedalOut" )
+				{
+
+					// Await from the plugin to return its state so save the preset
+					await _plugin.node.getState().then( ( params ) =>
+					{
+						_settings = params;
+						_plugsToSave = {
+							id: _plugin.id,
+							type: _plugin.tagName.toLowerCase(),
+							position: {
+								x: _plugin.x,
+								y: _plugin.y
+							},
+							settings: _settings
+						}
+						_currentPlugs.push( _plugsToSave );
+					} );
+				}
+			}
+			if ( !bankSelected.presets.find( item => item.label == _presetName ) )
+			{
+				//console.log('preset not exist');
+
+				let _newPreset = {
+					"_id": `${Date.now()}_preset`,
+					"label": `${_presetName}`,
+					"date": `${new Date().toJSON().slice( 0, 10 )}`,
+					"plugs": _currentPlugs,
+					"connexions": _currentConnexions,
+					//"screenshot":_screenshot
+				}
+				bankSelected.presets.push( _newPreset );
+				console.log( _newPreset )// ok pour le gainNode
+			} else
+			{
+				//console.log('preset exist', bankSelected.presets.find(item => item.label == _presetName));
+				// Not every plugin have an "params" getter, you need to try catch when using it
 				bankSelected.presets.find( item => item._id == this.presetSelected ).plugs = _currentPlugs;
 				bankSelected.presets.find( item => item._id == this.presetSelected ).connexions = _currentConnexions;
 				// bankSelected.presets.find(item => item._id == this.presetSelected).screenshot = _screenshot;
@@ -375,81 +432,7 @@
 			console.log( "preset saved!!!", this.banks );
 
 			//})
-
-			///////////////////////////////////////////////////////////////////////////
-
-			async function retrievePlugins()
-			{
-				for ( let i = 0; i < this.pedalboard.pedals.length; i++ )
-				{
-					_plugin = this.pedalboard.pedals[i];
-					_settings = [];
-
-					if ( _plugin.id != "pedalIn1" && _plugin.id != "pedalIn2" && _plugin.id != "pedalOut" )
-					{
-
-						// Await from the plugin to return its state so save the preset
-						await _plugin.node.getState().then( ( params ) =>
-						{
-							_settings = params;
-							_plugsToSave = {
-								id: _plugin.id,
-								type: _plugin.tagName.toLowerCase(),
-								position: {
-									x: _plugin.x,
-									y: _plugin.y
-								},
-								settings: _settings
-							}
-							_currentPlugs.push( _plugsToSave );
-						} );
-					}
-				}
-			}
-
-			function doesThePresetAlreadyExists()
-			{ return Boolean( bankSelected.presets.find( item => item.label == _presetName)) }
-
-			function addNewPreset()
-			{
-				let _newPreset =
-				{
-					"label": `${_presetName}`,
-					"date": `${new Date().toJSON().slice( 0, 10 )}`,
-					"plugs": _currentPlugs,
-					"connexions": _currentConnexions,
-					//"screenshot":_screenshot
-				}
-				bankSelected.presets.push( _newPreset );
-			}
 		}
-
-		// takeScreenshot() {
-		//   console.log('takeScreenshot');
-		//   html2canvas(this.pedalboard, {
-		//     allowTaint: true,
-		//     // foreignObjectRendering:true
-		//   }).then(canvas => {
-		//     console.log('onrendered', canvas);
-		//     // var tempcanvas = document.createElement('canvas');
-		//     // tempcanvas.width = 350;
-		//     // tempcanvas.height = 350;
-
-		//     // var context = tempcanvas.getContext('2d');
-		//     // context.drawImage(canvas, 112, 0, 288, 200, 0, 0, 350, 350);
-
-		//     let img = document.createElement('img');
-		//     img.src = canvas.toDataURL('image/png');
-		//     img.style.width = "400px";
-		//     this.pedalboard.appendChild(img);
-
-
-		//     // var link = document.createElement("a");
-		//     // link.href = canvas.toDataURL('image/jpg');   //function blocks CORS
-		//     // link.download = 'screenshot.jpg';
-		//     // link.click();
-		//   })
-		// }
 
 	} );
 } )();
