@@ -348,6 +348,11 @@ class PedalBoard extends HTMLElement {
     this.shadowRoot.querySelector('#bt_stereo').onclick = (e) => {
       this.changetomono();
 	}
+
+	this.shadowRoot.querySelector('wc-save').shadowRoot.querySelector('#div_app').onclick = (e) =>
+	{
+		this.shadowRoot.querySelector( 'wc-save' ).shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
+	}
   }
 
   openHeader() {
