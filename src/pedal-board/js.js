@@ -353,6 +353,8 @@ class PedalBoard extends HTMLElement {
 	{
 		this.shadowRoot.querySelector( 'wc-save' ).shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
 	}
+
+	this.shadowRoot.querySelector('#bt_clear').onclick = ( ) => this.clearPedalBoard()
   }
 
   openHeader() {
@@ -447,30 +449,46 @@ class PedalBoard extends HTMLElement {
     this.sleep(300).then(() => { this.handleJackMenu(p) });
   }
 
-  removePedal(p) {
-    if (confirm("Are you sure you want to remove this pedal ?")) {
-      let jacksIn = p.inputJacks;
-      let jacksOut = p.outputJacks;
+	clearPedalBoard()
+	{
+		let pedalsClean = this.pedals.slice(2); // Remove pedal-in and pedal-out ...... if there's just one pedal-in
 
-      if (jacksIn.length > 0) {
-        for (let i = jacksIn.length - 1; i >= 0; i--) {
-          this.disconnect(jacksIn[i].p1, jacksIn[i].p2);
-        }
-      }
-      if (jacksOut.length > 0) {
+		pedalsClean.forEach( pedal => this.removePedal( pedal, false ));
+	}
 
-        for (let i = jacksOut.length - 1; i >= 0; i--) {
-          console.log(jacksOut[i].p1, jacksOut[i].p2);
+	removePedal( p, boolAskForConfirmation )
+	{
+		console.log('p' + p)
+		if ( ( boolAskForConfirmation != null && boolAskForConfirmation == false ) || confirm( "Are you sure you want to remove this pedal ?" ) )
+		{
+			let jacksIn = p.inputJacks;
+			let jacksOut = p.outputJacks;
 
-          this.disconnect(jacksOut[i].p1, jacksOut[i].p2, jacksOut[i].pedal2inputNumber);
-        }
-      }
+			if ( jacksIn.length > 0 )
+			{
 
-      var index = this.pedals.indexOf(p);
-      if (index > -1) this.pedals.splice(index, 1);
-      this.removeChild(p);
-    }
-  }
+				for ( let i = jacksIn.length - 1; i >= 0; i-- )
+				{
+					this.disconnect( jacksIn[i].p1, jacksIn[i].p2 );
+				}
+			}
+			if ( jacksOut.length > 0 )
+			{
+
+				for ( let i = jacksOut.length - 1; i >= 0; i-- )
+				{
+					console.log( jacksOut[i].p1, jacksOut[i].p2 );
+
+					this.disconnect( jacksOut[i].p1, jacksOut[i].p2, jacksOut[i].pedal2inputNumber );
+				}
+			}
+
+
+
+			this.removeChild( p );
+			this.pedals.pop(p);
+		}
+	}
 
 
   isConnexionPossible(_nbNodeOut, _nbNodeIn) {

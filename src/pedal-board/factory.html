@@ -12,15 +12,15 @@
   const template = _currentdoc.querySelector(`template`);
   /**
    * This is a pedal factory. it creates a pedal === a PBPlugin using when the createPedal methode is called
-   * 
+   *
   */
   class factory {
     /**
      * The createPedal function create an audio modules with a GUI that can be used in the Pedalboard. It needs :
-     * @param {String} _tagname 
+     * @param {String} _tagname
      * @param {String} _pluginName
      * @param {URL} _pluginUrl
-     *  to : 
+     *  to :
      * - Import a distant audioNode;
      * - Import and link its GUI;
      * - Wrap it in a PBPlugin
@@ -58,7 +58,7 @@
               this.paramsLoaded = JSON.parse(newValue);
               console.log('this.paramsLoaded', this.paramsLoaded);
               console.log('thisNODE', this.node);
-              
+
              this.node.setState(this.paramsLoaded);
             }
             catch (err) {
@@ -82,9 +82,10 @@
           console.log(`Custom element ${this.is} moved to new page.`);
         }
 
-        // Called when the pedal is disconnected from the dom 
+        // Called when the pedal is disconnected from the dom
         disconnectedCallback() {
-          console.log(`Custom element ${this.is} removed from page.`);
+		  console.log(`Custom element ${this.is} removed from page.`);
+		  
         }
 
         // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
@@ -128,7 +129,7 @@
               this.nbNodeIn = node.numberOfInputs;
               this.nbNodeOut = node.numberOfOutputs;
 
-              // Push the Inputs to the Inputs array 
+              // Push the Inputs to the Inputs array
               for (var i = 1; i < this.nbNodeIn; i++) {
                 let tmp = "nodein" + i;
                 pedal[tmp] = GlobalContext.context.createGain();
@@ -175,12 +176,12 @@
               // fisrt implementation to catch plugin singularities
 
               try {
-                node.gui.onchange = () =>{ 
+                node.gui.onchange = () =>{
                   console.log("hzy");
                   this.setAttribute("dynamicparams", node.dynamicParam.listento);
                 };
-                
-                //this.setAttribute("dynamicParamsValues", JSON.stringify(node[this.attributetolisten]));                
+
+                //this.setAttribute("dynamicParamsValues", JSON.stringify(node[this.attributetolisten]));
 
               } catch (error) {
                 console.log(error);
