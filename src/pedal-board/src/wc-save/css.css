@@ -74,7 +74,7 @@
 }
 #div_dialog main aside button{
   background: #eee;
-  
+
   flex: 1;
   padding: 10px;
 }
@@ -179,19 +179,19 @@
   margin-left:2px;
 }
 
-#bt_openDialog:hover {
+#bt_saveLoad:hover {
   background: #222;
 }
 
-#bt_openDialog {
+#bt_saveLoad {
   background: transparent;
   color: #ccc;
-  
+
   padding: 10px;
 
   cursor: pointer;
 }
-#bt_openDialog iron-icon{
+#bt_saveLoad iron-icon{
   width: 20px;
 }
 
@@ -200,6 +200,7 @@
   padding-top: 5px;
   font-family: 'Open Sans', sans-serif;
   color:#fff;
+  margin-right : 10px;
 
 }
 hr{
@@ -217,7 +218,7 @@ hr{
 
   /* Position the tooltip */
   position: absolute;
-  
+
   top: 20%;
   left: 52%;
   z-index: 1;

@@ -65,7 +65,6 @@
 			// Extract the attribute from our element.
 			this.bt_loadPreset = this.shadowRoot.querySelector( '#bt_loadPreset' );
 			this.div_dialog = this.shadowRoot.querySelector( '#div_dialog' );
-			this.bt_openDialog = this.shadowRoot.querySelector( '#bt_openDialog' );
 			this.bt_saveBank = this.shadowRoot.querySelector( '#bt_saveBank' );
 			this.bt_savePreset = this.shadowRoot.querySelector( '#bt_savePreset' );
 			this.input_presetName = this.shadowRoot.querySelector( '#input_presetName' );
@@ -76,18 +75,16 @@
 			this.bankSelected = '';
 			this.plugsConnexions = '';
 
+			let dontWaitTheAPI = true;
 			if ( localStorage.getItem( 'banks' ) )
 				this.banks = JSON.parse( localStorage.getItem( 'banks' ) );
 			else
 			{
 				if( localStorage.getItem('token') == null )
-				{
 					this.banks = [];
-					this.renderBanks();
-					this.listeners();
-				}
 				else
 				{
+					dontWaitTheAPI = false;
 					this.getBanksFromAPI().then(
 						(banks) =>
 						{
@@ -98,6 +95,12 @@
 						(error) => alert(error)
 					);
 				}
+			}
+
+			if(dontWaitTheAPI)
+			{
+				this.renderBanks();
+				this.listeners();
 			}
 		}
 
@@ -154,6 +157,8 @@
 		 */
 		renderBanks()
 		{
+			this.shadowRoot.querySelector('#nav_banks').innerHTML = '';
+
 			this.banks.forEach( bank =>
 			{
 				this.nav_banks.insertAdjacentHTML( 'beforeEnd', this.renderLink( bank.label, ( bank._id ) ) );
@@ -190,34 +195,26 @@
 		 */
 		listeners()
 		{
-			// Load presets only if a preset is selected
-			this.bt_loadPreset.onclick = ( e ) =>
+			this.bt_loadPreset.onclick = ( ) =>
 			{
 				if ( this.isAPresetSlected ) this.loadPreset();
 				else alert( "Select a preset first" );
 			}
-			this.bt_openDialog.onclick = ( e ) =>
-			{
-				if ( !this.pedalboard.shadowRoot.querySelector( "#divAudioPlayer" ).classList.contains( "hidden" ) ) this.pedalboard.shadowRoot.querySelector( '#divAudioPlayer' ).classList.toggle( 'hidden' );
-				if ( !this.pedalboard.shadowRoot.querySelector( "#divSoundIn" ).classList.contains( "hidden" ) ) this.pedalboard.shadowRoot.querySelector( '#divSoundIn' ).classList.toggle( 'hidden' );
-				this.openDialog();
-			};
-			this.bt_saveBank.onclick = ( e ) => this.addNewBank();
 
-			// save presets only if a bank is selected and (a name written or a preset selected)
-			this.bt_savePreset.onclick = ( e ) =>
+			this.bt_saveBank.onclick = ( ) => this.addNewBank();
+
+			this.bt_savePreset.onclick = ( ) =>
 			{
 				if ( this.bankSelected )
 				{
 					if ( this.isAPresetSlected || this.input_presetName.value ) this.savePreset();
 					else alert( "Tape name of choose a preset to overwrite" )
 				}
+				else
+				{
+					alert('First off all you have to click a bank or create one')
+				}
 			}
-		}
-
-		openDialog()
-		{
-			this.div_dialog.classList.toggle( 'hidden' );
 		}
 
 		renderLink( name, id )
@@ -364,7 +361,7 @@
 		}
 
 		// create preset name
-		async  savePreset()
+		async  savePreset() //TODO règler le problem de sauvegarde de preset
 		{
 			//this.takeScreenshot();
 			//this.takeScreenshot().then(_screenshot=>{
@@ -390,17 +387,17 @@
 					await _plugin.node.getState().then( ( params ) =>
 					{
 						_settings = params;
-						_plugsToSave = {
-							id: _plugin.id,
-							type: _plugin.tagName.toLowerCase(),
-							position: {
-								x: _plugin.x,
-								y: _plugin.y
-							},
-							settings: _settings
-						}
-						_currentPlugs.push( _plugsToSave );
 					} );
+					_plugsToSave = {
+						id: _plugin.id,
+						type: _plugin.tagName.toLowerCase(),
+						position: {
+							x: _plugin.x,
+							y: _plugin.y
+						},
+						settings: _settings
+					}
+					_currentPlugs.push( _plugsToSave );
 				}
 			}
 			if ( !bankSelected.presets.find( item => item.label == _presetName ) )
