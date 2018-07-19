@@ -162,13 +162,12 @@
 			this.banks.forEach( bank =>
 			{
 				this.nav_banks.insertAdjacentHTML( 'beforeEnd', this.renderLink( bank.label, ( bank._id ) ) );
-
 			} );
 
 			this.selectBanksListeners();
 		}
 
-		renderPresetsOfBank(bankID)
+		renderPresetsOfBank(bankID) //TODO after saving a preset it's not put in his bank directly, fix it
 		{
 			this.nav_presets.innerHTML = '';
 
@@ -187,6 +186,11 @@
 			});
 
 			this.selectPresetsListeners();
+		}
+
+		deleteElement(id) //TODO
+		{
+			console.log('you have to delete ', id);
 		}
 
 		/**

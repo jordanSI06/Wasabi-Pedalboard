@@ -1145,50 +1145,60 @@ class PedalBoard extends HTMLElement {
   }
 
 
-  loadPlugin(p) {
-    return new Promise((resolve, reject) => {
-      // WE LOAD: type, id, positions, settings, connexions (we'll be treated this after plugins were loaded)
-      // - id
-      let _id = p.id;
-      // - settings
-      let _settings = p.settings;
-      // - type
-      let _tagName = p.type;
-      let target = this.getTarget(_tagName);
-      // - position
-      let _pos = { x: p.position.x, y: p.position.y };
+loadPlugin(p)
+{
+	return new Promise((resolve, reject) =>
+	{
+		if(p != null)
+		{
+			// WE LOAD: type, id, positions, settings, connexions (we'll be treated this after plugins were loaded)
+			// - id
+			let _id = p.id;
+			// - settings
+			let _settings = p.settings;
+			// - type
+			let _tagName = p.type;
+			let target = this.getTarget( _tagName );
+			// - position
+			let _pos = { x: p.position.x, y: p.position.y };
 
-      let _promise = new Promise((_resolve, _reject) => {
-        // script was already loaded
-        if (document.querySelector(`script[src="${target.baseUrl}/main.js"]`)) _resolve(true);
-        else {
-          // script was never loaded -> we create it
-          var script = document.createElement('script');
-          script.src = target.baseUrl + `/main.js`;
-          script.async = true;
-          script.onload = (e) => {
-            // create webcomponent plugin + setSettings
-            this.factory.createPedal(_tagName, target.classname, target.baseUrl)
-            _resolve(true);
-          };
-          document.head.appendChild(script);
-        }
-      }).then(async res => {
-        // add pedal
-        let plug = document.createElement(_tagName);
-        //plug.setAttribute('params', JSON.stringify(_settings));
-        plug.id = _id;
-        plug.setPosition(_pos.x, _pos.y);
-        this.addPedal(plug);
-        //console.log(plug);
-        await this.sleep(300).then(e => {
-          //console.log(e);
-        });
-        //console.log('finished to sleep');
-        resolve(plug);
-      });
-    })
-  }
+			let _promise = new Promise( ( _resolve, _reject ) =>
+			{
+				// script was already loaded
+				if ( document.querySelector( `script[src="${target.baseUrl}/main.js"]` ) ) _resolve( true );
+				else
+				{
+					// script was never loaded -> we create it
+					var script = document.createElement( 'script' );
+					script.src = target.baseUrl + `/main.js`;
+					script.async = true;
+					script.onload = ( e ) =>
+					{
+						// create webcomponent plugin + setSettings
+						this.factory.createPedal( _tagName, target.classname, target.baseUrl )
+						_resolve( true );
+					};
+					document.head.appendChild( script );
+				}
+			} ).then( async res =>
+			{
+				// add pedal
+				let plug = document.createElement( _tagName );
+				//plug.setAttribute('params', JSON.stringify(_settings));
+				plug.id = _id;
+				plug.setPosition( _pos.x, _pos.y );
+				this.addPedal( plug );
+				//console.log(plug);
+				await this.sleep( 300 ).then( e =>
+				{
+					//console.log(e);
+				} );
+				//console.log('finished to sleep');
+				resolve( plug );
+			} );
+		}
+	});
+}
 
   sleep(_mms) {
     return new Promise((resolve, reject) => {
