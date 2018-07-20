@@ -80,7 +80,7 @@
 				this.banks = JSON.parse( localStorage.getItem( 'banks' ) );
 			else
 			{
-				if( localStorage.getItem('token') == null )
+				if( !this.isUserConnected() )
 					this.banks = [];
 				else
 				{
@@ -375,56 +375,64 @@
 
 			let _currentPlugs = [];
 			let _currentConnexions = this.pedalboard.pluginConnected;
-			console.log( _currentConnexions ); // OK pour le gainnode
 
 			let _plugin = '';
 			let _plugsToSave = {};
 			let _settings = [];
-			for ( let i = 0; i < this.pedalboard.pedals.length; i++ )
-			{
-				_plugin = this.pedalboard.pedals[i];
-				_settings = [];
-				if ( _plugin.id != "pedalIn1" && _plugin.id != "pedalIn2" && _plugin.id != "pedalOut" )
-				{
 
-					// Await from the plugin to return its state so save the preset
-					await _plugin.node.getState().then( ( params ) =>
+			(async function jsonifyPlugins()
+			{
+				for ( let i = 0; i < this.pedalboard.pedals.length; i++ )
+				{
+					_plugin = this.pedalboard.pedals[i];
+					_settings = [];
+					if ( _plugin.id != "pedalIn1" && _plugin.id != "pedalIn2" && _plugin.id != "pedalOut" )
 					{
-						_settings = params;
-					} );
-					_plugsToSave = {
-						id: _plugin.id,
-						type: _plugin.tagName.toLowerCase(),
-						position: {
-							x: _plugin.x,
-							y: _plugin.y
-						},
-						settings: _settings
+
+						// Await from the plugin to return its state so save the preset
+						await _plugin.node.getState().then( ( params ) =>
+						{
+							_settings = params;
+						} );
+						_plugsToSave = {
+							id: _plugin.id,
+							type: _plugin.tagName.toLowerCase(),
+							position: {
+								x: _plugin.x,
+								y: _plugin.y
+							},
+							settings: _settings
+						}
+						_currentPlugs.push( _plugsToSave );
 					}
-					_currentPlugs.push( _plugsToSave );
 				}
-			}
+			})();
+
 			if ( !bankSelected.presets.find( item => item.label == _presetName ) )
 			{
-				//console.log('preset not exist');
-
-				let _newPreset = {
-					"_id": `${Date.now()}_preset`,
-					"label": `${_presetName}`,
-					"date": `${new Date().toJSON().slice( 0, 10 )}`,
-					"plugs": _currentPlugs,
-					"connexions": _currentConnexions,
-					//"screenshot":_screenshot
-				}
-				bankSelected.presets.push( _newPreset );
-				console.log( _newPreset )// ok pour le gainNode
-			} else
+				(function createNewPreset()
+				{
+					let _newPreset = {
+						"_id": `${Date.now()}_preset`,
+						"label": `${_presetName}`,
+						"date": `${new Date().toJSON().slice( 0, 10 )}`,
+						"plugs": _currentPlugs,
+						"connexions": _currentConnexions,
+						//"screenshot":_screenshot
+					}
+					bankSelected.presets.push( _newPreset );
+				})();
+			}
+			else
 			{
 				//console.log('preset exist', bankSelected.presets.find(item => item.label == _presetName));
 				// Not every plugin have an "params" getter, you need to try catch when using it
-				bankSelected.presets.find( item => item._id == this.presetSelected ).plugs = _currentPlugs;
-				bankSelected.presets.find( item => item._id == this.presetSelected ).connexions = _currentConnexions;
-				// bankSelected.presets.find(item => item._id == this.presetSelected).screenshot = _screenshot;
+				(function addPluginsAndConnexionToPreset()
+				{
+					bankSelected.presets.find( item => item._id == this.presetSelected ).plugs = _currentPlugs;
+					bankSelected.presets.find( item => item._id == this.presetSelected ).connexions = _currentConnexions;
+					// bankSelected.presets.find(item => item._id == this.presetSelected).screenshot = _screenshot;
+				})();
 			}
 
 			this.saveBank();
@@ -432,8 +440,10 @@
 			alert( 'Preset was successfully saved!' );
 			console.log( "preset saved!!!", this.banks );
 
-			//})
 		}
+
+		isUserConnected()
+		{ return localStorage.getItem("token") != null; }
 
 	} );
 } )();
