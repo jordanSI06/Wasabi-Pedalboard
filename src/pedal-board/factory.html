@@ -70,7 +70,9 @@
             console.log(`newValue:`, newValue);
               if(newValue == "numberOfInputs"){
                 this.nbNodeIn = this.node.numberOfInputs;
-                console.log(this.nbNodeIn)
+                this.w = this.node.gui.properties.dataWidth.value
+                // console.log(this.nbNodeIn);
+                // console.log(this.w);
                 this.addInput(this.nbNodeIn - 1);
               }
           }
