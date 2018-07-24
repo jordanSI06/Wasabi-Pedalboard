@@ -75,33 +75,50 @@
 			this.bankSelected = '';
 			this.plugsConnexions = '';
 
-			let dontWaitTheAPI = true;
-			if ( localStorage.getItem( 'banks' ) )
-				this.banks = JSON.parse( localStorage.getItem( 'banks' ) );
-			else
+			// Just a little wait to be sure the localstorage token is ready
+			setTimeout( async () =>
 			{
-				if( !this.isUserConnected() )
-					this.banks = [];
+				let dontWaitTheAPI = true;
+
+				if ( !this.isUserConnected() )
+				{
+					if ( localStorage.getItem( 'banks' ) )
+						this.banks = JSON.parse( localStorage.getItem( 'banks' ) );
+					else
+						this.banks = [];
+				}
 				else
 				{
-					dontWaitTheAPI = false;
-					this.getBanksFromAPI().then(
-						(banks) =>
+					if ( localStorage.getItem( 'banks' ) != null )
+					{
+						dontWaitTheAPI = false;
+
+						if( confirm(`It seems like your previous work has not been saved onlone, would you like to save it ?`) )
 						{
-							this.banks = JSON.parse(banks);
+							this.banks = JSON.parse( localStorage.getItem( 'banks' ) );
+							await this.saveBanksAndPreset();
+						}
+						else
+							localStorage.removeItem('banks');
+					}
+
+					this.getBanksFromAPI().then(
+						( banks ) =>
+						{
+							this.banks = JSON.parse( banks );
 							this.renderBanks();
 							this.listeners();
 						},
-						(error) => alert(error)
+						( error ) => alert( error )
 					);
 				}
-			}
 
-			if(dontWaitTheAPI)
-			{
-				this.renderBanks();
-				this.listeners();
-			}
+				if ( dontWaitTheAPI )
+				{
+					this.renderBanks();
+					this.listeners();
+				}
+			}, 1000);
 		}
 
 		// takeScreenshot() {
@@ -197,18 +214,21 @@
 		{
 			this.shadowRoot.querySelector('#nav_banks').innerHTML = '';
 
-			this.banks.forEach( bank =>
+			if(this.banks != null)
 			{
-				if(!bank.pedalBoardID)
-					bank.pedalBoardID = this.generateRandomPedalBoardID();
+				this.banks.forEach( bank =>
+				{
+					if(!bank.pedalBoardID)
+						bank.pedalBoardID = this.generateRandomPedalBoardID();
 
-				this.nav_banks.insertAdjacentHTML( 'beforeEnd', this.renderLink( bank.label, ( bank.pedalBoardID ) ) );
-			} );
+					this.nav_banks.insertAdjacentHTML( 'beforeEnd', this.renderLink( bank.label, ( bank.pedalBoardID ) ) );
+				} );
+			}
 
 			this.selectBanksListeners();
 		}
 
-		renderPresetsOfBank(pedalBoardID) // TODO after saving a preset it's not put in his bank directly, fix it
+		renderPresetsOfBank(pedalBoardID)
 		{
 			this.nav_presets.innerHTML = '';
 
@@ -232,15 +252,11 @@
 			this.selectPresetsListeners();
 		}
 
-		deleteElement(id) //TODO
-		{
-			console.log('you have to delete ', id);
-		}
-
 		/**
 		 * Listeners for the different elements
-		 * TODO: add LOAD button
+		 *
 		 */
+		//TODO add LOAD button
 		listeners()
 		{
 			this.bt_loadPreset.onclick = ( ) =>
@@ -274,9 +290,8 @@
 
 		loadPreset()
 		{
-			let bankSelected = this.banks.find( item => item._id == this.bankSelected );
-			this.plugs = bankSelected.presets.find( item => item._id == this.presetSelected ).plugs;
-			this.plugsConnexions = bankSelected.presets.find( item => item._id == this.presetSelected ).connexions;
+			this.plugs = this.presetSelected.plugs;
+			this.plugsConnexions = this.presetSelected.connexions;
 			//console.log('LOADING',bankSelected.presets.find(item => item._id == this.presetSelected));
 			//console.log(`START: LOAD PRESET ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
 
@@ -431,7 +446,7 @@
 		}
 
 		// create preset name
-		async savePreset() //TODO règler le problem de sauvegarde de preset
+		async savePreset()
 		{
 			//this.takeScreenshot();
 			//this.takeScreenshot().then(_screenshot=>{
@@ -443,7 +458,6 @@
 
 			let _plugin = '';
 			let _plugsToSave = {};
-			let _settings = [];
 
 			let self = this;
 
@@ -452,7 +466,7 @@
 				for ( let i = 0; i < self.pedalboard.pedals.length; i++ )
 				{
 					_plugin = self.pedalboard.pedals[i];
-					_settings = [];
+					let _settings = [];
 					if ( _plugin.id != "pedalIn1" && _plugin.id != "pedalIn2" && _plugin.id != "pedalOut" )
 					{
 
@@ -461,10 +475,13 @@
 						{
 							_settings = params;
 						} );
-						_plugsToSave = {
+
+						_plugsToSave =
+						{
 							id: _plugin.id,
 							type: _plugin.tagName.toLowerCase(),
-							position: {
+							position:
+							{
 								x: _plugin.x,
 								y: _plugin.y
 							},
@@ -503,7 +520,7 @@
 			}
 
 			this.saveBank();
-			this.renderPresetsOfBank();
+			this.renderPresetsOfBank(this.bankSelected.pedalBoardID);
 			alert( 'Preset was successfully saved!' );
 			console.log( "preset saved!!!", this.banks );
 		}
@@ -511,5 +528,56 @@
 		isUserConnected()
 		{ return localStorage.getItem("token") != null; }
 
+		async saveBanksAndPreset()
+		{
+			if ( localStorage.getItem( 'token' ) != null )
+			{
+				let banks = gatherAllBanks();
+
+				await updateBanks( banks ).then(
+					( resolve ) => localStorage.removeItem( 'banks' ),
+					( reject ) =>
+					{
+						localStorage.setItem( 'banks', JSON.stringify(this.banks) );
+
+						if ( reject == 'JWT' )
+							confirm( `Your session has expired, you need to login again.` )
+						else
+							confirm( `An expected error occured happened while trying to save your banks : \n${reject}\n` );
+					}
+				);
+			}
+
+			////////////////////////////////////////////////////////////////////////////////////////////////
+
+			async function updateBanks( banks )
+			{
+				return new Promise( ( resolve, reject ) =>
+				{
+					let xmlhttp = new XMLHttpRequest();
+
+					xmlhttp.onreadystatechange = () =>
+					{
+						if ( xmlhttp.readyState == XMLHttpRequest.DONE )
+						{
+							if ( xmlhttp.status == 200 )
+								resolve( xmlhttp.responseText )
+							else if ( xmlhttp.status == 403 )
+								reject( 'JWT' );
+							else
+								reject( xmlhttp.responseText );
+						}
+					}
+
+					xmlhttp.open( "POST", 'http://localhost:5001/api/bank/', true );
+					xmlhttp.setRequestHeader( "Authorization", `Bearer ${localStorage.getItem( 'token' )}` );
+					xmlhttp.setRequestHeader( "Content-Type", "application/json" );
+					xmlhttp.send( banks );
+				} );
+			}
+
+			function gatherAllBanks()
+			{ return JSON.stringify( document.querySelector( '#pedalboard' ).shadowRoot.querySelector( '#div_app' ).querySelector( '#header_settings' ).querySelector( '.div_settings' ).querySelector( 'wc-save' ).formatBanksForAPIUpdate() ); }
+		}
 	} );
 } )();

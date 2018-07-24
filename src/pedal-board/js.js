@@ -1022,7 +1022,6 @@ class PedalBoard extends HTMLElement {
     switch (this.currentState) {
       case "drawingNewJack":
         {
-          console.log("yes");
           let jackWeAreDragging = this.currentDraggableJack;
           let _pos = {
             x1: jackWeAreDragging.x1,
@@ -1030,7 +1029,6 @@ class PedalBoard extends HTMLElement {
             x2: loc.x / this.zoom,
             y2: loc.y / this.zoom
           };
-          console.log(_pos.x2, _pos.y2);
           jackWeAreDragging.reviewSVGJack(_pos);
         }
         break;
