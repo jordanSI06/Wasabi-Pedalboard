@@ -506,51 +506,6 @@
 			this.renderPresetsOfBank();
 			alert( 'Preset was successfully saved!' );
 			console.log( "preset saved!!!", this.banks );
-
-			// ! TO DELETE
-			( async function saveBanksAndPreset()
-			{
-				if ( localStorage.getItem( 'token' ) != null )
-				{
-					let banks = gatherAllBanks();
-
-					await updateBanks( banks ).then(
-						( resolve ) => { alert (resolve); },
-						( reject ) => { confirm( `An expected error occured happened while trying to save your banks : \n${reject}\nDo you really want to quit the PedalBoard ?` ) }
-					);
-				}
-			} )();
-
-			////////////////////////////////////////////////////////////////////////////////////////////////
-
-			async function updateBanks( banks )
-			{
-				return new Promise( ( resolve, reject ) =>
-				{
-					let xmlhttp = new XMLHttpRequest();
-
-					xmlhttp.onreadystatechange = () =>
-					{
-						if ( xmlhttp.readyState == XMLHttpRequest.DONE )
-						{
-							if ( xmlhttp.status == 200 ) resolve( xmlhttp.responseText )
-							else reject( xmlhttp.responseText );
-						}
-					}
-
-					xmlhttp.open( "POST", 'http://localhost:5001/api/bank/', true );
-					xmlhttp.setRequestHeader( "Authorization", `Bearer ${localStorage.getItem( 'token' )}` );
-					xmlhttp.setRequestHeader( "Content-Type", "application/json" );
-					console.log('ce que jenvoie', banks);
-					xmlhttp.send( banks );
-				} );
-			}
-
-			/**
-			 * @returns {JSON} The banks of the user (encapsulated in the 'wc-save' web-component graphically )
-			 */
-			function gatherAllBanks()
-			{ return JSON.stringify( document.querySelector( '#pedalboard' ).shadowRoot.querySelector( '#div_app' ).querySelector( '#header_settings' ).querySelector( '.div_settings' ).querySelector( 'wc-save' ).formatBanksForAPIUpdate() ); }
 		}
 
 		isUserConnected()

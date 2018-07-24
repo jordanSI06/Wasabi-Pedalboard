@@ -57,20 +57,20 @@ window.onbeforeunload = () =>
 {
 	( async function saveBanksAndPreset()
 	{
-		if( localStorage.getItem('token') != null)
+		if ( localStorage.getItem( 'token' ) != null )
 		{
 			let banks = gatherAllBanks();
 
-			await updateBanks(banks).then(
-				( resolve ) => { },
-				( reject ) => { confirm(`An expected error occured happened while trying to save your banks : \n${reject}\nDo you really want to quit the PedalBoard ?`) }
+			await updateBanks( banks ).then(
+				( resolve ) => {  },
+				( reject ) => { confirm( `An expected error occured happened while trying to save your banks : \n${reject}\nDo you really want to quit the PedalBoard ?` ) }
 			);
 		}
-	})();
+	} )();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
-	async function updateBanks(banks)
+	async function updateBanks( banks )
 	{
 		return new Promise( ( resolve, reject ) =>
 		{
@@ -87,13 +87,14 @@ window.onbeforeunload = () =>
 
 			xmlhttp.open( "POST", 'http://localhost:5001/api/bank/', true );
 			xmlhttp.setRequestHeader( "Authorization", `Bearer ${localStorage.getItem( 'token' )}` );
-			xmlhttp.send(banks);
+			xmlhttp.setRequestHeader( "Content-Type", "application/json" );
+			xmlhttp.send( banks );
 		} );
 	}
 
 	/**
-	 * @returns {string} The banks of the user (encapsulated in the 'wc-save' web-component graphically )
+	 * @returns {JSON} The banks of the user (encapsulated in the 'wc-save' web-component graphically )
 	 */
 	function gatherAllBanks()
-	{ return JSON.stringify(document.querySelector( '#pedalboard' ).shadowRoot.querySelector( '#div_app' ).querySelector( '#header_settings' ).querySelector( '.div_settings' ).querySelector( 'wc-save' ).banks); }
+	{ return JSON.stringify( document.querySelector( '#pedalboard' ).shadowRoot.querySelector( '#div_app' ).querySelector( '#header_settings' ).querySelector( '.div_settings' ).querySelector( 'wc-save' ).formatBanksForAPIUpdate() ); }
 }
