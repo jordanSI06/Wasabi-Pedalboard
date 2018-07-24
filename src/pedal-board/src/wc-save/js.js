@@ -148,8 +148,46 @@
 
 				xmlhttp.open( "GET", 'http://localhost:5001/api/bank/', true );
 				xmlhttp.setRequestHeader("Authorization", `Bearer ${localStorage.getItem('token')}`);
+				xmlhttp.setRequestHeader( "Content-Type", "application/json");
 				xmlhttp.send();
 			});
+		}
+
+		/**
+		 * @description Remove fileds like '_id' and 'date' to send to the API
+		 *
+		 * @returns {JSON} JSON Ready for the API
+		 */
+		formatBanksForAPIUpdate()
+		{
+			let bankCopy = this.banks;
+
+			bankCopy.forEach( bank =>
+			{
+				if(bank._id)
+					delete bank._id;
+
+				bank.presets.forEach( preset =>
+				{
+					this.formatPresetForAPIUpdate(preset);
+				});
+			});
+
+			return bankCopy;
+		}
+
+		/**
+		 * @description Remove fileds like '_id' and 'date' to send to the API
+		 *
+		 * @param {preset} preset The preset from which we want the parsing
+		 * @returns {JSON} JSON Ready for the API
+		 */
+		formatPresetForAPIUpdate(preset)
+		{
+			if(preset._id)
+				delete preset._id;
+
+			return preset;
 		}
 
 		/**
@@ -161,25 +199,31 @@
 
 			this.banks.forEach( bank =>
 			{
-				this.nav_banks.insertAdjacentHTML( 'beforeEnd', this.renderLink( bank.label, ( bank._id ) ) );
+				if(!bank.pedalBoardID)
+					bank.pedalBoardID = this.generateRandomPedalBoardID();
+
+				this.nav_banks.insertAdjacentHTML( 'beforeEnd', this.renderLink( bank.label, ( bank.pedalBoardID ) ) );
 			} );
 
 			this.selectBanksListeners();
 		}
 
-		renderPresetsOfBank(bankID) //TODO after saving a preset it's not put in his bank directly, fix it
+		renderPresetsOfBank(pedalBoardID) // TODO after saving a preset it's not put in his bank directly, fix it
 		{
 			this.nav_presets.innerHTML = '';
 
 			this.banks.forEach( bank =>
 			{
-				if( bank._id == bankID)
+				if( bank.pedalBoardID == pedalBoardID)
 				{
 					if(bank.presets != null)
 					{
 						bank.presets.forEach( preset =>
 						{
-							this.nav_presets.insertAdjacentHTML( 'beforeEnd', this.renderLink( preset.label, preset._id ) );
+							if ( !preset.pedalBoardID )
+								preset.pedalBoardID = this.generateRandomPedalBoardID();
+
+							this.nav_presets.insertAdjacentHTML( 'beforeEnd', this.renderLink( preset.label, preset.pedalBoardID ) );
 						});
 					}
 				}
@@ -211,7 +255,7 @@
 			{
 				if ( this.bankSelected )
 				{
-					if ( this.isAPresetSlected || this.input_presetName.value ) this.savePreset();
+					if ( this.isAPresetSlected || this.input_presetName.value ) this.savePreset( );
 					else alert( "Tape name of choose a preset to overwrite" )
 				}
 				else
@@ -235,11 +279,8 @@
 			this.plugsConnexions = bankSelected.presets.find( item => item._id == this.presetSelected ).connexions;
 			//console.log('LOADING',bankSelected.presets.find(item => item._id == this.presetSelected));
 			//console.log(`START: LOAD PRESET ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
-			console.log( "plugconnexions", this.plugsConnexions );
 
 			this.nbPluginTraitee = 0;
-
-			console.log( this.plugs )
 			this.loadNewPlugin( this.plugs[0] );
 		}
 
@@ -294,7 +335,7 @@
 				if ( e.id == _id )
 				{
 					e.classList.add( 'a_selected' );
-					this.bankSelected = e.id;
+					this.setBankSelected(e.id);
 					this.renderPresetsOfBank(_id);
 				}
 				else
@@ -304,11 +345,23 @@
 			} )
 		}
 
+		setBankSelected(id)
+		{
+			this.bankSelected = this.banks.find( bank => bank.pedalBoardID == id);
+		}
+
+		setPresetSelected(id)
+		{
+			if(this.bankSelected)
+				this.presetSelected = this.bankSelected.presets.find( preset => preset.pedalBoardID == id);
+			else
+				console.log('No bank selected')
+		}
+
 		selectPresetsListeners()
 		{
 			this.nav_presets.querySelectorAll( 'a' ).forEach( e =>
 			{
-				//console.log('a', e);
 				e.onclick = ( e ) => this.selectPreset( e.target.id );
 				e.ondblclick = ( e ) => this.loadPreset();
 			} )
@@ -322,7 +375,7 @@
 				{
 					this.isAPresetSlected = true;
 					e.classList.add( 'a_selected' );
-					this.presetSelected = e.id;
+					this.setPresetSelected(e.id);
 					this.input_presetName.value = e.getAttribute( 'value' );
 				} else
 				{
@@ -353,10 +406,10 @@
 				_bankName = _bankName.trim();
 
 				let _newBank = {
-					"_id": `${Date.now()}_bank`,
+					"_id": `${Date.now()}`,
 					"label": `${_bankName}`,
-					"date": `${new Date().toJSON().slice( 0, 10 )}`,
-					"presets": []
+					"presets": [],
+					"pedalBoardID" : this.generateRandomPedalBoardID()
 				}
 				this.banks.push( _newBank );
 				this.saveBank();
@@ -364,14 +417,26 @@
 			}
 		}
 
+		generateRandomPedalBoardID( length )
+		{
+			length = length != null ? length : 25;
+
+			var text = "";
+			var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+			for ( var i = 0; i < length; i++ )
+					text += possible.charAt( Math.floor( Math.random() * possible.length ) );
+
+			return text;
+		}
+
 		// create preset name
-		async  savePreset() //TODO règler le problem de sauvegarde de preset
+		async savePreset() //TODO règler le problem de sauvegarde de preset
 		{
 			//this.takeScreenshot();
 			//this.takeScreenshot().then(_screenshot=>{
 			//  console.log('_screenshot',_screenshot);
 			let _presetName = this.input_presetName.value.trim();
-			let bankSelected = this.banks.find( item => item._id == this.bankSelected );
 
 			let _currentPlugs = [];
 			let _currentConnexions = this.pedalboard.pluginConnected;
@@ -380,11 +445,13 @@
 			let _plugsToSave = {};
 			let _settings = [];
 
-			(async function jsonifyPlugins()
+			let self = this;
+
+			(async function jsonifyPlugins(self)
 			{
-				for ( let i = 0; i < this.pedalboard.pedals.length; i++ )
+				for ( let i = 0; i < self.pedalboard.pedals.length; i++ )
 				{
-					_plugin = this.pedalboard.pedals[i];
+					_plugin = self.pedalboard.pedals[i];
 					_settings = [];
 					if ( _plugin.id != "pedalIn1" && _plugin.id != "pedalIn2" && _plugin.id != "pedalOut" )
 					{
@@ -406,33 +473,33 @@
 						_currentPlugs.push( _plugsToSave );
 					}
 				}
-			})();
+			})(self);
 
-			if ( !bankSelected.presets.find( item => item.label == _presetName ) )
+			if ( !this.bankSelected.presets.find( item => item.label == _presetName ) )
 			{
-				(function createNewPreset()
+				(function createNewPreset(self)
 				{
 					let _newPreset = {
-						"_id": `${Date.now()}_preset`,
+						"_id": `${Date.now()}`,
 						"label": `${_presetName}`,
 						"date": `${new Date().toJSON().slice( 0, 10 )}`,
 						"plugs": _currentPlugs,
 						"connexions": _currentConnexions,
 						//"screenshot":_screenshot
 					}
-					bankSelected.presets.push( _newPreset );
-				})();
+					self.bankSelected.presets.push( _newPreset );
+				})(self);
 			}
 			else
 			{
 				//console.log('preset exist', bankSelected.presets.find(item => item.label == _presetName));
 				// Not every plugin have an "params" getter, you need to try catch when using it
-				(function addPluginsAndConnexionToPreset()
+				(function addPluginsAndConnexionToPreset(self)
 				{
-					bankSelected.presets.find( item => item._id == this.presetSelected ).plugs = _currentPlugs;
-					bankSelected.presets.find( item => item._id == this.presetSelected ).connexions = _currentConnexions;
+					self.presetSelected.plugs = _currentPlugs;
+					self.presetSelected.presets = _currentConnexions;
 					// bankSelected.presets.find(item => item._id == this.presetSelected).screenshot = _screenshot;
-				})();
+				})(self);
 			}
 
 			this.saveBank();
@@ -440,6 +507,50 @@
 			alert( 'Preset was successfully saved!' );
 			console.log( "preset saved!!!", this.banks );
 
+			// ! TO DELETE
+			( async function saveBanksAndPreset()
+			{
+				if ( localStorage.getItem( 'token' ) != null )
+				{
+					let banks = gatherAllBanks();
+
+					await updateBanks( banks ).then(
+						( resolve ) => { alert (resolve); },
+						( reject ) => { confirm( `An expected error occured happened while trying to save your banks : \n${reject}\nDo you really want to quit the PedalBoard ?` ) }
+					);
+				}
+			} )();
+
+			////////////////////////////////////////////////////////////////////////////////////////////////
+
+			async function updateBanks( banks )
+			{
+				return new Promise( ( resolve, reject ) =>
+				{
+					let xmlhttp = new XMLHttpRequest();
+
+					xmlhttp.onreadystatechange = () =>
+					{
+						if ( xmlhttp.readyState == XMLHttpRequest.DONE )
+						{
+							if ( xmlhttp.status == 200 ) resolve( xmlhttp.responseText )
+							else reject( xmlhttp.responseText );
+						}
+					}
+
+					xmlhttp.open( "POST", 'http://localhost:5001/api/bank/', true );
+					xmlhttp.setRequestHeader( "Authorization", `Bearer ${localStorage.getItem( 'token' )}` );
+					xmlhttp.setRequestHeader( "Content-Type", "application/json" );
+					console.log('ce que jenvoie', banks);
+					xmlhttp.send( banks );
+				} );
+			}
+
+			/**
+			 * @returns {JSON} The banks of the user (encapsulated in the 'wc-save' web-component graphically )
+			 */
+			function gatherAllBanks()
+			{ return JSON.stringify( document.querySelector( '#pedalboard' ).shadowRoot.querySelector( '#div_app' ).querySelector( '#header_settings' ).querySelector( '.div_settings' ).querySelector( 'wc-save' ).formatBanksForAPIUpdate() ); }
 		}
 
 		isUserConnected()
