@@ -297,7 +297,7 @@
 
 		loadPreset()
 		{
-			this.plugs = this.presetSelected.plugs;
+			this.plugs = this.presetSelected.plugins;
 			this.plugsConnexions = this.presetSelected.connexions;
 			//console.log('LOADING',bankSelected.presets.find(item => item._id == this.presetSelected));
 			//console.log(`START: LOAD PRESET ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
