@@ -126,8 +126,8 @@
 				setInterval( () =>
 				{
 					self.saveBanksAndPreset().then(
-						() => console.log( 'Saved' ),
-						() => console.error( 'Can not save' )
+						( resolve ) => console.log( 'Saved' ),
+						( reject ) => console.error( 'Can not save' )
 					);
 				}, time );
 			} )( this, (1000 * 60) );
@@ -286,9 +286,9 @@
 					if ( this.isAPresetSlected || this.input_presetName.value )
 					{
 						this.savePreset();
-						this.saveBanksAndPreset().then(
-							( ) => console.log('Saved'),
-							( ) => console.error( 'Can not save')
+						self.saveBanksAndPreset().then(
+							( resolve ) => console.log( 'Saved' ),
+							( reject ) => console.error( 'Can not save' )
 						);
 					}
 					else alert( "Tape name of choose a preset to overwrite" )
