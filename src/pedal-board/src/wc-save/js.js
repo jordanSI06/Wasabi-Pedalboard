@@ -89,7 +89,7 @@
 				}
 				else
 				{
-					if ( localStorage.getItem( 'banks' ) != null )
+					if ( localStorage.getItem( 'banks' ) !== null )
 					{
 						dontWaitTheAPI = false;
 
@@ -97,6 +97,7 @@
 						{
 							this.banks = JSON.parse( localStorage.getItem( 'banks' ) );
 							await this.saveBanksAndPreset();
+							this.banks = [];
 						}
 						else
 							localStorage.removeItem('banks');
@@ -119,6 +120,12 @@
 					this.listeners();
 				}
 			}, 1000);
+
+			setInterval( () =>
+			{
+				console.log('je save');
+				this.saveBanksAndPreset();
+			}, 1000 * 60);
 		}
 
 		// takeScreenshot() {
@@ -500,7 +507,7 @@
 						"_id": `${Date.now()}`,
 						"label": `${_presetName}`,
 						"date": `${new Date().toJSON().slice( 0, 10 )}`,
-						"plugs": _currentPlugs,
+						"plugins": _currentPlugs,
 						"connexions": _currentConnexions,
 						//"screenshot":_screenshot
 					}
@@ -530,22 +537,19 @@
 
 		async saveBanksAndPreset()
 		{
+			let error;
+
 			if ( localStorage.getItem( 'token' ) != null )
 			{
 				let banks = gatherAllBanks();
 
 				await updateBanks( banks ).then(
-					( resolve ) => localStorage.removeItem( 'banks' ),
-					( reject ) =>
-					{
-						localStorage.setItem( 'banks', JSON.stringify(this.banks) );
-
-						if ( reject == 'JWT' )
-							confirm( `Your session has expired, you need to login again.` )
-						else
-							confirm( `An expected error occured happened while trying to save your banks : \n${reject}\n` );
-					}
+					( ) => { },
+					( reject ) => { error = reject; }
 				);
+
+				return new Promise( ( resolve, reject ) =>
+				{ !error ? resolve() : reject( error ); } );
 			}
 
 			////////////////////////////////////////////////////////////////////////////////////////////////

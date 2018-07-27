@@ -55,5 +55,19 @@ window.onload=()=>
 // Before user leaves the page
 window.onunload = async () =>
 {
-	await document.querySelector( '#pedalboard' ).shadowRoot.querySelector( '#div_app' ).querySelector( '#header_settings' ).querySelector( '.div_settings' ).querySelector( 'wc-save' ).saveBanksAndPreset();
+	await document.querySelector( '#pedalboard' ).shadowRoot.querySelector( '#div_app' ).querySelector( '#header_settings' ).querySelector( '.div_settings' ).querySelector( 'wc-save' ).saveBanksAndPreset().then(
+		( resolve ) =>
+		{
+			localStorage.removeItem( 'banks' );
+		},
+		( reject ) =>
+		{
+			localStorage.setItem( 'banks', JSON.stringify( this.banks ) );
+
+			if ( reject == 'JWT' )
+				confirm( `Your session has expired, you need to login again.` )
+			else
+				confirm( `An unexpected error occured happened while trying to save your banks : \n${reject}\n` );
+		}
+	);
 }
