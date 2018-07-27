@@ -121,11 +121,16 @@
 				}
 			}, 1000);
 
-			setInterval( () =>
+			(function saveEveryXMinutes(self, time)
 			{
-				console.log('je save');
-				this.saveBanksAndPreset();
-			}, 1000 * 60);
+				setInterval( () =>
+				{
+					self.saveBanksAndPreset().then(
+						() => console.log( 'Saved' ),
+						() => console.error( 'Can not save' )
+					);
+				}, time );
+			} )( this, (1000 * 60) );
 		}
 
 		// takeScreenshot() {
@@ -278,7 +283,14 @@
 			{
 				if ( this.bankSelected )
 				{
-					if ( this.isAPresetSlected || this.input_presetName.value ) this.savePreset( );
+					if ( this.isAPresetSlected || this.input_presetName.value )
+					{
+						this.savePreset();
+						this.saveBanksAndPreset().then(
+							( ) => console.log('Saved'),
+							( ) => console.error( 'Can not save')
+						);
+					}
 					else alert( "Tape name of choose a preset to overwrite" )
 				}
 				else
@@ -535,6 +547,11 @@
 		isUserConnected()
 		{ return localStorage.getItem("token") != null; }
 
+		/**
+		 * @description Save all the banks and presets of the user to the API if he's logged.
+		 *
+		 * @returns {Promise} Resolve = nothing ; Reject = the occured error
+		 */
 		async saveBanksAndPreset()
 		{
 			let error;
