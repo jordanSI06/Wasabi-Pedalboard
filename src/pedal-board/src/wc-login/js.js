@@ -81,7 +81,9 @@
 						}
 						else if( xmlhttp.status == 200)
 						{
-							window.location.replace( xmlhttp.responseURL );
+							localStorage.setItem('token', xmlhttp.responseText);
+
+							this.shadowRoot.querySelector('#container').style.visibility = 'hidden';
 						}
 					}
 				}
