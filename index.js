@@ -64,7 +64,9 @@ window.onunload = async () =>
 			},
 			( reject ) =>
 			{
-				localStorage.setItem( 'banks', JSON.stringify( this.banks ) );
+				let banks = JSON.stringify( document.querySelector( '#pedalboard' ).shadowRoot.querySelector( '#div_app' ).querySelector( '#header_settings' ).querySelector( '.div_settings' ).querySelector( 'wc-save' ).banks );
+
+				if ( banks ) localStorage.setItem( 'banks', banks );
 
 				if ( reject == 'JWT' )
 					confirm( `Your session has expired, you need to login again.` )
@@ -75,8 +77,8 @@ window.onunload = async () =>
 	}
 	else
 	{
-		let banks = document.querySelector( '#pedalboard' ).shadowRoot.querySelector( '#div_app' ).querySelector( '#header_settings' ).querySelector( '.div_settings' ).querySelector( 'wc-save' ).banks();
+		let banks = JSON.stringify( document.querySelector( '#pedalboard' ).shadowRoot.querySelector( '#div_app' ).querySelector( '#header_settings' ).querySelector( '.div_settings' ).querySelector( 'wc-save' ).banks );
 
-		localStorage.setItem('banks', banks);
+		if ( banks ) localStorage.setItem( 'banks', banks );
 	}
 }

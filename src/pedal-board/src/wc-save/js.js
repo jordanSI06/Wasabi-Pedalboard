@@ -82,8 +82,11 @@
 
 				if ( !this.isUserConnected() )
 				{
-					if ( localStorage.getItem( 'banks' ) )
+					if ( localStorage.getItem( 'banks' ) != null )
+					{
+						console.log("localctorage", localStorage);
 						this.banks = JSON.parse( localStorage.getItem( 'banks' ) );
+					}
 					else
 						this.banks = [];
 				}
@@ -126,8 +129,8 @@
 				setInterval( () =>
 				{
 					self.saveBanksAndPreset().then(
-						( resolve ) => console.log( 'Saved' ),
-						( reject ) => console.error( 'Can not save' )
+						( ) => { if(localStorage.getItem('token') ) console.log( 'Saved' ) },
+						( ) => console.error( 'Can not save' )
 					);
 				}, time );
 			} )( this, (1000 * 60) );
@@ -286,7 +289,7 @@
 					if ( this.isAPresetSlected || this.input_presetName.value )
 					{
 						this.savePreset();
-						self.saveBanksAndPreset().then(
+						this.saveBanksAndPreset().then(
 							( resolve ) => console.log( 'Saved' ),
 							( reject ) => console.error( 'Can not save' )
 						);
@@ -532,7 +535,7 @@
 				// Not every plugin have an "params" getter, you need to try catch when using it
 				(function addPluginsAndConnexionToPreset(self)
 				{
-					self.presetSelected.plugs = _currentPlugs;
+					self.presetSelected.plugins = _currentPlugs;
 					self.presetSelected.presets = _currentConnexions;
 					// bankSelected.presets.find(item => item._id == this.presetSelected).screenshot = _screenshot;
 				})(self);
