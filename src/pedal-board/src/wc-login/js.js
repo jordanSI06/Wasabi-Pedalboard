@@ -62,7 +62,7 @@
 				let mail = this.shadowRoot.querySelector('#mail').value;
 				let password = this.shadowRoot.querySelector('#password').value;
 
-				let request = `http://localhost:5001/api/auth/local?mail=${mail}&password=${password}`;
+				let request = `http://localhost:5001/api/auth/local?mail=${mail}&password=${password}`; //TODO change
 
 				let xmlhttp = new XMLHttpRequest();
 

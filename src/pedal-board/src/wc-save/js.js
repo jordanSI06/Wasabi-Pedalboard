@@ -178,7 +178,7 @@
 					}
 				}
 
-				xmlhttp.open( "GET", 'http://localhost:5001/api/bank/', true );
+				xmlhttp.open( "GET", 'http://localhost:5001/api/bank/', true ); //TODO change
 				xmlhttp.setRequestHeader("Authorization", `Bearer ${localStorage.getItem('token')}`);
 				xmlhttp.setRequestHeader( "Content-Type", "application/json");
 				xmlhttp.send();
@@ -593,7 +593,7 @@
 						}
 					}
 
-					xmlhttp.open( "POST", 'http://localhost:5001/api/bank/', true );
+					xmlhttp.open( "POST", 'http://localhost:5001/api/bank/', true ); //TODO change
 					xmlhttp.setRequestHeader( "Authorization", `Bearer ${localStorage.getItem( 'token' )}` );
 					xmlhttp.setRequestHeader( "Content-Type", "application/json" );
 					xmlhttp.send( banks );
