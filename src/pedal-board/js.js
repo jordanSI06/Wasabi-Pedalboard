@@ -1358,7 +1358,8 @@ class PedalBoard extends HTMLElement {
     // When you play for 4 seconds, the input gain is adjusted depending on the max measured value 
     bt_learn.addEventListener("click", (e) => {
       this.sound.gainUserMedia.gain.value = 1;
-      this.sound.gainUserMedia2.gain.value = 1;
+      if(this.sound.gainUserMedia2)
+        this.sound.gainUserMedia2.gain.value = 1;
 
       _tabVolume = [];
       i = 4000;
