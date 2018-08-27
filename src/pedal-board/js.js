@@ -1205,7 +1205,7 @@ class PedalBoard extends HTMLElement {
   /***** II> PART SOUND *****/
   addChangeAudioListeners() {
     // Listener for input gain knob
-    this.shadowRoot.querySelector("#knob_In").addEventListener('change', (e) => {
+    this.shadowRoot.querySelector("#knob_In").addEventListener('input', (e) => {
       this.shadowRoot.querySelector("#knob_In").title = "" + e.target.value;
       this.sound.gainNodeIn.gain.value = e.target.value;
       this.sound.gainUserMedia.gain.value = e.target.value;
@@ -1213,13 +1213,13 @@ class PedalBoard extends HTMLElement {
     });
 
     // Listener for output gain knob
-    this.shadowRoot.querySelector("#knob_Out").addEventListener('change', (e) => {
+    this.shadowRoot.querySelector("#knob_Out").addEventListener('input', (e) => {
       this.shadowRoot.querySelector("#knob_Out").title = "" + e.target.value;
       this.sound.gainNodeOut.gain.value = e.target.value;
     });
 
     // Listener for usermedia gain knob
-    this.shadowRoot.querySelector("#knob_In_UserMedia").addEventListener('change', (e) => {
+    this.shadowRoot.querySelector("#knob_In_UserMedia").addEventListener('input', (e) => {
       this.shadowRoot.querySelector("#knob_In_UserMedia").title = "" + e.target.value;
       this.sound.gainUserMedia.gain.value = e.target.value;
       this.sound.gainNodeIn.gain.value = e.target.value;
