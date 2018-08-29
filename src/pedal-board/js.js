@@ -307,12 +307,6 @@ class PedalBoard extends HTMLElement {
       this.openAudioPlayer();
     }
 
-    this.shadowRoot.querySelector('#bt_clearPedalboard').onclick = (e) =>{
-      if (confirm("Are you sure you want to clear the pedalboard ? NOTE: THIS ACTION IS IRREVERSIBLE")){
-        
-      }
-    }
-
     this.querySelector('#svg-canvas').onclick = (e) => {
       if (!this.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
       if (!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
@@ -344,6 +338,10 @@ class PedalBoard extends HTMLElement {
 
     this.shadowRoot.querySelector('#bt_stereo').onclick = (e) => {
       this.changetomono();
+    }
+
+    this.shadowRoot.querySelector('#bt_clearPedalboard').onclick = (e) => {
+      this.clearPedalboard();
     }
 
   }
@@ -378,6 +376,20 @@ class PedalBoard extends HTMLElement {
 
   openAudioPlayer() {
     this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
+  }
+
+  clearPedalboard() {
+    if (confirm("Do you want to clear the pedalboard?")) {
+      let i;
+      let size = this.pedals.length;
+      for(i=0; i<=size; i++){
+        console.log(this.pedals[i].id)
+        if(this.pedals[2].id!="pedalIn1" && this.pedals[2].id!="pedalOut"){
+          console.log(this.pedals[2].id)
+          this.removePedal(this.pedals[2]);
+        }
+      }  
+    }
   }
 
   setMediadevicesToSoundIn() {
@@ -1364,7 +1376,7 @@ class PedalBoard extends HTMLElement {
     // When you play for 4 seconds, the input gain is adjusted depending on the max measured value 
     bt_learn.addEventListener("click", (e) => {
       this.sound.gainUserMedia.gain.value = 1;
-      if(this.sound.gainUserMedia2)
+      if (this.sound.gainUserMedia2)
         this.sound.gainUserMedia2.gain.value = 1;
 
       _tabVolume = [];
