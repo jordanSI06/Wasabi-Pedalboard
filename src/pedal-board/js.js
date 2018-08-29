@@ -383,7 +383,6 @@ class PedalBoard extends HTMLElement {
       let i;
       let size = this.pedals.length;
       for(i=0; i<=size; i++){
-        console.log(this.pedals[i].id)
         if(this.pedals[2].id!="pedalIn1" && this.pedals[2].id!="pedalOut"){
           console.log(this.pedals[2].id)
           this.removePedal(this.pedals[2]);
@@ -448,7 +447,7 @@ class PedalBoard extends HTMLElement {
   }
 
   removePedal(p) {
-    if (confirm("Are you sure you want to remove this pedal ?")) {
+    
       let jacksIn = p.inputJacks;
       let jacksOut = p.outputJacks;
 
@@ -469,7 +468,7 @@ class PedalBoard extends HTMLElement {
       var index = this.pedals.indexOf(p);
       if (index > -1) this.pedals.splice(index, 1);
       this.removeChild(p);
-    }
+    
   }
 
 
