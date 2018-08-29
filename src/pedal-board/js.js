@@ -307,6 +307,12 @@ class PedalBoard extends HTMLElement {
       this.openAudioPlayer();
     }
 
+    this.shadowRoot.querySelector('#bt_clearPedalboard').onclick = (e) =>{
+      if (confirm("Are you sure you want to clear the pedalboard ? NOTE: THIS ACTION IS IRREVERSIBLE")){
+        
+      }
+    }
+
     this.querySelector('#svg-canvas').onclick = (e) => {
       if (!this.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
       if (!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
@@ -986,7 +992,7 @@ class PedalBoard extends HTMLElement {
     switch (this.currentState) {
       case "drawingNewJack":
         {
-          console.log("yes");
+          //console.log("yes");
           let jackWeAreDragging = this.currentDraggableJack;
           let _pos = {
             x1: jackWeAreDragging.x1,
@@ -994,7 +1000,7 @@ class PedalBoard extends HTMLElement {
             x2: loc.x / this.zoom,
             y2: loc.y / this.zoom
           };
-          console.log(_pos.x2, _pos.y2);
+          //console.log(_pos.x2, _pos.y2);
           jackWeAreDragging.reviewSVGJack(_pos);
         }
         break;
