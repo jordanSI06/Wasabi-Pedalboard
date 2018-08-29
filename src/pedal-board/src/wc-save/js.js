@@ -120,7 +120,9 @@
     listeners() {
       // Load presets only if a preset is selected
       this.bt_loadPreset.onclick = (e) => {
-        if (this.isAPresetSlected) this.loadPreset();
+        if (this.isAPresetSlected){
+          this.loadPreset();
+        } 
         else alert("Select a preset first");
       }
       this.bt_openDialog.onclick = (e) => {
@@ -173,6 +175,7 @@
 
       //this.pedalboard.loadPresets(this.plugs);
       console.log(this.plugs)
+      this.pedalboard.clearPedalboard();
       this.loadNewPlugin(this.plugs[0]);
     }
 

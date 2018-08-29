@@ -341,7 +341,8 @@ class PedalBoard extends HTMLElement {
     }
 
     this.shadowRoot.querySelector('#bt_clearPedalboard').onclick = (e) => {
-      this.clearPedalboard();
+      if (confirm("Do you want to clear the pedalboard?"))
+        this.clearPedalboard();
     }
 
   }
@@ -379,15 +380,13 @@ class PedalBoard extends HTMLElement {
   }
 
   clearPedalboard() {
-    if (confirm("Do you want to clear the pedalboard?")) {
-      let i;
-      let size = this.pedals.length;
-      for(i=0; i<=size; i++){
-        if(this.pedals[2].id!="pedalIn1" && this.pedals[2].id!="pedalOut"){
-          console.log(this.pedals[2].id)
-          this.removePedal(this.pedals[2]);
-        }
-      }  
+    //TODO: Correction of this function for more clean code
+    let size = this.pedals.length - 1;
+    for (let i = size; i >= 0; i--) {
+      if (this.pedals[i].id != "pedalIn1" && this.pedals[i].id != "pedalOut") {
+        console.log(this.pedals[i].id)
+        this.removePedal(this.pedals[i]);
+      }
     }
   }
 
@@ -447,28 +446,27 @@ class PedalBoard extends HTMLElement {
   }
 
   removePedal(p) {
-    
-      let jacksIn = p.inputJacks;
-      let jacksOut = p.outputJacks;
+    let jacksIn = p.inputJacks;
+    let jacksOut = p.outputJacks;
 
-      if (jacksIn.length > 0) {
-        for (let i = jacksIn.length - 1; i >= 0; i--) {
-          this.disconnect(jacksIn[i].p1, jacksIn[i].p2);
-        }
+    if (jacksIn.length > 0) {
+      for (let i = jacksIn.length - 1; i >= 0; i--) {
+        this.disconnect(jacksIn[i].p1, jacksIn[i].p2);
       }
-      if (jacksOut.length > 0) {
+    }
+    if (jacksOut.length > 0) {
 
-        for (let i = jacksOut.length - 1; i >= 0; i--) {
-          console.log(jacksOut[i].p1, jacksOut[i].p2);
+      for (let i = jacksOut.length - 1; i >= 0; i--) {
+        console.log(jacksOut[i].p1, jacksOut[i].p2);
 
-          this.disconnect(jacksOut[i].p1, jacksOut[i].p2, jacksOut[i].pedal2inputNumber);
-        }
+        this.disconnect(jacksOut[i].p1, jacksOut[i].p2, jacksOut[i].pedal2inputNumber);
       }
+    }
 
-      var index = this.pedals.indexOf(p);
-      if (index > -1) this.pedals.splice(index, 1);
-      this.removeChild(p);
-    
+    var index = this.pedals.indexOf(p);
+    if (index > -1) this.pedals.splice(index, 1);
+    this.removeChild(p);
+
   }
 
 
