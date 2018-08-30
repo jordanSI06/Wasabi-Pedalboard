@@ -380,7 +380,6 @@ class PedalBoard extends HTMLElement {
   }
 
   clearPedalboard() {
-    //TODO: Correction of this function for more clean code
     let size = this.pedals.length - 1;
     for (let i = size; i >= 0; i--) {
       if (this.pedals[i].id != "pedalIn1" && this.pedals[i].id != "pedalOut") {
@@ -904,7 +903,7 @@ class PedalBoard extends HTMLElement {
 
     } else if ((p = this.findPedalWhoseInputIsHighlighted()) !== undefined) {
       //pedalMenu = p;
-      if (p.inputJacks.length == 1) {
+      if (p.inputJacks.length >= 1) {
         let sourcePedal = p.inputJacks[0].p1;
         // first we disconnect the jack before immediatly creating
         // a new one to drag
