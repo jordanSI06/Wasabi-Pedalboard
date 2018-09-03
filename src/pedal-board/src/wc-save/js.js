@@ -15,6 +15,7 @@
       }
       this.isAPresetSlected = false;
       this.bankSelected;
+
     }
 
     get is() { return this.nodeName.toLowerCase(); }
@@ -120,14 +121,14 @@
     listeners() {
       // Load presets only if a preset is selected
       this.bt_loadPreset.onclick = (e) => {
-        if (this.isAPresetSlected){
+        if (this.isAPresetSlected) {
           this.loadPreset();
-        } 
+        }
         else alert("Select a preset first");
       }
       this.bt_openDialog.onclick = (e) => {
-        if(!this.pedalboard.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.pedalboard.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
-        if(!this.pedalboard.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.pedalboard.shadowRoot.querySelector('#divSoundIn').classList.toggle('hidden');
+        if (!this.pedalboard.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.pedalboard.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
+        if (!this.pedalboard.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.pedalboard.shadowRoot.querySelector('#divSoundIn').classList.toggle('hidden');
         this.openDialog();
       };
       this.bt_saveBank.onclick = (e) => this.addNewBank();
@@ -194,7 +195,8 @@
     async loadConnexions() {
       console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
       for (let i = 0; i < this.plugsConnexions.length; i++) {
-        let tabId = []; console.log(this.plugsConnexions[i].in);
+        let tabId = []; 
+        console.log(this.plugsConnexions[i]);
         console.log(this.pedalboard.pedals[this.pedalboard.pedals.length - 1].id);
         for (let i = 0; i < this.pedalboard.pedals.length; i++) {
           tabId.push(this.pedalboard.pedals[i].id);
@@ -306,8 +308,24 @@
         if (_plugin.id != "pedalIn1" && _plugin.id != "pedalIn2" && _plugin.id != "pedalOut") {
 
           // Await from the plugin to return its state so save the preset
-          await _plugin.node.getState().then((params) => {
-            _settings = params;
+          if (_plugin.node.getState != null) {
+            await _plugin.node.getState().then((params) => {
+              _settings = params;
+              _plugsToSave = {
+                id: _plugin.id,
+                type: _plugin.tagName.toLowerCase(),
+                position: {
+                  x: _plugin.x,
+                  y: _plugin.y
+                },
+                settings: _settings
+              }
+              _currentPlugs.push(_plugsToSave);
+            });
+            console.log(_plugsToSave)
+         }
+          else{
+            _settings = {};
             _plugsToSave = {
               id: _plugin.id,
               type: _plugin.tagName.toLowerCase(),
@@ -318,7 +336,8 @@
               settings: _settings
             }
             _currentPlugs.push(_plugsToSave);
-          });
+
+          }
         }
       }
       if (!bankSelected.presets.find(item => item.label == _presetName)) {

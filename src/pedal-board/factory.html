@@ -25,7 +25,7 @@
      * - Import and link its GUI;
      * - Wrap it in a PBPlugin
     */
-    createPedal(_tagName, _pluginName, _pluginUrl) {
+    createPedal(_tagName, _pluginName, _pluginUrl, id) {
       // Register the x-custom element with the browser and associate the class created
       customElements.define(_tagName, class extends PBPlugin(HTMLElement) {
         constructor() {
@@ -34,10 +34,19 @@
           // Default values if non specified width/heigth nbinput/nboutput for pedal (fix wor wam DX7);
           this.w = 825;
           this.h = 115;
+          this.pedalId = id;
+          this.options = {};
 
           this.params = '';
           this.node = '';
           this.paramsLoaded = '';
+          let saver = document.querySelector("#ul_container").querySelector("#li_1").querySelector("pedal-board").shadowRoot.querySelector("#div_app").querySelector("header").querySelector("#header_settings").querySelector("wc-save");
+          try {
+            console.log(saver.banks.find(item => item._id == saver.bankSelected).presets.find(item => item._id == saver.presetSelected).plugs.find(item => item.id == this.pedalId).settings.nbcanaux);
+            let optionForMixer = saver.banks.find(item => item._id == saver.bankSelected).presets.find(item => item._id == saver.presetSelected).plugs.find(item => item.id == this.pedalId).settings.nbcanaux;
+            if (_pluginName == "Mixer") { this.options = { "numberOfInputs": optionForMixer }; };
+          } catch (error) {
+          }
         }
 
         get is() { return this.nodeName.toLowerCase(); }
@@ -50,7 +59,7 @@
         // Called if one of the observed attribute changed.
         attributeChangedCallback(name, oldValue, newValue, nbNodeIn) {
           console.log(`Custom element ${this.is} attributes changed.`);
-            if(name ==="params"){
+          if (name === "params") {
             try {
               console.log(`name: ${name}`);
               console.log(`oldValue:`, oldValue);
@@ -58,23 +67,23 @@
               this.paramsLoaded = JSON.parse(newValue);
               console.log('this.paramsLoaded', this.paramsLoaded);
               console.log('thisNODE', this.node);
-              
-             this.node.setState(this.paramsLoaded);
+
+              this.node.setState(this.paramsLoaded);
             }
             catch (err) {
               console.log(err);
             }
           }
-          else if(name ==="dynamicparams"){
+          else if (name === "dynamicparams") {
             console.log(`name: ${name}`);
             console.log(`newValue:`, newValue);
-              if(newValue == "numberOfInputs"){
-                this.nbNodeIn = this.node.numberOfInputs;
-                this.w = this.node.gui.properties.dataWidth.value
-                // console.log(this.nbNodeIn);
-                // console.log(this.w);
-                this.addInput(this.nbNodeIn - 1);
-              }
+            if (newValue == "numberOfInputs") {
+              this.nbNodeIn = this.node.numberOfInputs;
+              this.w = this.node.gui.properties.dataWidth.value
+              // console.log(this.nbNodeIn);
+              // console.log(this.w);
+              this.addInput(this.nbNodeIn - 1);
+            }
           }
 
         }
@@ -107,8 +116,10 @@
         loadandBuildPlugin() {
           var pedal = this;
           var wrapper = this.shadowRoot.querySelector(".laPedale");
+
           try {
-            this.plugin = new window[_pluginName](GlobalContext.context, _pluginUrl);
+            console.log(this.options);
+            this.plugin = new window[_pluginName](GlobalContext.context, _pluginUrl, this.options);
 
           } catch (error) {
             console.warn("WAP plugin implementation changes : replace your module definition by window.mymodule");
@@ -175,13 +186,13 @@
                 }
               }
 
-              
+
               // fisrt implementation to catch plugin singularities
               try {
-                node.gui.onchange = () =>{ 
+                node.gui.onchange = () => {
                   this.setAttribute("dynamicparams", node.dynamicParam.listento);
                 };
-                
+
               } catch (error) {
                 console.log(error);
               }
