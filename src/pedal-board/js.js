@@ -450,7 +450,7 @@ class PedalBoard extends HTMLElement {
 
     if (jacksIn.length > 0) {
       for (let i = jacksIn.length - 1; i >= 0; i--) {
-        this.disconnect(jacksIn[i].p1, jacksIn[i].p2);
+        this.disconnect(jacksIn[i].p1, jacksIn[i].p2, jacksIn[i].pedal2inputNumber);
       }
     }
     if (jacksOut.length > 0) {
