@@ -323,17 +323,21 @@ class PedalBoard extends HTMLElement {
     }
 
     this.shadowRoot.querySelector('#bt_zoom_in').onclick = (e) => {
-      this.zoomindex++;
-      this.zoom = this.zoomtab[this.zoomindex];
-      console.log(this.zoom)
-      this.doZoom();
+      if (this.zoomindex < this.zoomtab.length-1) {
+        this.zoomindex++;
+        this.zoom = this.zoomtab[this.zoomindex];
+        this.doZoom();
+      }else console.log("You cannot zoom in more");
+
     }
 
     this.shadowRoot.querySelector('#bt_zoom_out').onclick = (e) => {
-      this.zoomindex--;
-      this.zoom = this.zoomtab[this.zoomindex];
-      console.log(this.zoom)
-      this.doZoom();
+      if (this.zoomindex > 0) {
+        this.zoomindex--;
+        this.zoom = this.zoomtab[this.zoomindex];
+        console.log(this.zoom)
+        this.doZoom();
+      }else console.log("You cannot zoom out more");
     }
 
     this.shadowRoot.querySelector('#bt_stereo').onclick = (e) => {
