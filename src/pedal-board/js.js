@@ -49,8 +49,8 @@ class PedalBoard extends HTMLElement {
     this.wO = 0;
     this.hO = 0;
 
-    this.zoomtab = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
-    this.zoomindex = 9;
+    this.zoomtab = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
+    this.zoomindex = 4;
     this.zoom = this.zoomtab[this.zoomindex];
 
     // factory
@@ -323,17 +323,21 @@ class PedalBoard extends HTMLElement {
     }
 
     this.shadowRoot.querySelector('#bt_zoom_in').onclick = (e) => {
-      this.zoomindex++;
-      this.zoom = this.zoomtab[this.zoomindex];
-      console.log(this.zoom)
-      this.doZoom();
+      if (this.zoomindex < this.zoomtab.length-1) {
+        this.zoomindex++;
+        this.zoom = this.zoomtab[this.zoomindex];
+        this.doZoom();
+      }else console.log("You cannot zoom in more");
+
     }
 
     this.shadowRoot.querySelector('#bt_zoom_out').onclick = (e) => {
-      this.zoomindex--;
-      this.zoom = this.zoomtab[this.zoomindex];
-      console.log(this.zoom)
-      this.doZoom();
+      if (this.zoomindex > 0) {
+        this.zoomindex--;
+        this.zoom = this.zoomtab[this.zoomindex];
+        console.log(this.zoom)
+        this.doZoom();
+      }else console.log("You cannot zoom out more");
     }
 
     this.shadowRoot.querySelector('#bt_stereo').onclick = (e) => {
