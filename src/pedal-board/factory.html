@@ -145,15 +145,14 @@
           // LOAD NODE
           this.plugin.load().then((node) => {
             // LOAD GUI
+            //Store the node as a field of the PBPlugin
+            this.node = node;
+
+            // Get the I/O numbers of the plugin
+            this.nbNodeOut = node.numberOfOutputs;
+            this.nbNodeIn = node.numberOfInputs;
 
             this.plugin.loadGui().then((elem) => {
-
-              //Store the node as a field of the PBPlugin
-              this.node = node;
-
-              // Get the I/O numbers of the plugin
-              this.nbNodeOut = node.numberOfOutputs;
-              this.nbNodeIn = node.numberOfInputs;
 
               // Push the Inputs to the Inputs array 
               for (var i = 1; i < this.nbNodeIn; i++) {

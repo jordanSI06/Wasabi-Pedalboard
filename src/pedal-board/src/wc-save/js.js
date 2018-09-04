@@ -188,11 +188,11 @@
         this.nbPluginTraitee += 1;
         if (this.nbPluginTraitee < this.plugs.length) this.loadNewPlugin(this.plugs[this.nbPluginTraitee]);
 
-        else { this.loadConnexions(); }
+        else { setTimeout(()=>{this.loadConnexions();},1000) }
       })
     }
 
-    async loadConnexions() {
+    loadConnexions() {
       console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
       for (let i = 0; i < this.plugsConnexions.length; i++) {
         let tabId = []; 

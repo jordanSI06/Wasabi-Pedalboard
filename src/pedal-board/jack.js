@@ -52,6 +52,7 @@ class Jack {
       x2: (iPos.xpos[this.pedal2inputNumber] + this.offsetX),
       y2: (iPos.ypos[this.pedal2inputNumber] + this.offsetY)
     }
+    
     this.reviewSVGJack(_pos, _id);
   }
 
@@ -76,12 +77,13 @@ class Jack {
     }
 
     // if pedal 2 on the left of pedal 1
-    let delta = (_pos.x2 - _pos.x1) * ((_pos.x2 < _pos.x1) ? -1 : 1);
-    let path = `M ${_pos.x1} ${_pos.y1} C ${_pos.x1 + delta}  ${_pos.y1} ${_pos.x2 - delta} ${_pos.y2} ${_pos.x2} ${_pos.y2}`;
+   
 
-    this.shape1.setAttribute("d", path);
-    this.end.setAttribute("x", _pos.x2 - 10);
-    this.end.setAttribute("y", _pos.y2 - 10);
+      let delta = (_pos.x2 - _pos.x1) * ((_pos.x2 < _pos.x1) ? -1 : 1);
+      let path = `M ${_pos.x1} ${_pos.y1} C ${_pos.x1 + delta}  ${_pos.y1} ${_pos.x2 - delta} ${_pos.y2} ${_pos.x2} ${_pos.y2}`;
+      this.shape1.setAttribute("d", path);
+      this.end.setAttribute("x", _pos.x2 - 10);
+      this.end.setAttribute("y", _pos.y2 - 10);    
 
     return this;
   }
