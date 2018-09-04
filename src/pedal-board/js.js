@@ -620,7 +620,7 @@ class PedalBoard extends HTMLElement {
 
 
       let distInput = [];
-      let distMinToInputForHighlight = 20;
+      let distMinToInputForHighlight = 40;
 
       for (var i = 0; i < iPos.xpos.length; i++) {
 
@@ -631,7 +631,7 @@ class PedalBoard extends HTMLElement {
            */
 
           distInput[i] = this.distance(x, y, iPos.xpos[i] - 100, iPos.ypos[i]);
-          distMinToInputForHighlight = 50;
+          distMinToInputForHighlight = 40;
         } else {
           // regular case, we're just pointing the mouse around
           distInput[i] = this.distance(x, y, iPos.xpos[i], iPos.ypos[i]);
@@ -644,7 +644,7 @@ class PedalBoard extends HTMLElement {
       }
 
       // It depends if we're trying to plug a jack or not
-      let bestInputDistance = 50;
+      let bestInputDistance = 100;
       for (var i = 0; i < distInput.length; i++) {
         if (distInput[i] < bestInputDistance) {
           bestInputDistance = distInput[i];

@@ -69,7 +69,7 @@ class Jack {
       this.end.setAttribute('width', `${100}px`);
       this.end.setAttribute('height', `${20}px`);
       this.end.setAttribute('id', `${_id}_2`);
-      
+
       let svg = PedalBoard.createSVGcanvas();
       svg.appendChild(this.shape1);
       svg.appendChild(this.end);
@@ -82,6 +82,9 @@ class Jack {
     this.shape1.setAttribute("d", path);
     this.end.setAttribute("x", _pos.x2 - 10);
     this.end.setAttribute("y", _pos.y2 - 10);
+
     return this;
   }
+
+  
 }

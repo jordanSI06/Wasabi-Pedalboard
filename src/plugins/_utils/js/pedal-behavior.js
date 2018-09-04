@@ -44,7 +44,7 @@ PBPlugin = function (superClass) {
 
     addInput(rank) {
       this.inputP[rank] = document.createElement("div");
-      this.inputP[rank].style = 'margin-top :' + 40 * rank + 'px';
+      this.inputP[rank].style = 'margin-top :' + 50 * rank + 'px';
       this.inputP[rank].classList.add("input");
       if (typeof this.nbNodeIn == "undefined" || (this.nbNodeIn > 0)) this.shadowRoot.querySelector(".laPedale").appendChild(this.inputP[rank]);
 
@@ -69,7 +69,7 @@ PBPlugin = function (superClass) {
       //Creation of as much graphic inputs as nbNodeIn. nbNodeIn has been set in factory just before the runbehaviormethod is called
       for (var i = 0; i < this.nbNodeIn; i++) {
         this.inputP[i] = document.createElement("div");
-        this.inputP[i].style = 'margin-top :' + 40 * i + 'px';
+        this.inputP[i].style = 'margin-top :' + 50 * i + 'px';
         this.inputP[i].classList.add("input");
         if (typeof this.nbNodeIn == "undefined" || (this.nbNodeIn > 0)) elem.appendChild(this.inputP[i]);
       }
@@ -77,7 +77,7 @@ PBPlugin = function (superClass) {
       //Creation of as much graphic outputs as nbNodeOut. nbNodeOut has been set in factory just before the runbehaviormethod is called
       for (var i = 0; i < this.nbNodeOut; i++) {
         this.outputP[i] = document.createElement("div");
-        this.outputP[i].style = 'margin-top :' + 40 * i + 'px';
+        this.outputP[i].style = 'margin-top :' + 50 * i + 'px';
         this.outputP[i].classList.add("output");
         if (typeof this.nbNodeOut == "undefined" || (this.nbNodeOut > 0)) elem.appendChild(this.outputP[i]);
       }
@@ -197,7 +197,7 @@ PBPlugin = function (superClass) {
       var ypos = [];
       for (var i = 0; i < this.nbNodeIn; i++) {
         xpos[i] = ((this.x) + this.IOsize / 2 + (-this.IOsize / 2));
-        ypos[i] = (((this.y) + this.IOsize / 2 + (this.IOsize - 4) + 12) + 40 * i);
+        ypos[i] = (((this.y) + this.IOsize / 2 + (this.IOsize - 4) + 12) + 50 * i);
 
 
       }
@@ -215,7 +215,7 @@ PBPlugin = function (superClass) {
       var ypos = [];
       for (var i = 0; i < this.nbNodeOut; i++) {
         xpos[i] = ((this.x) + this.IOsize / 2 + (this.w + 2 * this.IOsize - 2)),
-          ypos[i] = (((this.y) + this.IOsize / 2 + (this.IOsize) + 8) + 20 * i);
+          ypos[i] = (((this.y) + this.IOsize / 2 + (this.IOsize) + 8) + 25 * i);
 
       }
       return { xpos, ypos }
