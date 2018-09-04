@@ -522,7 +522,7 @@ class PedalBoard extends HTMLElement {
 
     // remove connexion from "this.pluginConnected"
     for (let i = 0; i < this.pluginConnected.length; i++) {
-      if (this.pluginConnected[i].in == p2.id && this.pluginConnected[i].out == p1.id) {
+      if (this.pluginConnected[i].in.id == p2.id && this.pluginConnected[i].out == p1.id) {
         this.pluginConnected.splice(i, 1);
         break;
       }
