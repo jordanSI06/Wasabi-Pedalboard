@@ -335,7 +335,6 @@ class PedalBoard extends HTMLElement {
       if (this.zoomindex > 0) {
         this.zoomindex--;
         this.zoom = this.zoomtab[this.zoomindex];
-        console.log(this.zoom)
         this.doZoom();
       }else console.log("You cannot zoom out more");
     }
