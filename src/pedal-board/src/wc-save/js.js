@@ -202,6 +202,7 @@
           tabId.push(this.pedalboard.pedals[i].id);
         }
         if (this.plugsConnexions[i].out == 'pedalIn2') this.pedalboard.changetomono();
+        
         this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`), this.plugsConnexions[i].in.inputnumber);
 
       }

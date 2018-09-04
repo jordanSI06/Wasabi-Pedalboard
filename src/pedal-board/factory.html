@@ -127,7 +127,6 @@
         createPlugin() {
           this.OptionsManager().then((options) => {
             try {
-              console.log("hey")
               this.plugin = new window[_pluginName](GlobalContext.context, _pluginUrl, options);
               this.loadPlugin(this.plugin)
             } catch (error) {
@@ -153,8 +152,8 @@
               this.node = node;
 
               // Get the I/O numbers of the plugin
-              this.nbNodeIn = node.numberOfInputs;
               this.nbNodeOut = node.numberOfOutputs;
+              this.nbNodeIn = node.numberOfInputs;
 
               // Push the Inputs to the Inputs array 
               for (var i = 1; i < this.nbNodeIn; i++) {

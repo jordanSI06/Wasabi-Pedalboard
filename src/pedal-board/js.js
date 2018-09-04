@@ -474,7 +474,7 @@ class PedalBoard extends HTMLElement {
 
 
   isConnexionPossible(_nbNodeOut, _nbNodeIn) {
-    return ((typeof _nbNodeOut == "undefined" || (_nbNodeOut > 0)) && (typeof _nbNodeIn == "undefined" || (_nbNodeIn > 0)));
+    return /*((typeof _nbNodeOut == "undefined" || (_nbNodeOut > 0)) &&*/ (typeof _nbNodeIn == "undefined" || (_nbNodeIn > 0))/*)*/;
   }
 
   connect(p1, p2, inputNumber) {
