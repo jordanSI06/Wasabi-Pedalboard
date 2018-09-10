@@ -9,10 +9,8 @@
     // ----- METHODS: DEFAULT -----
     // is called when an instance of the element is created
     constructor() {
-      // Toujours appeler "super" d'abord dans le constructeur
       super();
 
-      // Ecrire la fonctionnalité de l'élément ici
       const _urlAudio = {
         cat1: {
           label: "Metal riff 1",
@@ -57,6 +55,34 @@
         cat11: {
           label: "Multi feeq sin wave",
           path: "11"
+        },
+        cat12: {
+          label: "RawPRI",
+          path: "RawPRI.mp3"
+        },
+        cat13: {
+          label: "GuitarSolo1_DI",
+          path: "GuitarSolo1_DI.mp3"
+        },
+        cat14: {
+          label: "GuitarSolo2_DI",
+          path: "GuitarSolo2_DI.mp3"
+        },
+        cat15: {
+          label: "Folk Acoustic DI",
+          path: "FolkAcousticDI.mp3"
+        },
+        cat16: {
+          label: "3F_DI_guitar",
+          path: "3F_DI_guitar.wav"
+        },
+        cat17: {
+          label: "DIGuitarRIFF",
+          path: "DIGuitarRIFF.mp3"
+        },
+        cat18: {
+          label: "CleanGuitarRiff",
+          path: "CleanGuitarRiff.mp3"
         }
       };
 
@@ -88,7 +114,7 @@
     // is called every time the element is inserted into the DOM. It is useful for running setup code, such as fetching resources or rendering.
     // appelé lorsque l'élément personnalisé est connecté pour la première fois au DOM du document
     connectedCallback() {
-   //console.log(`Custom element ${this.is} added to page.`);
+      //console.log(`Custom element ${this.is} added to page.`);
 
       // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
       const shadowRoot = this.attachShadow({ mode: `open` });
