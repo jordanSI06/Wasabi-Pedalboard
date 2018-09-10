@@ -15,6 +15,8 @@
       }
       this.isAPresetSlected = false;
       this.bankSelected;
+      this.availablePdb = true;
+      this.allbanks;
 
     }
 
@@ -67,7 +69,9 @@
       this.bankSelected = '';
       this.plugsConnexions = '';
 
-      if (localStorage.getItem('banks')) this.banks = JSON.parse(localStorage.getItem('banks'));
+      if (localStorage.getItem('banks')) {
+        this.banks = JSON.parse(localStorage.getItem('banks'));
+      }
       else this.banks = [];
       localStorage.setItem('banks', JSON.stringify(this.banks));
       this.loadBanks();
@@ -111,6 +115,8 @@
           this.nav_banks.insertAdjacentHTML('beforeEnd', this.renderLink(this.banks[elem]));
         }
       )
+      this.nav_banks.insertAdjacentHTML('beforeEnd', this.renderLink(buildInBank));
+      this.allbanks = this.banks.concat(buildInBank);
       this.selectBanksListeners();
     }
 
@@ -125,6 +131,8 @@
           this.loadPreset();
         }
         else alert("Select a preset first");
+        console.log(this.shadowRoot.querySelector("#div_dialog"));
+        this.shadowRoot.querySelector("#div_dialog").classList.toggle('hidden');
       }
       this.bt_openDialog.onclick = (e) => {
         if (!this.pedalboard.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.pedalboard.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
@@ -138,6 +146,7 @@
         if (this.bankSelected) {
           if (this.isAPresetSlected || this.input_presetName.value) this.savePreset();
           else alert("Tape name of choose a preset to overwrite")
+          this.shadowRoot.querySelector("#div_dialog").classList.toggle('hidden');
         }
       }
     }
@@ -147,7 +156,9 @@
     }
 
     loadPresets() {
-      let bankSelected = this.banks.find(item => item._id == this.bankSelected);
+      this.banks = JSON.parse(localStorage.banks);
+      this.allbanks = this.banks.concat(buildInBank);
+      let bankSelected = this.allbanks.find(item => item._id == this.bankSelected);
       let _presets = bankSelected.presets;
       this.nav_presets.innerHTML = '';
       Object.keys(_presets).map(
@@ -165,51 +176,60 @@
     }
 
     loadPreset() {
-      let bankSelected = this.banks.find(item => item._id == this.bankSelected);
+      this.pedalboard.clearPedalboard();
+      // this.showWaiting(this.availablePdb);
+      this.availablePdb = false;
+      let bankSelected = this.allbanks.find(item => item._id == this.bankSelected);
       this.plugs = bankSelected.presets.find(item => item._id == this.presetSelected).plugs;
       this.plugsConnexions = bankSelected.presets.find(item => item._id == this.presetSelected).connexions;
       //console.log('LOADING',bankSelected.presets.find(item => item._id == this.presetSelected));
       //console.log(`START: LOAD PRESET ${this.bankSelected} > ${this.presetSelected}`, this.plugs);
-      console.log("plugconnexions", this.plugsConnexions);
+      //console.log(this.plugs);
+      //console.log("plugconnexions", this.plugsConnexions);
 
       this.nbPluginTraitee = 0;
 
       //this.pedalboard.loadPresets(this.plugs);
       console.log(this.plugs)
-      this.pedalboard.clearPedalboard();
-      this.loadNewPlugin(this.plugs[0]);
+      this.loadNewPlugins(this.plugs);
     }
 
-    loadNewPlugin(p) {
-      console.log(p);
-      this.pedalboard.loadPlugin(p).then(plugin => {
-        console.log('----- !!!! PLUGIN LOADED !!!!! -----', plugin);
-        console.log('NEXT : -----{{{{ this.nbPluginTraitee----- }}}}}', this.nbPluginTraitee);
-        this.nbPluginTraitee += 1;
-        if (this.nbPluginTraitee < this.plugs.length) this.loadNewPlugin(this.plugs[this.nbPluginTraitee]);
 
-        else { setTimeout(()=>{this.loadConnexions();},1000) }
-      })
+    loadNewPlugins(plugs) {
+      var promises = [];
+      plugs.forEach((p, index) => {
+        promises[index] = this.pedalboard.loadPlugin(p);
+      });
+
+      Promise.all(promises).then(() => {
+        this.loadPluginStates();
+        setTimeout(()=>{this.loadConnexions()},800);
+      });
+    }
+
+    loadPluginStates() {
+      for (let i = 0; i < this.plugs.length; i++) {
+        console.log(this.plugs[i]);
+        this.pedalboard.querySelector(`#${this.plugs[i].id}`).setAttribute('params', JSON.stringify(this.plugs[i].settings));
+      }
     }
 
     loadConnexions() {
       console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
       for (let i = 0; i < this.plugsConnexions.length; i++) {
-        let tabId = []; 
+        let tabId = [];
         console.log(this.plugsConnexions[i]);
         console.log(this.pedalboard.pedals[this.pedalboard.pedals.length - 1].id);
         for (let i = 0; i < this.pedalboard.pedals.length; i++) {
           tabId.push(this.pedalboard.pedals[i].id);
         }
         if (this.plugsConnexions[i].out == 'pedalIn2') this.pedalboard.changetomono();
-        
+
         this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`), this.plugsConnexions[i].in.inputnumber);
 
       }
-      for (let i = 0; i < this.plugs.length; i++) {
-        console.log(this.plugs[i]);
-        this.pedalboard.querySelector(`#${this.plugs[i].id}`).setAttribute('params', JSON.stringify(this.plugs[i].settings));
-      }
+
+      this.availablePdb = true;
     }
 
     sleep(_mms) {
@@ -242,7 +262,10 @@
       this.nav_presets.querySelectorAll('a').forEach(e => {
         //console.log('a', e);
         e.onclick = (e) => this.selectPreset(e.target.id);
-        e.ondblclick = (e) => this.loadPreset();
+        e.ondblclick = (e) => {
+          this.loadPreset();
+          this.shadowRoot.querySelector("#div_dialog").classList.toggle('hidden');
+        }
       })
     }
 
@@ -294,7 +317,7 @@
       //this.takeScreenshot().then(_screenshot=>{
       //  console.log('_screenshot',_screenshot);
       let _presetName = this.input_presetName.value.trim();
-      let bankSelected = this.banks.find(item => item._id == this.bankSelected);
+      let bankSelected = this.allbanks.find(item => item._id == this.bankSelected);
 
       let _currentPlugs = [];
       let _currentConnexions = this.pedalboard.pluginConnected;
@@ -324,8 +347,8 @@
               _currentPlugs.push(_plugsToSave);
             });
             console.log(_plugsToSave)
-         }
-          else{
+          }
+          else {
             _settings = {};
             _plugsToSave = {
               id: _plugin.id,
@@ -369,6 +392,8 @@
 
       //})
     }
+
+
 
   });
 })();
