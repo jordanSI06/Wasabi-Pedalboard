@@ -50,7 +50,7 @@ class PedalBoard extends HTMLElement {
     this.hO = 0;
 
     this.zoomtab = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
-    this.zoomindex = 4;
+    this.zoomindex = 2;
     this.zoom = this.zoomtab[this.zoomindex];
 
     // factory
@@ -171,6 +171,8 @@ class PedalBoard extends HTMLElement {
         this.explorerepo(repo[i], lastrepo);
       }
     });
+    this.doZoom();
+
   }
 
 
@@ -463,6 +465,14 @@ class PedalBoard extends HTMLElement {
 
         this.disconnect(jacksOut[i].p1, jacksOut[i].p2, jacksOut[i].pedal2inputNumber);
       }
+    }
+
+    try {
+      delete p.shadowRoot.querySelector('.laPedale').childNodes[1]._plug;
+
+    } catch (error) {
+      console.log("plugin hierarchie does not match with regular wap");
+      delete p.shadowRoot.querySelector('.laPedale').childNodes[1];
     }
 
     var index = this.pedals.indexOf(p);
@@ -1252,7 +1262,7 @@ class PedalBoard extends HTMLElement {
     this.sound.gainNodeIn = this.sound.context.createGain();
     // last gain of the pdb audio graph
     this.sound.gainNodeOut = this.sound.context.createGain();
-    this.sound.gainNodeOut.gain.value = 0.25;
+    this.sound.gainNodeOut.gain.value = 1;
     // gain for the user media (micro or external sound card)
     this.sound.gainUserMedia = this.sound.context.createGain();
     // Player mediasource
