@@ -23,6 +23,8 @@ html,body{
   height: 100%;
 }
 
+
+
 :host{
   background-color: #eee;
 
@@ -61,7 +63,7 @@ header {
   top: 0px;
   left: 0px;
   right: 0px;
-  z-index: 1;
+  z-index: 20;
 
   display: flex;
   flex-direction: row;
