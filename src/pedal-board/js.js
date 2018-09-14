@@ -630,7 +630,7 @@ class PedalBoard extends HTMLElement {
 
 
       let distInput = [];
-      let distMinToInputForHighlight = 40;
+      let distMinToInputForHighlight = 20;
 
       for (var i = 0; i < iPos.xpos.length; i++) {
 
