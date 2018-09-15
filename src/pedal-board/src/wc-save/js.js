@@ -115,7 +115,14 @@
           this.nav_banks.insertAdjacentHTML('beforeEnd', this.renderLink(this.banks[elem]));
         }
       )
-      this.nav_banks.insertAdjacentHTML('beforeEnd', this.renderLink(buildInBank));
+
+      Object.keys(buildInBank).map(
+        (elem, index) => {
+          this.nav_banks.insertAdjacentHTML('beforeEnd', this.renderLink(buildInBank[elem]));
+        }
+      )
+
+      //this.nav_banks.insertAdjacentHTML('beforeEnd', this.renderLink(buildInBank));
       this.allbanks = this.banks.concat(buildInBank);
       this.selectBanksListeners();
     }
@@ -159,6 +166,7 @@
       this.banks = JSON.parse(localStorage.banks);
       this.allbanks = this.banks.concat(buildInBank);
       let bankSelected = this.allbanks.find(item => item._id == this.bankSelected);
+      console.log(bankSelected);
       let _presets = bankSelected.presets;
       this.nav_presets.innerHTML = '';
       Object.keys(_presets).map(
