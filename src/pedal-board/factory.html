@@ -111,9 +111,10 @@
             if (_pluginName == "WasabiMixer") {
               try {
                 let saver = document.querySelector("#ul_container").querySelector("#li_1").querySelector("pedal-board").shadowRoot.querySelector("#div_app").querySelector("header").querySelector("#header_settings").querySelector("wc-save");
-                let optionForMixer = saver.banks.find(item => item._id == saver.bankSelected).presets.find(item => item._id == saver.presetSelected).plugs.find(item => item.id == this.pedalId).settings.nbcanaux;
+                let optionForMixer = saver.allbanks.find(item => item._id == saver.bankSelected).presets.find(item => item._id == saver.presetSelected).plugs.find(item => item.id == this.pedalId).settings.nbcanaux;
                 resolve({ "numberOfInputs": optionForMixer });
               } catch (error) {
+                console.log(error);
                 resolve({});
               }
             }
@@ -128,8 +129,10 @@
           this.OptionsManager().then((options) => {
             try {
               this.plugin = new window[_pluginName](GlobalContext.context, _pluginUrl, options);
+              console.log(this.plugin);
               this.loadPlugin(this.plugin)
             } catch (error) {
+              console.log(error)
               console.warn("WAP plugin implementation changes : replace your module definition by window.mymodule");
               this.plugin = new WAPlugin[_pluginName](GlobalContext.context, _pluginUrl);
               this.loadPlugin(this.plugin)

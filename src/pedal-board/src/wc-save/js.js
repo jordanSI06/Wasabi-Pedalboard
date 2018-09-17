@@ -211,7 +211,7 @@
 
       Promise.all(promises).then(() => {
         this.loadPluginStates();
-        setTimeout(()=>{this.loadConnexions()},800);
+        setTimeout(()=>{this.loadConnexions()},1000);
       });
     }
 
@@ -226,13 +226,13 @@
       console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
       for (let i = 0; i < this.plugsConnexions.length; i++) {
         let tabId = [];
-        console.log(this.plugsConnexions[i]);
-        console.log(this.pedalboard.pedals[this.pedalboard.pedals.length - 1].id);
+        // console.log(this.plugsConnexions[i]);
+        // console.log(this.pedalboard.pedals[this.pedalboard.pedals.length - 1].id);
         for (let i = 0; i < this.pedalboard.pedals.length; i++) {
           tabId.push(this.pedalboard.pedals[i].id);
         }
         if (this.plugsConnexions[i].out == 'pedalIn2') this.pedalboard.changetomono();
-
+        console.log(this.plugsConnexions[i].in.inputnumber);
         this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`), this.plugsConnexions[i].in.inputnumber);
 
       }

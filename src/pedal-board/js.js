@@ -491,8 +491,9 @@ class PedalBoard extends HTMLElement {
     // si p1_Out && p2_In existent (>1) alors la connexion est possible
     if (this.isConnexionPossible(p1.nbNodeOut, p2.nbNodeIn)) {
       let j = new Jack();
-      if (inputNumber) j.connexion(p1, p2, inputNumber);
-      else j.connexion(p1, p2, p2.bestInputNumber);
+      console.log(inputNumber);
+      if (inputNumber) p2.bestInputNumber = inputNumber;
+      j.connexion(p1, p2, p2.bestInputNumber);
       p1.addJackAtOutput(j);
       p2.addJackAtInput(j);
       if (inputNumber) this.soundNodeConnection(p1, p2, inputNumber);
@@ -628,9 +629,8 @@ class PedalBoard extends HTMLElement {
         oPos.ypos[count] = oPos.ypos[count] * this.zoom;
       }
 
-
       let distInput = [];
-      let distMinToInputForHighlight = 20;
+      let distMinToInputForHighlight = 20*this.zoom;
 
       for (var i = 0; i < iPos.xpos.length; i++) {
 
@@ -640,8 +640,8 @@ class PedalBoard extends HTMLElement {
            into account the length of the jack ending (an image of 100px width)
            */
 
-          distInput[i] = this.distance(x, y, iPos.xpos[i] - 100, iPos.ypos[i]);
-          distMinToInputForHighlight = 40;
+          distInput[i] = this.distance(x, y, iPos.xpos[i] - 100 * this.zoom, iPos.ypos[i]);
+          distMinToInputForHighlight = 40*this.zoom;
         } else {
           // regular case, we're just pointing the mouse around
           distInput[i] = this.distance(x, y, iPos.xpos[i], iPos.ypos[i]);
@@ -654,7 +654,7 @@ class PedalBoard extends HTMLElement {
       }
 
       // It depends if we're trying to plug a jack or not
-      let bestInputDistance = 100;
+      let bestInputDistance = 100 * this.zoom;
       for (var i = 0; i < distInput.length; i++) {
         if (distInput[i] < bestInputDistance) {
           bestInputDistance = distInput[i];
@@ -668,14 +668,14 @@ class PedalBoard extends HTMLElement {
       }
 
 
-      let bestOutputDistance = 100;
+      let bestOutputDistance = 100 * this.zoom;
       for (var i = 0; i < distOutput.length; i++) {
         if (distOutput[i] < bestOutputDistance) {
           bestOutputDistance = distOutput[i];
           p.bestOutputNumber = i;
         }
       }
-      if (bestOutputDistance < 40) {
+      if (bestOutputDistance < 40 * this.zoom) {
         if (!p.outputHighlighted) p.highLightOutput(p.bestOutputNumber, true);
       } else {
         if (p.outputHighlighted) p.highLightOutput(p.bestOutputNumber, false);
