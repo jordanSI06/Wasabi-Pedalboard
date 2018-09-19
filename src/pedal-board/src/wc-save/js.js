@@ -211,7 +211,7 @@
 
       Promise.all(promises).then(() => {
         this.loadPluginStates();
-        setTimeout(()=>{this.loadConnexions()},1000);
+       setTimeout(()=>{this.loadConnexions()},1500);
       });
     }
 
