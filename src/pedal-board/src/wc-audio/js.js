@@ -21,7 +21,7 @@
           path: "LasseMagoDI.mp3"
         },
         cat3: {
-          label: "Cool rythm",
+          label: "Cool Rythm",
           path: "Di-Guitar.mp3"
         },
         cat4: {
@@ -53,35 +53,35 @@
           path: "Muse2Rythm.mp3"
         },
         cat11: {
-          label: "Multi feeq sin wave",
+          label: "----",
           path: "11"
         },
         cat12: {
-          label: "RawPRI",
+          label: "Blues riff",
           path: "RawPRI.mp3"
         },
         cat13: {
-          label: "GuitarSolo1_DI",
+          label: "Blues solo 1",
           path: "GuitarSolo1_DI.mp3"
         },
         cat14: {
-          label: "GuitarSolo2_DI",
+          label: "Blues solo 2",
           path: "GuitarSolo2_DI.mp3"
         },
         cat15: {
-          label: "Folk Acoustic DI",
+          label: "Folk Acoustic 1",
           path: "FolkAcousticDI.mp3"
         },
         cat16: {
-          label: "3F_DI_guitar",
+          label: "Folk Acoustic 2",
           path: "3F_DI_guitar.wav"
         },
         cat17: {
-          label: "DIGuitarRIFF",
+          label: "Guitar Riff 1",
           path: "DIGuitarRIFF.mp3"
         },
         cat18: {
-          label: "CleanGuitarRiff",
+          label: "Guitar Riff 2",
           path: "CleanGuitarRiff.mp3"
         }
       };
