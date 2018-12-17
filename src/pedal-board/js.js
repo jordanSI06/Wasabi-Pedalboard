@@ -50,7 +50,7 @@ class PedalBoard extends HTMLElement {
     this.hO = 0;
 
     this.zoomtab = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
-    this.zoomindex = 2;
+    this.zoomindex = 4;
     this.zoom = this.zoomtab[this.zoomindex];
 
     // factory
