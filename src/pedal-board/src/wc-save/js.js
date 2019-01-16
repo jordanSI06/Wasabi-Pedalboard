@@ -21,9 +21,11 @@
       this.resultBank=this.url.searchParams.get("bank");
       this.resultPreset=this.url.searchParams.get("preset");
     
-      console.log(this.resultBank);
-      console.log(this.resultPreset);
-      
+      //console.log(this.resultBank);
+      //console.log(this.resultPreset);
+      setTimeout(() => {
+        this.loadPresetOnLoad();
+      }, 500);
     
     }
 
@@ -39,6 +41,7 @@
         console.log(`name: ${name}`);
         console.log(`oldValue:`, oldValue);
         console.log(`newValue:`, JSON.parse(newValue));
+        
       }
       catch (err) {
         console.log(err);
@@ -317,7 +320,6 @@
           e.classList.remove('a_selected');
         }
       })
-      this.loadPresetOnLoad(this.resultBank, this.resultPreset);
     }
 
     selectPresetsListeners() {
@@ -459,4 +461,4 @@
 
 
   });
-})();
+  })();
