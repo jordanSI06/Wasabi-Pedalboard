@@ -17,7 +17,14 @@
       this.bankSelected;
       this.availablePdb = true;
       this.allbanks;
-
+      this.url = new URL(window.location.href),
+      this.resultBank=this.url.searchParams.get("bank");
+      this.resultPreset=this.url.searchParams.get("preset");
+    
+      console.log(this.resultBank);
+      console.log(this.resultPreset);
+      
+    
     }
 
     get is() { return this.nodeName.toLowerCase(); }
@@ -125,6 +132,7 @@
       //this.nav_banks.insertAdjacentHTML('beforeEnd', this.renderLink(buildInBank));
       this.allbanks = this.banks.concat(buildInBank);
       this.selectBanksListeners();
+      
     }
 
     /**
@@ -202,6 +210,33 @@
       this.loadNewPlugins(this.plugs);
     }
 
+    loadPresetOnLoad(){
+      console.log(buildInBank);
+       let bankSelected = buildInBank.find(item => item.label == this.resultBank);
+        this.plugs = bankSelected.presets.find(item => item.label == this.resultPreset).plugs;
+        this.plugsConnexions = bankSelected.presets.find(item => item.label == this.resultPreset).connexions;
+        this.loadNewPluginsOnLoad(this.plugs);
+    }
+
+    loadNewPluginsOnLoad(plugs) {
+      var promises = [];
+      plugs.forEach((p, index) => {
+        promises[index] = this.pedalboard.loadPlugin(p);
+      });
+
+      Promise.all(promises).then(() => {
+        this.loadPluginStatesOnLoad(plugs);
+       setTimeout(()=>{this.loadConnexionsOnLoad()},1500);
+      });
+    }
+
+    loadPluginStatesOnLoad(plugs) {
+      for (let i = 0; i < plugs.length; i++) {
+        console.log(plugs[i]);
+        this.pedalboard.querySelector(`#${plugs[i].id}`).setAttribute('params', JSON.stringify(plugs[i].settings));
+      }
+    }
+
 
     loadNewPlugins(plugs) {
       var promises = [];
@@ -220,6 +255,24 @@
         console.log(this.plugs[i]);
         this.pedalboard.querySelector(`#${this.plugs[i].id}`).setAttribute('params', JSON.stringify(this.plugs[i].settings));
       }
+    }
+
+    loadConnexionsOnLoad() {
+      console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
+      for (let i = 0; i < this.plugsConnexions.length; i++) {
+        let tabId = [];
+        // console.log(this.plugsConnexions[i]);
+        // console.log(this.pedalboard.pedals[this.pedalboard.pedals.length - 1].id);
+        for (let i = 0; i < this.pedalboard.pedals.length; i++) {
+          tabId.push(this.pedalboard.pedals[i].id);
+        }
+        if (this.plugsConnexions[i].out == 'pedalIn2') this.pedalboard.changetomono();
+        console.log(this.plugsConnexions[i].in.inputnumber);
+        this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`), this.plugsConnexions[i].in.inputnumber);
+
+      }
+
+      this.availablePdb = true;
     }
 
     loadConnexions() {
@@ -264,6 +317,7 @@
           e.classList.remove('a_selected');
         }
       })
+      this.loadPresetOnLoad(this.resultBank, this.resultPreset);
     }
 
     selectPresetsListeners() {
@@ -298,6 +352,7 @@
 
     clearBanks() {
       localStorage.clear();
+      
     }
 
     addNewBank() {
