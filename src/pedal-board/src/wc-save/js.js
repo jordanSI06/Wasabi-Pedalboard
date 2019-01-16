@@ -21,11 +21,12 @@
       this.resultBank=this.url.searchParams.get("bank");
       this.resultPreset=this.url.searchParams.get("preset");
     
-      //console.log(this.resultBank);
-      //console.log(this.resultPreset);
-      setTimeout(() => {
-        this.loadPresetOnLoad();
-      }, 500);
+      if(this.resultBank != null && this.resultPreset != null){
+        setTimeout(() => {
+          this.loadPresetOnLoad();
+        }, 500);
+      }
+      
     
     }
 
@@ -214,7 +215,6 @@
     }
 
     loadPresetOnLoad(){
-      console.log(buildInBank);
        let bankSelected = buildInBank.find(item => item.label == this.resultBank);
         this.plugs = bankSelected.presets.find(item => item.label == this.resultPreset).plugs;
         this.plugsConnexions = bankSelected.presets.find(item => item.label == this.resultPreset).connexions;
