@@ -21,6 +21,7 @@
       this.resultBank=this.url.searchParams.get("bank");
       this.resultPreset=this.url.searchParams.get("preset");
     
+      //Laisser le temps à la page de se charger
       if(this.resultBank != null && this.resultPreset != null){
         setTimeout(() => {
           this.loadPresetOnLoad();
@@ -214,6 +215,7 @@
       this.loadNewPlugins(this.plugs);
     }
 
+    //Appelé si on a mi des params à l'URL
     loadPresetOnLoad(){
        let bankSelected = buildInBank.find(item => item.label == this.resultBank);
         this.plugs = bankSelected.presets.find(item => item.label == this.resultPreset).plugs;
@@ -240,6 +242,24 @@
       }
     }
 
+    loadConnexionsOnLoad() {
+      console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
+      for (let i = 0; i < this.plugsConnexions.length; i++) {
+        let tabId = [];
+        // console.log(this.plugsConnexions[i]);
+        // console.log(this.pedalboard.pedals[this.pedalboard.pedals.length - 1].id);
+        for (let i = 0; i < this.pedalboard.pedals.length; i++) {
+          tabId.push(this.pedalboard.pedals[i].id);
+        }
+        if (this.plugsConnexions[i].out == 'pedalIn2') this.pedalboard.changetomono();
+        console.log(this.plugsConnexions[i].in.inputnumber);
+        this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`), this.plugsConnexions[i].in.inputnumber);
+
+      }
+
+      this.availablePdb = true;
+    }
+
 
     loadNewPlugins(plugs) {
       var promises = [];
@@ -260,23 +280,7 @@
       }
     }
 
-    loadConnexionsOnLoad() {
-      console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
-      for (let i = 0; i < this.plugsConnexions.length; i++) {
-        let tabId = [];
-        // console.log(this.plugsConnexions[i]);
-        // console.log(this.pedalboard.pedals[this.pedalboard.pedals.length - 1].id);
-        for (let i = 0; i < this.pedalboard.pedals.length; i++) {
-          tabId.push(this.pedalboard.pedals[i].id);
-        }
-        if (this.plugsConnexions[i].out == 'pedalIn2') this.pedalboard.changetomono();
-        console.log(this.plugsConnexions[i].in.inputnumber);
-        this.pedalboard.connect(this.pedalboard.querySelector(`#${this.plugsConnexions[i].out}`), this.pedalboard.querySelector(`#${this.plugsConnexions[i].in.id}`), this.plugsConnexions[i].in.inputnumber);
-
-      }
-
-      this.availablePdb = true;
-    }
+    
 
     loadConnexions() {
       console.log(`-------------- loadConnexions (${this.plugsConnexions.length}) --------------`);
