@@ -217,7 +217,7 @@
 
     //Appelé si on a mi des params à l'URL
     loadPresetOnLoad(){
-       let bankSelected = buildInBank.find(item => item.label == this.resultBank);
+       let bankSelected = this.allbanks.find(item => item.label == this.resultBank);
         this.plugs = bankSelected.presets.find(item => item.label == this.resultPreset).plugs;
         this.plugsConnexions = bankSelected.presets.find(item => item.label == this.resultPreset).connexions;
         this.loadNewPluginsOnLoad(this.plugs);
