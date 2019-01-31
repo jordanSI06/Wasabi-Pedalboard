@@ -9,6 +9,12 @@
   <title>SimplePedalBoard</title>
   <meta name="description" content="SimplePedalBoard description">
 
+   <!-- factory plugins -->
+   <script src="./src/pedal-board/src/wc-save/buildInPresets.js"></script>
+
+
+   <script src="https://wasabi.i3s.unice.fr/WebAudioPluginBank/bower_components/webaudio-controls2/webcomponents-lite.js"></script>
+
   <!-- See https://goo.gl/OOhYW5 -->
   <link rel="manifest" href="./manifest.json">
   <link href="https://fonts.googleapis.com/css?family=PT+Sans|Quicksand|Roboto" rel="stylesheet">
@@ -32,11 +38,7 @@
   <link rel="import" href="./src/plugins/pedal-in">
   <link rel="import" href="./src/plugins/pedal-out">
 
-  <!-- factory plugins -->
-  <script src="./src/pedal-board/src/wc-save/buildInPresets.js"></script>
-
-
-  <script src="https://wasabi.i3s.unice.fr/WebAudioPluginBank/bower_components/webaudio-controls2/webcomponents-lite.js"></script>
+ 
   <script>
     WebAudioControlsOptions = {
       useMidi: 1,
