@@ -166,8 +166,8 @@ class PedalBoard extends HTMLElement {
 
     // to add another repository  : Uncomment the promise.all block, set the urls and comment the "this.request" line
     Promise.all([this.request("https://webaudiomodules.org/repository.json"), 
-                  this.request("https://mainline.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo => {
-                  //this.request("https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo => {
+                  //this.request("https://mainline.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo => {
+                  this.request("https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo => {
       for (var i = 0; i < repo.length; i++) {
         if (i == repo.length - 1) var lastrepo = true
         this.explorerepo(repo[i], lastrepo);
