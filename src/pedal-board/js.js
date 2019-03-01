@@ -557,6 +557,8 @@ class PedalBoard extends HTMLElement {
     for (var i = 0; i < this.pedals.length; i++) {
       this.pedals[i].updateJackPosition();
     }
+
+    window.dispatchEvent(new ResizeEvent());
   }
 
   resizeElements() {
