@@ -489,7 +489,7 @@ class PedalBoard extends HTMLElement {
   }
 
   connect(p1, p2, inputNumber) {
-
+    //TODO: faire en sorte de reconnaitre l'output sortie de la première pédale afin de selectionner le bon chemin
     // si p1_Out && p2_In existent (>1) alors la connexion est possible
     if (this.isConnexionPossible(p1.nbNodeOut, p2.nbNodeIn)) {
       let j = new Jack();
