@@ -488,23 +488,28 @@ class PedalBoard extends HTMLElement {
     return /*((typeof _nbNodeOut == "undefined" || (_nbNodeOut > 0)) &&*/ (typeof _nbNodeIn == "undefined" || (_nbNodeIn > 0))/*)*/;
   }
 
-  connect(p1, p2, inputNumber) {
+  connect(p1, p2, inputNumber, outputNumber) {
     //TODO: faire en sorte de reconnaitre l'output sortie de la première pédale afin de selectionner le bon chemin
     // si p1_Out && p2_In existent (>1) alors la connexion est possible
     if (this.isConnexionPossible(p1.nbNodeOut, p2.nbNodeIn)) {
       let j = new Jack();
       console.log(inputNumber);
+      console.log(outputNumber);
       if (inputNumber) p2.bestInputNumber = inputNumber;
-      j.connexion(p1, p2, p2.bestInputNumber);
+      if (outputNumber) p1.bestOutputNumber = outputNumber;
+      j.connexion(p1, p2, p2.bestInputNumber, p1.bestOutputNumber);
       p1.addJackAtOutput(j);
       p2.addJackAtInput(j);
       if (inputNumber) this.soundNodeConnection(p1, p2, inputNumber);
       else this.soundNodeConnection(p1, p2);
 
+      if (outputNumber) this.soundNodeConnection(p1, p2, inputNumber, outputNumber);
+      else this.soundNodeConnection(p1, p2);
+
       // add connexion for "this.pluginConnected"
       this.pluginConnected.push({
 
-        in: { id: p2.id, inputnumber: p2.bestInputNumber }, out: p1.id
+        in: { id: p2.id, inputnumber: p2.bestInputNumber }, out: {id: p1.id, outputNumber : p1.bestOutputNumber}
       });
     }
     console.log(this.pluginConnected);
