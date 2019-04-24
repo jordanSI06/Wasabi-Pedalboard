@@ -393,6 +393,11 @@ class PedalBoard extends HTMLElement {
     this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
   }
 
+
+  openMultiTrack(){
+    this.shadowRoot.querySelector("#divMultiTrack").classList.toggle("hidden");
+  }
+  
   clearPedalboard() {
     let size = this.pedals.length - 1;
     for (let i = size; i >= 0; i--) {
