@@ -287,6 +287,16 @@ input[type=range]::-webkit-slider-thumb {
 
   padding: 10px;
 }
+
+#divMultiTrack{
+  top:44px;
+  background: #222;
+  position: absolute;
+  right:0px;
+
+  padding: 10px;
+}
+
 .select_devices {
   border: 1px solid #555;
 

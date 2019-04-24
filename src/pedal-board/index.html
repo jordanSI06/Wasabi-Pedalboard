@@ -1,6 +1,7 @@
 <link rel="import" href="./src/wc-tabspedals">
 <link rel="import" href="./src/wc-audio">
 <link rel="import" href="./src/wc-save">
+<link rel="import" href="./src/wc-multitrack">
 <template>
   <link rel="stylesheet" href="./src/pedal-board/css.css">
   <style>
@@ -141,6 +142,11 @@
         <!-- AUDIO -->
         <div id="divAudioPlayer" class="hidden">
           <wc-audio id="wc-audio"></wc-audio>
+        </div>
+
+        <!-- Multitrack -->
+        <div id="divMultiTrack">
+          <wc-multitrack id="wc-multitrack"></wc-multitrack>
         </div>
 
         <div id="divSoundIn" class="hidden">

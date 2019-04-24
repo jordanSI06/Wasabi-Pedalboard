@@ -324,7 +324,7 @@ class PedalBoard extends HTMLElement {
       if (!this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.contains("hidden")) this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
       this.openMultiTrack();
     }
-    
+
     this.shadowRoot.querySelector('#bt_fullScreen').onclick = (e) => {
       this.openFullScreen();
     }
@@ -394,10 +394,10 @@ class PedalBoard extends HTMLElement {
   }
 
 
-  openMultiTrack(){
-    this.shadowRoot.querySelector("#divMultiTrack").classList.toggle("hidden");
+  openMultiTrack() {
+    this.shadowRoot.querySelector("#divMultiTrack").classList.toggle('hidden');
   }
-  
+
   clearPedalboard() {
     let size = this.pedals.length - 1;
     for (let i = size; i >= 0; i--) {
