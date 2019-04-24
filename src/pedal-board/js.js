@@ -165,9 +165,9 @@ class PedalBoard extends HTMLElement {
     this.nbrcat = 0;
 
     // to add another repository  : Uncomment the promise.all block, set the urls and comment the "this.request" line
-    Promise.all([this.request("https://webaudiomodules.org/repository.json"), 
-                  //this.request("https://mainline.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo => {
-                  this.request("https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo => {
+    Promise.all([this.request("https://webaudiomodules.org/repository.json"),
+    //this.request("https://mainline.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo => {
+    this.request("https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json")]).then(repo => {
       for (var i = 0; i < repo.length; i++) {
         if (i == repo.length - 1) var lastrepo = true
         this.explorerepo(repo[i], lastrepo);
@@ -318,6 +318,13 @@ class PedalBoard extends HTMLElement {
 
     }
 
+    this.shadowRoot.querySelector('#bt_multiTrack').onclick = (e) => {
+      if (!this.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
+      if (!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
+      if (!this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.contains("hidden")) this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
+      this.openMultiTrack();
+    }
+    
     this.shadowRoot.querySelector('#bt_fullScreen').onclick = (e) => {
       this.openFullScreen();
     }
@@ -327,11 +334,11 @@ class PedalBoard extends HTMLElement {
     }
 
     this.shadowRoot.querySelector('#bt_zoom_in').onclick = (e) => {
-      if (this.zoomindex < this.zoomtab.length-1) {
+      if (this.zoomindex < this.zoomtab.length - 1) {
         this.zoomindex++;
         this.zoom = this.zoomtab[this.zoomindex];
         this.doZoom();
-      }else console.log("You cannot zoom in more");
+      } else console.log("You cannot zoom in more");
 
     }
 
@@ -340,7 +347,7 @@ class PedalBoard extends HTMLElement {
         this.zoomindex--;
         this.zoom = this.zoomtab[this.zoomindex];
         this.doZoom();
-      }else console.log("You cannot zoom out more");
+      } else console.log("You cannot zoom out more");
     }
 
     this.shadowRoot.querySelector('#bt_stereo').onclick = (e) => {
@@ -509,7 +516,7 @@ class PedalBoard extends HTMLElement {
       // add connexion for "this.pluginConnected"
       this.pluginConnected.push({
 
-        in: { id: p2.id, inputnumber: p2.bestInputNumber }, out: {id: p1.id, outputNumber : p1.bestOutputNumber}
+        in: { id: p2.id, inputnumber: p2.bestInputNumber }, out: { id: p1.id, outputNumber: p1.bestOutputNumber }
       });
     }
     console.log(this.pluginConnected);
@@ -563,7 +570,7 @@ class PedalBoard extends HTMLElement {
       this.pedals[i].updateJackPosition();
     }
 
-    
+
   }
 
   resizeElements() {
@@ -639,7 +646,7 @@ class PedalBoard extends HTMLElement {
       }
 
       let distInput = [];
-      let distMinToInputForHighlight = 20*this.zoom;
+      let distMinToInputForHighlight = 20 * this.zoom;
 
       for (var i = 0; i < iPos.xpos.length; i++) {
 
@@ -650,7 +657,7 @@ class PedalBoard extends HTMLElement {
            */
 
           distInput[i] = this.distance(x, y, iPos.xpos[i] - 100 * this.zoom, iPos.ypos[i]);
-          distMinToInputForHighlight = 40*this.zoom;
+          distMinToInputForHighlight = 40 * this.zoom;
         } else {
           // regular case, we're just pointing the mouse around
           distInput[i] = this.distance(x, y, iPos.xpos[i], iPos.ypos[i]);

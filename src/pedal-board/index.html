@@ -28,8 +28,9 @@
         <div id="div_setIO">
           <!-- I : width="40" height="40"  diameter="24" -->
           <div class="row">
-            <webaudio-knob id="knob_In" class="knob" min="0" max="1" sprites="99" value="100" step="0.01" midilearn="true" src="./img/knobs/nux_black_white_stripe.png"
-              width="30" height="30" diameter="24"></webaudio-knob>
+            <webaudio-knob id="knob_In" class="knob" min="0" max="1" sprites="99" value="100" step="0.01"
+              midilearn="true" src="./img/knobs/nux_black_white_stripe.png" width="30" height="30" diameter="24">
+            </webaudio-knob>
             <div class="column" title="gain">
               <span class="span_gainLevel">input</span>
               <canvas id="meter1" width="100" height="10"></canvas>
@@ -38,8 +39,9 @@
           </div>
           <!-- O -->
           <div class="row">
-            <webaudio-knob id="knob_Out" class="knob" min="0" max="2.5" value="1" sprites="99" value="100" step="0.01" midilearn="true"
-              src="./img/knobs/nux_black_white_stripe.png" width="30" height="30" diameter="24"></webaudio-knob>
+            <webaudio-knob id="knob_Out" class="knob" min="0" max="2.5" value="1" sprites="99" value="100" step="0.01"
+              midilearn="true" src="./img/knobs/nux_black_white_stripe.png" width="30" height="30" diameter="24">
+            </webaudio-knob>
             <div class="column" title="gain">
               <span class="span_gainLevel">output</span>
               <canvas id="meter2" width="100" height="10"></canvas>
@@ -81,6 +83,12 @@
             </button>
           </wc-save>
 
+          <!-- MultiTrack -->
+          <button id="bt_multiTrack" title="Open MultiTrack" class="tooltip">
+            <iron-icon icon="icons:view-list"></iron-icon>
+            <span class="tooltiptext">Open the MultiTrack</span>
+          </button>
+
           <!-- Clear -->
           <button id="bt_clearPedalboard" title="Clear" class="tooltip">
             <iron-icon icon="icons:delete"></iron-icon>
@@ -90,7 +98,8 @@
           <span>-</span>
 
 
-          <a href='http://wasabihome.i3s.unice.fr/webaudio-plugin-proposal/' id="bt_Doc" title="Documentation" target='_blank' class="tooltip">
+          <a href='http://wasabihome.i3s.unice.fr/webaudio-plugin-proposal/' id="bt_Doc" title="Documentation"
+            target='_blank' class="tooltip">
             <iron-icon icon="icons:help"></iron-icon>
             <span class="tooltiptext">Online documentation</span>
           </a>
@@ -99,13 +108,14 @@
             <span class="tooltiptext">See plugins available</span>
           </a>
 
-          <a title="More information" href='http://sparks-vm31.i3s.unice.fr/toolsdemos/' id="bt_viewBlog" title="More infos" target='_blank'
-            class="tooltip">
+          <a title="More information" href='http://sparks-vm31.i3s.unice.fr/toolsdemos/' id="bt_viewBlog"
+            title="More infos" target='_blank' class="tooltip">
             <iron-icon icon="icons:book"></iron-icon>
             <span class="tooltiptext">More infos</span>
           </a>
 
-          <a title="Source Code on Github" href="https://github.com/guizmo2000/TER-Pedalboard-creation/tree/dynamicLoading" target='_blank'
+          <a title="Source Code on Github"
+            href="https://github.com/guizmo2000/TER-Pedalboard-creation/tree/dynamicLoading" target='_blank'
             class="tooltip">
             <iron-icon icon="social:share"></iron-icon>
             <span class="tooltiptext">Source code</span>
@@ -136,15 +146,17 @@
         <div id="divSoundIn" class="hidden">
           <span class="span_tuto">Click learn, play loudly, gain will be adjusted</span>
           <div class="select_devices">
-            <webaudio-switch src="img/switch_toggle.png" class="id" id="mic" height="28" width="40" alt="Activate sound input" title="Click to enable sound input"></webaudio-switch>
+            <webaudio-switch src="img/switch_toggle.png" class="id" id="mic" height="28" width="40"
+              alt="Activate sound input" title="Click to enable sound input"></webaudio-switch>
             <span id="span_time" class="span_time">4s</span>
             <button id="bt_learn">Learn</button>
             <select id="select_audioinput" title="Devices"></select>
           </div>
 
           <div class="row">
-            <webaudio-knob id="knob_In_UserMedia" class="knob" min="0" max="1" sprites="99" value="1" step="0.01" midilearn="true" src="./img/knobs/nux_black_white_stripe.png"
-              width="40" height="40" data-role="time" diameter="24"></webaudio-knob>
+            <webaudio-knob id="knob_In_UserMedia" class="knob" min="0" max="1" sprites="99" value="1" step="0.01"
+              midilearn="true" src="./img/knobs/nux_black_white_stripe.png" width="40" height="40" data-role="time"
+              diameter="24"></webaudio-knob>
             <div class="column" title="gain">
               <span class="span_gainLevel">input</span>
               <canvas id="meter3" width="100" height="10"></canvas>
