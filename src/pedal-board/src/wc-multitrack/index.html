@@ -1,12 +1,13 @@
 <template>
     <link rel="stylesheet" href="./src/pedal-board/src/wc-multitrack/css.css">
-  
+    <link rel="stylesheet" href="./src/pedal-board/src/wc-multitrack/css.css">
     <div id="div_app">
       <div class="div_app_multitrack">
-        <label id="label-input-file" for="input-file">
-          <iron-icon icon="icons:file-upload"></iron-icon>
-        </label>
-        <select id="select_audio"></select>
+        <main>
+            <p><button id="record" disabled>Record audio</button> <button id="stop" disabled>Stop</button></p>
+            <canvas  width="800" height="100"></canvas>
+            <button onclick="download(event)">Download</button>
+          </main>
       </div>
     </div>
   </template>
