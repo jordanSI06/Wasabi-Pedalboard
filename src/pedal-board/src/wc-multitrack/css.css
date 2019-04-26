@@ -1,5 +1,37 @@
+@import "compass/css3";
+
 canvas {
 	display: block;
 	background: #efefef;
   border:1px solid;
+  height: 100px;
+  width: 95%;
+  margin-left: 10px;
+}
+
+button img { 
+  width: 25px;
+  height: 25px;
+}
+
+button {
+  border: 0px;
+  background-color : white;
+}
+
+.flex-container {
+
+  list-style: none;
+  display: flex;
+  align-content: flex-start;
+}
+
+#can {
+  height : 100px;
+  width : 95%;
+}
+
+#test {
+ width : 100px;
+  height : 100px;
 }

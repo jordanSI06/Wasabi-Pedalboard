@@ -1,13 +1,17 @@
 <template>
     <link rel="stylesheet" href="./src/pedal-board/src/wc-multitrack/css.css">
-    <link rel="stylesheet" href="./src/pedal-board/src/wc-multitrack/css.css">
     <div id="div_app">
       <div class="div_app_multitrack">
         <main>
-            <p><button id="record" disabled>Record audio</button> <button id="stop" disabled>Stop</button></p>
-            <canvas  width="800" height="100"></canvas>
-            <button id="download">Download</button>
-          </main>
+          <ul class="flex-container">
+            <li class="flex-item"> 
+              <button id="record" disabled><img src="./src/pedal-board/src/wc-multitrack/rec.png"></button></br>
+              <button id="stop" disabled><img src="./src/pedal-board/src/wc-multitrack/stop.png"></button></br>
+              <button id="download"><img src="./src/pedal-board/src/wc-multitrack/dl.png"></button>
+            </li>
+            <li d="can"><canvas width="2000" height="100"></canvas></li>
+          </ul>
+        </main>
       </div>
     </div>
   </template>
