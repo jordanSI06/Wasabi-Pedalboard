@@ -165,7 +165,7 @@
 
     download() {
       let parent = this;
-      this.blob = new Blob(this.recordedBlobs, { type: 'audio/wav' });
+      //this.blob = new Blob(this.recordedBlobs, { type: 'audio/wav' });
       this.url = window.URL.createObjectURL(this.blob);
       this.link = document.createElement('a');
       this.link.style.display = 'none';
