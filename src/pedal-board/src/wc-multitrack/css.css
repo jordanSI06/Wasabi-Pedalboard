@@ -3,8 +3,7 @@ canvas {
 	background: #efefef;
   border:1px solid;
   height: 100px;
-  width: 95%;
-  margin-left: 10px;
+	width: 95%;
 }
 
 button img { 

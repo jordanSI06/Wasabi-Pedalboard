@@ -197,11 +197,11 @@
 
       this.bufferLength = data.length;
 
-      context.fillStyle = 'rgb(255, 255, 255)';
+      context.fillStyle = 'rgb(239, 239, 239)';
       context.fillRect(0, 0, canvasWidth, canvasHeigth);
 
       context.lineWidth = 1;
-      context.strokeStyle = 'rgb(0, 0, 0)';
+      context.strokeStyle = 'rgb(0, 40, 122)';
 
       context.beginPath();
 
