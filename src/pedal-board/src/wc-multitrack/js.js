@@ -15,7 +15,6 @@
       this.gc = GlobalContext;
 
       //Graphic Element
-      const parent = this;
       this.recordButton;
       this.stopButton;
       this.dlButton;
@@ -23,6 +22,7 @@
 
       //Audio element
       this.ac = new AudioContext();
+      this.dest= this.ac.createMediaStreamDestination();
       this.recorder;
       this.limiter = this.ac.createDynamicsCompressor();
       this.limiter.connect(this.ac.destination);
@@ -197,11 +197,11 @@
 
       this.bufferLength = data.length;
 
-      context.fillStyle = 'rgb(239, 239, 239)';
+      context.fillStyle = 'rgb(85, 85, 85)';
       context.fillRect(0, 0, canvasWidth, canvasHeigth);
 
       context.lineWidth = 1;
-      context.strokeStyle = 'rgb(0, 40, 122)';
+      context.strokeStyle = 'rgb(205, 205, 205)';
 
       context.beginPath();
 

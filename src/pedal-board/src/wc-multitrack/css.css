@@ -1,7 +1,7 @@
 canvas {
 	display: block;
-	background: #efefef;
-  border:1px solid;
+	background: rgb(85, 85, 85);
+  border:2px solid rgb(135, 135, 135);
   height: 100px;
 	width: 95%;
 }
@@ -13,7 +13,7 @@ button img {
 
 button {
   border: 0px;
-  background-color : white;
+  background-color : #333;
 }
 
 .flex-container {
