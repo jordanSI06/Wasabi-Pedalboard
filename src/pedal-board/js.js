@@ -115,6 +115,12 @@ class PedalBoard extends HTMLElement {
 
     this.soundSample = shadowRoot.querySelector('wc-audio').shadowRoot.querySelector('audio');
 
+    // Get the multitrack component
+    this.multitrackPlayer = shadowRoot.querySelector('wc-multitrack')
+    
+
+
+
     this.w = this.offsetWidth;
     this.wO = this.w;
 
@@ -1301,8 +1307,12 @@ class PedalBoard extends HTMLElement {
     // The meter3 (user media on mic wc-audio) display the sound amplitude of gainUserMedia
     this.sound.gainUserMedia.connect(this.meter3);
 
-
-
+    // Multitrack player
+    // Connect PD main output to Multitrack player input
+    this.sound.gainNodeOut.connect(this.multitrackPlayer.getInput());
+    // connect multitrack player output to main media gain
+    this.multitrackPlayer.getOutput().connect(this.sound.audioDestination);
+    
     if (navigator.mediaDevices.getUserMedia) {
       var constraints = {
         audio: {

@@ -12,7 +12,22 @@
       super();
 
       //Global Context of Pedalboard
-      this.gc = GlobalContext;
+      this.ac = GlobalContext.context;
+
+      // Graph node creation
+      this.input= this.ac.createGain();
+      this.input.gain.value = 0;
+      this.output= this.ac.createGain();
+      //this.limiter = this.ac.createDynamicsCompressor();
+
+      // For mediaRecording
+      this.dest = this.ac.createMediaStreamDestination();
+
+      // build graph
+      //this.input.connect(this.limiter);
+      //this.limiter.connect(this.output);
+      this.input.connect(this.output);
+      this.output.connect(this.dest); // associated to MediaRecorder
 
       //Graphic Element
       this.recordButton;
@@ -20,13 +35,7 @@
       this.dlButton;
       this.canvas;
 
-      //Audio element
-      this.ac = new AudioContext();
-      this.dest= this.ac.createMediaStreamDestination();
-      this.recorder;
-      this.limiter = this.ac.createDynamicsCompressor();
-      this.limiter.connect(this.ac.destination);
-
+     
       //File element
       this.blob;
       this.recordedBlobs = [];
@@ -44,6 +53,14 @@
 
     }
 
+    getInput() {
+      return this.input;
+
+    }
+    getOutput() {
+      return this.output;
+
+    }
     get is() { return this.nodeName.toLowerCase(); }
 
     // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
@@ -89,7 +106,7 @@
           parent.recordButton.addEventListener('click', parent.startRecording.bind(parent));
           parent.stopButton.addEventListener('click', parent.stopRecording.bind(parent));
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
-          parent.recorder = new MediaRecorder(stream);
+          parent.recorder = new MediaRecorder(parent.dest.stream);
           parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
 
           console.log('recorder is ready');
@@ -99,6 +116,7 @@
 
     startRecording() {
       console.log('start recording');
+      this.input.gain.value = 1;
       this.recordButton.disabled = true;
       this.stopButton.disabled = false;
 
@@ -109,6 +127,7 @@
 
     stopRecording() {
       console.log('stop recording');
+      this.input.gain.value = 0;
       this.recordButton.disabled = false;
       this.stopButton.disabled = true;
 
@@ -150,7 +169,8 @@
       this.bufferSourceNode = this.ac.createBufferSource();
       //this.bufferSourceNode.loop = true;
       this.bufferSourceNode.buffer = sample;
-      this.bufferSourceNode.connect(this.limiter);
+      this.bufferSourceNode.loop = true;
+      this.bufferSourceNode.connect(this.output);
       this.bufferSourceNode.start();
 
       this.data = [];
