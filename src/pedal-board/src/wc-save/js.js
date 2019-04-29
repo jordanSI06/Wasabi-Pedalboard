@@ -157,6 +157,7 @@
       this.bt_openDialog.onclick = (e) => {
         if (!this.pedalboard.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.pedalboard.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
         if (!this.pedalboard.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.pedalboard.shadowRoot.querySelector('#divSoundIn').classList.toggle('hidden');
+        if (!this.pedalboard.shadowRoot.querySelector("#divMultiTrack").classList.contains("hidden")) this.pedalboard.shadowRoot.querySelector("#divMultiTrack").classList.toggle("hidden");
         this.openDialog();
       };
       this.bt_saveBank.onclick = (e) => this.addNewBank();

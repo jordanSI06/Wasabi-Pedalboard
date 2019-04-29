@@ -299,6 +299,7 @@ class PedalBoard extends HTMLElement {
     this.shadowRoot.querySelector('#bt_openMicroDevices').onclick = (e) => {
       if (!this.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
       if (!this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.contains("hidden")) this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
+      if (!this.shadowRoot.querySelector("#divMultiTrack").classList.contains("hidden")) this.shadowRoot.querySelector("#divMultiTrack").classList.toggle("hidden");
       this.openMediaDevices();
     }
     this.shadowRoot.querySelector('#bt_openMicroDevices').onmouseover = (e) => {
@@ -308,6 +309,7 @@ class PedalBoard extends HTMLElement {
     this.shadowRoot.querySelector('#bt_openAudio').onclick = (e) => {
       if (!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
       if (!this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.contains("hidden")) this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
+      if (!this.shadowRoot.querySelector("#divMultiTrack").classList.contains("hidden")) this.shadowRoot.querySelector("#divMultiTrack").classList.toggle("hidden");
       this.openAudioPlayer();
     }
 
@@ -315,7 +317,6 @@ class PedalBoard extends HTMLElement {
       if (!this.shadowRoot.querySelector("#divAudioPlayer").classList.contains("hidden")) this.shadowRoot.querySelector('#divAudioPlayer').classList.toggle('hidden');
       if (!this.shadowRoot.querySelector("#divSoundIn").classList.contains("hidden")) this.shadowRoot.querySelector("#divSoundIn").classList.toggle("hidden");
       if (!this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.contains("hidden")) this.shadowRoot.querySelector("wc-save").shadowRoot.querySelector('#div_dialog').classList.toggle('hidden');
-
     }
 
     this.shadowRoot.querySelector('#bt_multiTrack').onclick = (e) => {
