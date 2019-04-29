@@ -169,7 +169,7 @@
       this.bufferSourceNode = this.ac.createBufferSource();
       //this.bufferSourceNode.loop = true;
       this.bufferSourceNode.buffer = sample;
-      this.bufferSourceNode.loop = true;
+      //this.bufferSourceNode.loop = true;
       this.bufferSourceNode.connect(this.output);
       this.bufferSourceNode.start();
 
