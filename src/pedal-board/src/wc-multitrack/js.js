@@ -143,14 +143,18 @@
     }
 
     playingTrack() {
-      if(this.statePlay==false){
-        this.bufferSourceNode.connect(this.output);
-        this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/pause.png')
-      }else if(this.statePlay==true){
-        this.bufferSourceNode.disconnect(this.output);
-        this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/play.png')
+      if(this.bufferSourceNode && this.stateRecord==false){
+        if(this.statePlay==false){
+          this.bufferSourceNode.connect(this.output);
+          this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/pause.png');
+        }else if(this.statePlay==true){
+          this.bufferSourceNode.disconnect(this.output);
+          this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/play.png');
+        }
+        this.statePlay=!this.statePlay;
+      }else{
+        console.warn("You cannot play/pause! (There's no file or the track is recording");
       }
-      this.statePlay=!this.statePlay;
     }
 
 
@@ -194,6 +198,7 @@
       this.bufferSourceNode.loop = true;
       this.bufferSourceNode.connect(this.output);
       this.bufferSourceNode.start();
+      this.statePlay=false;
       this.bufferSourceNode.disconnect(this.output);
 
       this.data = [];
