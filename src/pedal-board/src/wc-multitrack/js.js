@@ -134,12 +134,7 @@
         this.recorder.stop()
         this.buttonStopImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/rec.png');
       }
-      this.stateRecord=!this.stateRecord;
-    }
-
-    stopSample() {
-      console.log('record something');
-      this.startRecording();
+      this.stateRecord = !this.stateRecord;
     }
 
     onRecordingReady(e) {
@@ -187,20 +182,25 @@
     }
 
     download() {
-      let parent = this;
-      //this.blob = new Blob(this.recordedBlobs, { type: 'audio/wav' });
-      this.url = window.URL.createObjectURL(this.blob);
-      this.link = document.createElement('a');
-      this.link.style.display = 'none';
-      this.link.href = this.url;
-      this.link.download = "track.wav";
-      document.body.appendChild(this.link);
-      this.link.click();
+      if (this.stateRecord == false && this.bufferSourceNode) {
+        let parent = this;
+        //this.blob = new Blob(this.recordedBlobs, { type: 'audio/wav' });
+        this.url = window.URL.createObjectURL(this.blob);
+        this.link = document.createElement('a');
+        this.link.style.display = 'none';
+        this.link.href = this.url;
+        this.link.download = "track.wav";
+        document.body.appendChild(this.link);
+        this.link.click();
 
-      setTimeout(function () {
-        document.body.removeChild(parent.link);
-        window.URL.revokeObjectURL(parent.url);
-      }, 100);
+        setTimeout(function () {
+          document.body.removeChild(parent.link);
+          window.URL.revokeObjectURL(parent.url);
+        }, 100);
+      }else{
+        console.warn("You cannot download now! (File doesn't exist or the track is recording)")
+      }
+
     }
 
     stopSample() {
@@ -224,7 +224,7 @@
       this.title = nameTitle;
     }
 
-    clearCanvas(){
+    clearCanvas() {
       let context = this.canvas.getContext('2d');
       let canvasWidth = this.canvas.width;
       let canvasHeigth = this.canvas.height;
