@@ -144,10 +144,10 @@
 
     playingTrack() {
       if(this.statePlay==false){
-        this.bufferSourceNode.context.resume();
+        this.bufferSourceNode.connect(this.output);
         this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/pause.png')
       }else if(this.statePlay==true){
-        this.bufferSourceNode.context.suspend();
+        this.bufferSourceNode.disconnect(this.output);
         this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/play.png')
       }
       this.statePlay=!this.statePlay;
@@ -193,7 +193,8 @@
       this.bufferSourceNode.buffer = sample;
       this.bufferSourceNode.loop = true;
       this.bufferSourceNode.connect(this.output);
-      //this.bufferSourceNode.start();
+      this.bufferSourceNode.start();
+      this.bufferSourceNode.disconnect(this.output);
 
       this.data = [];
       this.channelData = sample.getChannelData(0);
