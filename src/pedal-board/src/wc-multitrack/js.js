@@ -33,6 +33,7 @@
       this.recordButton;
       this.stopButton;
       this.dlButton;
+      this.volumeRange;
       this.canvas;
 
      
@@ -46,11 +47,6 @@
       this.channelData;
       this.url;
       this.link;
-
-      this.params = {
-
-      }
-
     }
 
     getInput() {
@@ -96,7 +92,8 @@
       let parent = this;
       this.recordButton = this.shadowRoot.querySelector('#record');
       this.stopButton = this.shadowRoot.querySelector('#stop');
-      this.dlButton = this.shadowRoot.querySelector('#download')
+      this.dlButton = this.shadowRoot.querySelector('#download');
+      this.volumeRange=this.shadowRoot.querySelector('#volume')
       this.canvas = this.shadowRoot.querySelector('canvas');
       navigator.mediaDevices.getUserMedia({
         audio: true
@@ -106,6 +103,7 @@
           parent.recordButton.addEventListener('click', parent.startRecording.bind(parent));
           parent.stopButton.addEventListener('click', parent.stopRecording.bind(parent));
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
+          parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
           parent.recorder = new MediaRecorder(parent.dest.stream);
           parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
 
@@ -167,9 +165,8 @@
       }
 
       this.bufferSourceNode = this.ac.createBufferSource();
-      //this.bufferSourceNode.loop = true;
       this.bufferSourceNode.buffer = sample;
-      //this.bufferSourceNode.loop = true;
+      this.bufferSourceNode.loop = true;
       this.bufferSourceNode.connect(this.output);
       this.bufferSourceNode.start();
 
@@ -206,6 +203,13 @@
         this.bufferSourceNode.stop();
         this.bufferSourceNode.disconnect();
         this.bufferSourceNode = undefined;
+      }
+    }
+
+    changeVolume(e){
+      let volume= e.target.value /100
+      if(this.bufferSourceNode){
+        this.output.gain.value=volume;
       }
     }
 
