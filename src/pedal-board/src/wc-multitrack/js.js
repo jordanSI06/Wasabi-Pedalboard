@@ -129,6 +129,9 @@
         this.input.gain.value = 1;
         this.stopSample();
         this.clearCanvas();
+        this.statePlay=false;
+        this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/play.png');
+
         this.recorder.start();
         this.buttonStopImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/stop.png');
       }
@@ -198,7 +201,6 @@
       this.bufferSourceNode.loop = true;
       this.bufferSourceNode.connect(this.output);
       this.bufferSourceNode.start();
-      this.statePlay=false;
       this.bufferSourceNode.disconnect(this.output);
 
       this.data = [];
