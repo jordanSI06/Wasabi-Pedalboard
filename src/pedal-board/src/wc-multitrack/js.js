@@ -15,9 +15,9 @@
       this.ac = GlobalContext.context;
 
       // Graph node creation
-      this.input= this.ac.createGain();
+      this.input = this.ac.createGain();
       this.input.gain.value = 0;
-      this.output= this.ac.createGain();
+      this.output = this.ac.createGain();
       //this.limiter = this.ac.createDynamicsCompressor();
 
       // For mediaRecording
@@ -30,13 +30,17 @@
       this.output.connect(this.dest); // associated to MediaRecorder
 
       //Graphic Element
+      this.title;
       this.recordButton;
       this.stopButton;
       this.dlButton;
       this.volumeRange;
       this.canvas;
 
-     
+      this.buttonStopImg;
+      this.stateRecord = false;
+
+
       //File element
       this.blob;
       this.recordedBlobs = [];
@@ -90,18 +94,20 @@
 
       //Extract attribute
       let parent = this;
+      this.title = this.shadowRoot.querySelector('#nameTrack')
       this.recordButton = this.shadowRoot.querySelector('#record');
       this.stopButton = this.shadowRoot.querySelector('#stop');
+      this.buttonStopImg = this.shadowRoot.querySelector('#btn_stop_img');
       this.dlButton = this.shadowRoot.querySelector('#download');
-      this.volumeRange=this.shadowRoot.querySelector('#volume')
+      this.volumeRange = this.shadowRoot.querySelector('#volume')
       this.canvas = this.shadowRoot.querySelector('canvas');
       navigator.mediaDevices.getUserMedia({
         audio: true
       })
         .then(function (stream) {
-          parent.recordButton.disabled = false;
-          parent.recordButton.addEventListener('click', parent.startRecording.bind(parent));
-          parent.stopButton.addEventListener('click', parent.stopRecording.bind(parent));
+          //parent.title.addEventListener('click', parent.changeTitle.bind(parent));
+          parent.recordButton.addEventListener('click', parent.recordingTrack.bind(parent));
+          //parent.stopButton.addEventListener('click', parent.stopRecording.bind(parent));
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
           parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
           parent.recorder = new MediaRecorder(parent.dest.stream);
@@ -112,25 +118,25 @@
     }
     // ----- METHODS: CUSTOM -----
 
-    startRecording() {
+    recordingTrack() {
       console.log('start recording');
-      this.input.gain.value = 1;
-      this.recordButton.disabled = true;
-      this.stopButton.disabled = false;
+      if (this.stateRecord == false) {
+        this.input.gain.value = 1;
+        this.stopSample();
+        this.clearCanvas();
+        this.recorder.start();
+        this.buttonStopImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/stop.png');
+      }
+      if (this.stateRecord == true) {
+        console.log('stop recording');
+        this.input.gain.value = 0;
 
-      this.stopSample();
-
-      this.recorder.start();
+        this.recorder.stop()
+        this.buttonStopImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/rec.png');
+      }
+      this.stateRecord=!this.stateRecord;
     }
 
-    stopRecording() {
-      console.log('stop recording');
-      this.input.gain.value = 0;
-      this.recordButton.disabled = false;
-      this.stopButton.disabled = true;
-
-      this.recorder.stop()
-    }
     stopSample() {
       console.log('record something');
       this.startRecording();
@@ -187,7 +193,7 @@
       this.link = document.createElement('a');
       this.link.style.display = 'none';
       this.link.href = this.url;
-      this.link.download = 'pedalboard_song.wav';
+      this.link.download = "track.wav";
       document.body.appendChild(this.link);
       this.link.click();
 
@@ -206,11 +212,30 @@
       }
     }
 
-    changeVolume(e){
-      let volume= e.target.value /100
-      if(this.bufferSourceNode){
-        this.output.gain.value=volume;
+    changeVolume(e) {
+      this.volume = e.target.value / 100
+      if (this.bufferSourceNode) {
+        this.output.gain.value = this.volume;
       }
+    }
+
+    changeTitle() {
+      let nameTitle = prompt("Enter the new title of your track");
+      this.title = nameTitle;
+    }
+
+    clearCanvas(){
+      let context = this.canvas.getContext('2d');
+      let canvasWidth = this.canvas.width;
+      let canvasHeigth = this.canvas.height;
+
+      context.fillStyle = 'rgb(85, 85, 85)';
+      context.fillRect(0, 0, canvasWidth, canvasHeigth);
+
+      context.lineWidth = 1;
+      context.strokeStyle = 'rgb(205, 205, 205)';
+
+      context.beginPath();
     }
 
     RenderWave(canvas, data) {

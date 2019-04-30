@@ -6,6 +6,21 @@ canvas {
 	width: 95%;
 }
 
+li.flex-item {
+  border:2px solid rgb(135, 135, 135);
+  height:100px;
+}
+
+#nameTrack{
+  color:white;
+  font-weight: bold;
+}
+
+#buttonList{
+  display: flex;
+  align-content: flex-start;
+}
+
 button img { 
   width: 25px;
   height: 25px;
