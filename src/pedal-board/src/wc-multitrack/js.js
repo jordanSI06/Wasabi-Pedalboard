@@ -36,10 +36,12 @@
       this.dlButton;
       this.volumeRange;
       this.canvas;
+      this.playButton;
 
       this.buttonStopImg;
+      this.buttonPlayImg;
       this.stateRecord = false;
-
+      this.statePlay = false;
 
       //File element
       this.blob;
@@ -97,7 +99,9 @@
       this.title = this.shadowRoot.querySelector('#nameTrack')
       this.recordButton = this.shadowRoot.querySelector('#record');
       this.stopButton = this.shadowRoot.querySelector('#stop');
+      this.playButton = this.shadowRoot.querySelector('#play');
       this.buttonStopImg = this.shadowRoot.querySelector('#btn_stop_img');
+      this.buttonPlayImg = this.shadowRoot.querySelector('#btn_play_img');
       this.dlButton = this.shadowRoot.querySelector('#download');
       this.volumeRange = this.shadowRoot.querySelector('#volume')
       this.canvas = this.shadowRoot.querySelector('canvas');
@@ -110,6 +114,7 @@
           //parent.stopButton.addEventListener('click', parent.stopRecording.bind(parent));
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
           parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
+          parent.playButton.addEventListener('click', parent.playingTrack.bind(parent));
           parent.recorder = new MediaRecorder(parent.dest.stream);
           parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
 
@@ -125,17 +130,29 @@
         this.stopSample();
         this.clearCanvas();
         this.recorder.start();
-        this.buttonStopImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/stop.png');
+        this.buttonStopImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/stop.png');
       }
       if (this.stateRecord == true) {
         console.log('stop recording');
         this.input.gain.value = 0;
 
         this.recorder.stop()
-        this.buttonStopImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/rec.png');
+        this.buttonStopImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/rec.png');
       }
-      this.stateRecord=!this.stateRecord;
+      this.stateRecord = !this.stateRecord;
     }
+
+    playingTrack() {
+      if(this.statePlay==false){
+        this.bufferSourceNode.context.resume();
+        this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/pause.png')
+      }else if(this.statePlay==true){
+        this.bufferSourceNode.context.suspend();
+        this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/play.png')
+      }
+      this.statePlay=!this.statePlay;
+    }
+
 
     stopSample() {
       console.log('record something');
@@ -164,6 +181,8 @@
       this.fileReader.readAsArrayBuffer(this.blob);
     }
 
+
+
     useSample(sample) {
       if (this.bufferSourceNode) {
         this.bufferSourceNode.stop();
@@ -174,7 +193,7 @@
       this.bufferSourceNode.buffer = sample;
       this.bufferSourceNode.loop = true;
       this.bufferSourceNode.connect(this.output);
-      this.bufferSourceNode.start();
+      //this.bufferSourceNode.start();
 
       this.data = [];
       this.channelData = sample.getChannelData(0);
@@ -224,7 +243,7 @@
       this.title = nameTitle;
     }
 
-    clearCanvas(){
+    clearCanvas() {
       let context = this.canvas.getContext('2d');
       let canvasWidth = this.canvas.width;
       let canvasHeigth = this.canvas.height;
