@@ -35,13 +35,17 @@
       this.stopButton;
       this.dlButton;
       this.volumeRange;
+      this.volume = 0.5;
+      this.mute;
       this.canvas;
       this.playButton;
+
 
       this.buttonStopImg;
       this.buttonPlayImg;
       this.stateRecord = false;
       this.statePlay = false;
+      this.muteSwitch = false;
 
       //File element
       this.blob;
@@ -103,7 +107,8 @@
       this.buttonStopImg = this.shadowRoot.querySelector('#btn_stop_img');
       this.buttonPlayImg = this.shadowRoot.querySelector('#btn_play_img');
       this.dlButton = this.shadowRoot.querySelector('#download');
-      this.volumeRange = this.shadowRoot.querySelector('#volume')
+      this.volumeRange = this.shadowRoot.querySelector('#volume');
+      this.mute = this.shadowRoot.querySelector('#mute');
       this.canvas = this.shadowRoot.querySelector('canvas');
       navigator.mediaDevices.getUserMedia({
         audio: true
@@ -115,6 +120,7 @@
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
           parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
           parent.playButton.addEventListener('click', parent.playingTrack.bind(parent));
+          parent.mute.addEventListener('click', parent.muteVolume.bind(parent));
           parent.recorder = new MediaRecorder(parent.dest.stream);
           parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
 
@@ -129,8 +135,8 @@
         this.input.gain.value = 1;
         this.stopSample();
         this.clearCanvas();
-        this.statePlay=false;
-        this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/play.png');
+        this.statePlay = false;
+        this.buttonPlayImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/play.png');
 
         this.recorder.start();
         this.buttonStopImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/stop.png');
@@ -146,16 +152,16 @@
     }
 
     playingTrack() {
-      if(this.bufferSourceNode && this.stateRecord==false){
-        if(this.statePlay==false){
+      if (this.bufferSourceNode && this.stateRecord == false) {
+        if (this.statePlay == false) {
           this.bufferSourceNode.connect(this.output);
-          this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/pause.png');
-        }else if(this.statePlay==true){
+          this.buttonPlayImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/pause.png');
+        } else if (this.statePlay == true) {
           this.bufferSourceNode.disconnect(this.output);
-          this.buttonPlayImg.setAttribute('src','./src/pedal-board/src/wc-multitrack/img/play.png');
+          this.buttonPlayImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/play.png');
         }
-        this.statePlay=!this.statePlay;
-      }else{
+        this.statePlay = !this.statePlay;
+      } else {
         console.warn("You cannot play/pause! (There's no file or the track is recording");
       }
     }
@@ -229,7 +235,7 @@
           document.body.removeChild(parent.link);
           window.URL.revokeObjectURL(parent.url);
         }, 100);
-      }else{
+      } else {
         console.warn("You cannot download now! (File doesn't exist or the track is recording)")
       }
 
@@ -245,10 +251,23 @@
     }
 
     changeVolume(e) {
-      this.volume = e.target.value / 100
-      if (this.bufferSourceNode) {
-        this.output.gain.value = this.volume;
-      }
+        this.volume = e.target.value / 100;
+        if (this.bufferSourceNode) {
+          if (!this.muteSwitch) {
+          this.output.gain.value = this.volume;
+          }
+        }
+    }
+
+    muteVolume() {
+        if (!this.muteSwitch) {
+          if (this.bufferSourceNode) {
+          this.output.gain.value = 0;
+          }
+        } else {
+          this.output.gain.value = this.volume;
+        }
+      this.muteSwitch = !this.muteSwitch;
     }
 
     changeTitle() {
