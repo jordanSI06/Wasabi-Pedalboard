@@ -39,13 +39,17 @@
       this.mute;
       this.canvas;
       this.playButton;
+      this.loopButton;
+
 
 
       this.buttonStopImg;
       this.buttonPlayImg;
+      this.buttonLoopImg;
       this.stateRecord = false;
       this.statePlay = false;
       this.muteSwitch = false;
+      this.stateLoop = false;
 
       //File element
       this.blob;
@@ -107,9 +111,11 @@
       this.playButton = this.shadowRoot.querySelector('#play');
       this.buttonStopImg = this.shadowRoot.querySelector('#btn_stop_img');
       this.buttonPlayImg = this.shadowRoot.querySelector('#btn_play_img');
+      this.buttonLoopImg = this.shadowRoot.querySelector('#btn_loop_img')
       this.dlButton = this.shadowRoot.querySelector('#download');
       this.volumeRange = this.shadowRoot.querySelector('#volume');
       this.mute = this.shadowRoot.querySelector('#mute');
+      this.loopButton = this.shadowRoot.querySelector('#loop');
       this.canvas = this.shadowRoot.querySelector('canvas');
       navigator.mediaDevices.getUserMedia({
         audio: true
@@ -124,23 +130,39 @@
           parent.mute.addEventListener('click', parent.muteVolume.bind(parent));
           parent.recorder = new MediaRecorder(parent.dest.stream);
           parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
+          parent.loopButton.addEventListener('click', parent.loopTrack.bind(parent));
           console.log('recorder is ready');
         });
     }
     // ----- METHODS: CUSTOM -----
 
-    recreateBuffer(){
-      let parent=this;
-      this.statePlay=false;
-      this.buttonPlayImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/play.png'),
+    recreateBuffer() {
+      let parent = this;
+      this.statePlay = false;
+      this.buttonLoopImg.setAttribute('style', 'fill : white;');
+      this.stateLoop = false;
+      this.buttonPlayImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/play.png');
       this.bufferSourceNode.stop();
       this.bufferSourceNode = this.ac.createBufferSource();
       this.bufferSourceNode.buffer = this.sample;
       this.bufferSourceNode.connect(this.output);
       this.bufferSourceNode.start();
       this.bufferSourceNode.disconnect(this.output);
-      this.bufferSourceNode.onended= function() {
+      this.bufferSourceNode.onended = function () {
         parent.recreateBuffer();
+      }
+    }
+
+    loopTrack() {
+      if (this.bufferSourceNode) {
+        if (this.stateLoop == false) {
+          this.buttonLoopImg.setAttribute('style', 'fill : green;')
+          this.bufferSourceNode.loop = true;
+        } else {
+          this.buttonLoopImg.setAttribute('style', 'fill : white;')
+          this.bufferSourceNode.loop = false;
+        }
+        this.stateLoop = !this.stateLoop;
       }
     }
 
@@ -212,7 +234,7 @@
 
 
     useSample(sample) {
-      let parent=this;
+      let parent = this;
       if (this.bufferSourceNode) {
         this.bufferSourceNode.stop();
         this.bufferSourceNode.disconnect()
@@ -220,9 +242,9 @@
 
       this.bufferSourceNode = this.ac.createBufferSource();
       this.bufferSourceNode.buffer = sample;
-      this.sample=sample
+      this.sample = sample
       this.bufferSourceNode.loop = false;
-      this.bufferSourceNode.onended= function() {
+      this.bufferSourceNode.onended = function () {
         parent.recreateBuffer();
       }
       this.bufferSourceNode.connect(this.output);
@@ -271,23 +293,23 @@
     }
 
     changeVolume(e) {
-        this.volume = e.target.value / 100;
-        if (this.bufferSourceNode) {
-          if (!this.muteSwitch) {
+      this.volume = e.target.value / 100;
+      if (this.bufferSourceNode) {
+        if (!this.muteSwitch) {
           this.output.gain.value = this.volume;
           console.log(this.bufferSourceNode.context.currentTime)
-          }
         }
+      }
     }
 
     muteVolume() {
-        if (!this.muteSwitch) {
-          if (this.bufferSourceNode) {
+      if (!this.muteSwitch) {
+        if (this.bufferSourceNode) {
           this.output.gain.value = 0;
-          }
-        } else {
-          this.output.gain.value = this.volume;
         }
+      } else {
+        this.output.gain.value = this.volume;
+      }
       this.muteSwitch = !this.muteSwitch;
     }
 
