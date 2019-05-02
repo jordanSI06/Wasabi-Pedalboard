@@ -49,6 +49,7 @@
 
       //File element
       this.blob;
+      this.sample;
       this.recordedBlobs = [];
       this.fileReader;
       this.arrayBuffer;
@@ -116,18 +117,32 @@
         .then(function (stream) {
           //parent.title.addEventListener('click', parent.changeTitle.bind(parent));
           parent.recordButton.addEventListener('click', parent.recordingTrack.bind(parent));
-          //parent.stopButton.addEventListener('click', parent.stopRecording.bind(parent));
+          parent.stopButton.addEventListener('click', parent.recreateBuffer.bind(parent));
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
           parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
           parent.playButton.addEventListener('click', parent.playingTrack.bind(parent));
           parent.mute.addEventListener('click', parent.muteVolume.bind(parent));
           parent.recorder = new MediaRecorder(parent.dest.stream);
           parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
-
           console.log('recorder is ready');
         });
     }
     // ----- METHODS: CUSTOM -----
+
+    recreateBuffer(){
+      let parent=this;
+      this.statePlay=false;
+      this.buttonPlayImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/play.png'),
+      this.bufferSourceNode.stop();
+      this.bufferSourceNode = this.ac.createBufferSource();
+      this.bufferSourceNode.buffer = this.sample;
+      this.bufferSourceNode.connect(this.output);
+      this.bufferSourceNode.start();
+      this.bufferSourceNode.disconnect(this.output);
+      this.bufferSourceNode.onended= function() {
+        parent.recreateBuffer();
+      }
+    }
 
     recordingTrack() {
       console.log('start recording');
@@ -197,6 +212,7 @@
 
 
     useSample(sample) {
+      let parent=this;
       if (this.bufferSourceNode) {
         this.bufferSourceNode.stop();
         this.bufferSourceNode.disconnect()
@@ -204,7 +220,11 @@
 
       this.bufferSourceNode = this.ac.createBufferSource();
       this.bufferSourceNode.buffer = sample;
-      this.bufferSourceNode.loop = true;
+      this.sample=sample
+      this.bufferSourceNode.loop = false;
+      this.bufferSourceNode.onended= function() {
+        parent.recreateBuffer();
+      }
       this.bufferSourceNode.connect(this.output);
       this.bufferSourceNode.start();
       this.bufferSourceNode.disconnect(this.output);
@@ -255,6 +275,7 @@
         if (this.bufferSourceNode) {
           if (!this.muteSwitch) {
           this.output.gain.value = this.volume;
+          console.log(this.bufferSourceNode.context.currentTime)
           }
         }
     }
