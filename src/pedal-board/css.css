@@ -294,13 +294,12 @@ input[type=range]::-webkit-slider-thumb {
 
 #divMultiTrack{
   top:44px;
-  background-color: #222;
+  background-color: #333;
   position: absolute;
   right:0px;
   padding: 0px;
-  background-color: white;
   width: 100%;
-  height: 130px;
+  height: 180px;
 }
 
 .select_devices {

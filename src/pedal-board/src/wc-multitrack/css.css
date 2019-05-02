@@ -2,13 +2,13 @@ canvas {
 	display: block;
 	background: rgb(85, 85, 85);
   border:2px solid rgb(135, 135, 135);
-  height: 100px;
+  height: 130px;
 	width: 95%;
 }
 
 li.flex-item {
   border:2px solid rgb(135, 135, 135);
-  height:100px;
+  height:130px;
 }
 
 #nameTrack{
@@ -19,6 +19,11 @@ li.flex-item {
 #buttonList{
   display: flex;
   align-content: flex-start;
+}
+
+/* iron-icon from multi-track are now white. */
+iron-icon{
+  fill: white;
 }
 
 button img { 
