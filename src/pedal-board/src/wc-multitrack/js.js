@@ -36,19 +36,24 @@
       this.dlButton;
       this.volumeRange;
       this.volume = 0.5;
-      this.mute;
       this.canvas;
       this.playButton;
       this.loopButton;
+      this.titleButton;
 
-
-
+      // Icon buttons element & inner elements
       this.buttonStopImg;
       this.buttonPlayImg;
       this.buttonLoopImg;
+      this.buttonMuteImg;
+      this.buttonDlImg;
+      this.buttonRecImg;
+      this.titleInner;
+
+      // Element state
       this.stateRecord = false;
       this.statePlay = false;
-      this.muteSwitch = false;
+      this.stateMute = false;
       this.stateLoop = false;
 
       //File element
@@ -106,16 +111,29 @@
       //Extract attribute
       let parent = this;
       this.title = this.shadowRoot.querySelector('#nameTrack')
+
+      // Buttons assigned with query selector
       this.recordButton = this.shadowRoot.querySelector('#record');
       this.stopButton = this.shadowRoot.querySelector('#stop');
       this.playButton = this.shadowRoot.querySelector('#play');
+      this.muteButton = this.shadowRoot.querySelector("#mute");
+      this.loopButton = this.shadowRoot.querySelector('#loop');
+      this.dlButton = this.shadowRoot.querySelector('#download');
+      this.titleButton = this.shadowRoot.querySelector('#title');
+
+      // Buttons icons assigned with query selector
+      this.buttonRecImg = this.shadowRoot.querySelector('#btn_rec_img');
       this.buttonStopImg = this.shadowRoot.querySelector('#btn_stop_img');
       this.buttonPlayImg = this.shadowRoot.querySelector('#btn_play_img');
-      this.buttonLoopImg = this.shadowRoot.querySelector('#btn_loop_img')
-      this.dlButton = this.shadowRoot.querySelector('#download');
+      this.buttonLoopImg = this.shadowRoot.querySelector('#btn_loop_img');
+      this.buttonMuteImg = this.shadowRoot.querySelector('#btn_mute_img');
+      this.buttonDlImg = this.shadowRoot.querySelector('#btn_dl_img');
+      this.titleInner = this.shadowRoot.querySelector('#title_content');
+
+      // Volume range slider assigned with query selector
       this.volumeRange = this.shadowRoot.querySelector('#volume');
-      this.mute = this.shadowRoot.querySelector('#mute');
-      this.loopButton = this.shadowRoot.querySelector('#loop');
+
+      // Canvas assigned with query selector
       this.canvas = this.shadowRoot.querySelector('canvas');
       navigator.mediaDevices.getUserMedia({
         audio: true
@@ -127,10 +145,11 @@
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
           parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
           parent.playButton.addEventListener('click', parent.playingTrack.bind(parent));
-          parent.mute.addEventListener('click', parent.muteVolume.bind(parent));
+          parent.muteButton.addEventListener('click', parent.muteVolume.bind(parent));
           parent.recorder = new MediaRecorder(parent.dest.stream);
           parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
           parent.loopButton.addEventListener('click', parent.loopTrack.bind(parent));
+          parent.titleButton.addEventListener('click',parent.changeTilte.bind(parent));
           console.log('recorder is ready');
         });
     }
@@ -140,8 +159,6 @@
       let parent = this;
       this.statePlay = false;
       this.buttonLoopImg.setAttribute('style', 'fill : white;');
-      this.stateLoop = false;
-      this.buttonPlayImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/play.png');
       this.bufferSourceNode.stop();
       this.bufferSourceNode = this.ac.createBufferSource();
       this.bufferSourceNode.buffer = this.sample;
@@ -151,12 +168,17 @@
       this.bufferSourceNode.onended = function () {
         parent.recreateBuffer();
       }
+      if (this.stateLoop) {
+        this.bufferSourceNode.loop = true;
+        this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
+      }
+      this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
     }
 
     loopTrack() {
       if (this.bufferSourceNode) {
         if (this.stateLoop == false) {
-          this.buttonLoopImg.setAttribute('style', 'fill : green;')
+          this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
           this.bufferSourceNode.loop = true;
         } else {
           this.buttonLoopImg.setAttribute('style', 'fill : white;')
@@ -173,17 +195,17 @@
         this.stopSample();
         this.clearCanvas();
         this.statePlay = false;
-        this.buttonPlayImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/play.png');
-
+        this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
         this.recorder.start();
-        this.buttonStopImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/stop.png');
+        this.buttonRecImg.setAttribute('style', 'fill:red;');
+        this.buttonDlImg.setAttribute('style', 'fill: #fff');
       }
       if (this.stateRecord == true) {
         console.log('stop recording');
         this.input.gain.value = 0;
-
         this.recorder.stop()
-        this.buttonStopImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/rec.png');
+        this.buttonRecImg.setAttribute('style', 'fill:#fff;');
+        this.buttonDlImg.setAttribute('style', 'fill: rgb(191, 255, 194);');
       }
       this.stateRecord = !this.stateRecord;
     }
@@ -192,17 +214,21 @@
       if (this.bufferSourceNode && this.stateRecord == false) {
         if (this.statePlay == false) {
           this.bufferSourceNode.connect(this.output);
-          this.buttonPlayImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/pause.png');
+          this.buttonPlayImg.setAttribute('icon', 'av:pause');
         } else if (this.statePlay == true) {
           this.bufferSourceNode.disconnect(this.output);
-          this.buttonPlayImg.setAttribute('src', './src/pedal-board/src/wc-multitrack/img/play.png');
+          this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
         }
         this.statePlay = !this.statePlay;
       } else {
         console.warn("You cannot play/pause! (There's no file or the track is recording");
       }
+      console.log("hello there, this function had been executed")
     }
 
+    changeTilte(){
+      this.titleInner.textContent = 'foo bar';
+    }
 
     stopSample() {
       console.log('record something');
@@ -230,8 +256,6 @@
       }
       this.fileReader.readAsArrayBuffer(this.blob);
     }
-
-
 
     useSample(sample) {
       let parent = this;
@@ -262,7 +286,7 @@
     }
 
     download() {
-      if (this.stateRecord == false && this.bufferSourceNode) {
+      if (!this.stateRecord && this.bufferSourceNode) {
         let parent = this;
         //this.blob = new Blob(this.recordedBlobs, { type: 'audio/wav' });
         this.url = window.URL.createObjectURL(this.blob);
@@ -295,7 +319,7 @@
     changeVolume(e) {
       this.volume = e.target.value / 100;
       if (this.bufferSourceNode) {
-        if (!this.muteSwitch) {
+        if (!this.stateMute) {
           this.output.gain.value = this.volume;
           console.log(this.bufferSourceNode.context.currentTime)
         }
@@ -303,14 +327,16 @@
     }
 
     muteVolume() {
-      if (!this.muteSwitch) {
+      if (!this.stateMute) {
         if (this.bufferSourceNode) {
           this.output.gain.value = 0;
+          this.buttonMuteImg.setAttribute('icon', 'av:volume-off')
         }
       } else {
         this.output.gain.value = this.volume;
+        this.buttonMuteImg.setAttribute('icon', 'av:volume-up')
       }
-      this.muteSwitch = !this.muteSwitch;
+      this.stateMute = !this.stateMute;
     }
 
     changeTitle() {

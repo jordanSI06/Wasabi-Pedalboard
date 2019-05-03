@@ -1,32 +1,51 @@
 <template>
-    <link rel="stylesheet" href="./src/pedal-board/src/wc-multitrack/css.css">
-    <div id="div_app">
-      <div class="div_app_multitrack">
-        <main>
-          <ul class="flex-container">
-            <li class="flex-item">
-              <div id="nameTrack">
-                <p id="title">Untitled Track</p>
-              </div> 
-              <div id="buttonList">
-                  <button id="record" ><img id="btn_stop_img"  src="./src/pedal-board/src/wc-multitrack/img/rec.png"></button></br>
-                  <button id="play"><img id="btn_play_img" src="./src/pedal-board/src/wc-multitrack/img/play.png"></button></br>
-                  <button id="stop"><img id="btn_stop_img" src="./src/pedal-board/src/wc-multitrack/img/stop.png"></button></br>
+  <link rel="stylesheet" href="./src/pedal-board/src/wc-multitrack/css.css">
+  <div id="div_app">
+    <div class="div_app_multitrack">
+      <main>
+        <ul class="flex-container">
+          <li class="flex-item">
+            <div id="nameTrack">
+             <button id='title'><p id="title_content">Untitled Track</p></button>
+            </div>
+            <div id="buttonList">
+              <button id="record">
+                <iron-icon id="btn_rec_img" icon="icons:radio-button-checked"></iron-icon>
+              </button>
+              <button id="play">
+                <iron-icon id="btn_play_img" icon="av:play-circle-filled"></iron-icon>
+              </button>
+              <button id="stop">
+                <iron-icon id="btn_stop_img" icon="av:stop"></iron-icon>
+              </button>
+              <button id="?1">
+                <iron-icon id="?1" icon="icons:help-outline"></iron-icon>
+              </button>
 
-              </div>
-              <div id="buttonList">
-                  <button id="mute"> <iron-icon id="icon_mute" icon="icons:alarm-off"></iron-icon></button>
-                  <button id="loop"><iron-icon id="btn_loop_img" icon="icons:refresh"></iron-icon></button>
-                  <button id="download"><img src="./src/pedal-board/src/wc-multitrack/img/dl.png"></button>
-              </div>
-              <div id="volumePart">
-                  <input id="volume" type="range" min="0" max="100">
-              </div>
-            </li>
-            <li d="can"><canvas width="2000" height="100"></canvas></li>
-          </ul>
-        </main>
-      </div>
+
+            </div>
+            <div id="buttonList">
+              <button id="mute">
+                <iron-icon id="btn_mute_img" icon="av:volume-up"></iron-icon>
+              </button>
+              <button id="loop">
+                <iron-icon id="btn_loop_img" icon="icons:refresh"></iron-icon>
+              </button>
+              <button id="download">
+                <iron-icon id="btn_dl_img" icon="icons:file-download"></iron-icon>
+              </button>
+              <button id="?2">
+                <iron-icon id="?2" icon="icons:help-outline"></iron-icon>
+              </button>
+            </div>
+            <div id="volumePart">
+              <input id="volume" type="range" min="0" max="100">
+            </div>
+          </li>
+          <li id="can"><canvas width="2000" height="100"></canvas></li>
+        </ul>
+      </main>
     </div>
-  </template>
-  <script src="./js.js"></script>
+  </div>
+</template>
+<script src="./js.js"></script>

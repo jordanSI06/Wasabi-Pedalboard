@@ -11,10 +11,7 @@ li.flex-item {
   height:130px;
 }
 
-#nameTrack{
-  color:white;
-  font-weight: bold;
-}
+
 
 #buttonList{
   display: flex;
@@ -23,17 +20,21 @@ li.flex-item {
 
 /* iron-icon from multi-track are now white. */
 iron-icon{
-  fill: white;
+  fill: #fff;
+  width:24px;
+  height:24px;
 }
 
-button img { 
-  width: 25px;
-  height: 25px;
+button:not(.titleclass) img { 
+  width: 20px;
+  height: 20px;
 }
+
 
 button {
   border: 0px;
   background-color : #333;
+  outline:0;
 }
 
 .flex-container {
@@ -48,7 +49,21 @@ button {
   width : 95%;
 }
 
-#test {
- width : 100px;
-  height : 100px;
+#title_content{
+  color:white;
+  font-weight: bold;
+  padding: -2px -2px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border: 1px solid #000000;
+  height: 36px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: grab;
+  margin-top: 0px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+ 
 }
