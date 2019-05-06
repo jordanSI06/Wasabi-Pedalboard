@@ -67,6 +67,7 @@
       this.channelData;
       this.url;
       this.link;
+      this.fileName = "Untitled track";
     }
 
     getInput() {
@@ -227,7 +228,13 @@
     }
 
     changeTilte(){
-      this.titleInner.textContent = 'foo bar';
+      let a = prompt('enter value');
+      if(a.length > 20 && a.length > 0){alert("Enter a shorter name (1 to 20 character allowed)");
+      this.changeTilte();
+    } else {
+      this.titleInner.textContent = a; 
+      this.fileName = a;
+    }
     }
 
     stopSample() {
@@ -293,7 +300,7 @@
         this.link = document.createElement('a');
         this.link.style.display = 'none';
         this.link.href = this.url;
-        this.link.download = "track.wav";
+        this.link.download = this.fileName+".wav";
         document.body.appendChild(this.link);
         this.link.click();
 
@@ -339,10 +346,6 @@
       this.stateMute = !this.stateMute;
     }
 
-    changeTitle() {
-      let nameTitle = prompt("Enter the new title of your track");
-      this.title = nameTitle;
-    }
 
     clearCanvas() {
       let context = this.canvas.getContext('2d');
