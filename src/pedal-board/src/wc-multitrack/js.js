@@ -42,6 +42,10 @@
       this.titleButton;
       this.addButton;
 
+      //Start/Pause
+      this.startedAt;
+      this.pausedAt;
+
       // Icon buttons element & inner elements
       this.buttonStopImg;
       this.buttonPlayImg;
@@ -54,6 +58,7 @@
       // Element state
       this.stateRecord = false;
       this.statePlay = false;
+      this.statePause = false;
       this.stateMute = false;
       this.stateLoop = false;
       this.stateId = 1;
@@ -72,7 +77,7 @@
       this.fileName = "Untitled track";
 
       this.main;
-      
+
     }
 
     getInput() {
@@ -148,7 +153,7 @@
         .then(function (stream) {
           //parent.title.addEventListener('click', parent.changeTitle.bind(parent));
           parent.recordButton.addEventListener('click', parent.recordingTrack.bind(parent));
-          parent.stopButton.addEventListener('click', parent.recreateBuffer.bind(parent));
+          parent.stopButton.addEventListener('click', parent.stopTrack.bind(parent));
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
           parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
           parent.playButton.addEventListener('click', parent.playingTrack.bind(parent));
@@ -156,24 +161,28 @@
           parent.recorder = new MediaRecorder(parent.dest.stream);
           parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
           parent.loopButton.addEventListener('click', parent.loopTrack.bind(parent));
-          parent.titleButton.addEventListener('click',parent.changeTilte.bind(parent));
+          parent.titleButton.addEventListener('click', parent.changeTilte.bind(parent));
           parent.addButton.addEventListener('click', parent.addTrack.bind(parent));
           console.log('recorder is ready');
         });
     }
     // ----- METHODS: CUSTOM -----
 
+    stopTrack() {
+      this.bufferSourceNode.stop();
+      this.recreateBuffer();
+    }
+
     recreateBuffer() {
       let parent = this;
       this.statePlay = false;
       this.buttonLoopImg.setAttribute('style', 'fill : white;');
-      this.bufferSourceNode.stop();
       this.bufferSourceNode = this.ac.createBufferSource();
       this.bufferSourceNode.buffer = this.sample;
       this.bufferSourceNode.connect(this.output);
-      this.bufferSourceNode.start();
       this.bufferSourceNode.disconnect(this.output);
       this.bufferSourceNode.onended = function () {
+        console.log("Etape 2");
         parent.recreateBuffer();
       }
       if (this.stateLoop) {
@@ -221,33 +230,47 @@
     playingTrack() {
       if (this.bufferSourceNode && this.stateRecord == false) {
         if (this.statePlay == false) {
+          if (this.pausedAt) {
+            this.startedAt = Date.now();
+            this.bufferSourceNode.start(0, this.pausedAt / 1000);
+            this.pausedAt = undefined;
+          } else {
+            this.startedAt = Date.now()
+            this.bufferSourceNode.start();
+          }
+
           this.bufferSourceNode.connect(this.output);
           this.buttonPlayImg.setAttribute('icon', 'av:pause');
         } else if (this.statePlay == true) {
-          this.bufferSourceNode.disconnect(this.output);
+          this.bufferSourceNode.stop()
+          this.recreateBuffer();
+          this.pausedAt = Date.now() - this.startedAt;
+          this.startedAt = Date.now();
+          //this.bufferSourceNode.disconnect(this.output);
           this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
         }
         this.statePlay = !this.statePlay;
       } else {
         console.warn("You cannot play/pause! (There's no file or the track is recording");
       }
-      console.log("hello there, this function had been executed")
     }
 
-    changeTilte(){
+
+    changeTilte() {
       let a = prompt('enter value');
-      if(a.length > 20 && a.length > 0){alert("Enter a shorter name (1 to 20 character allowed)");
-      this.changeTilte();
-    } else {
-      this.titleInner.textContent = a; 
-      this.fileName = a;
-    }
+      if (a.length > 20 && a.length > 0) {
+        alert("Enter a shorter name (1 to 20 character allowed)");
+        this.changeTilte();
+      } else {
+        this.titleInner.textContent = a;
+        this.fileName = a;
+      }
     }
 
-    stopSample() {
+    /*stopSample() {
       console.log('record something');
       this.startRecording();
-    }
+    }*/
 
     onRecordingReady(e) {
       let parent = this;
@@ -274,7 +297,7 @@
     useSample(sample) {
       let parent = this;
       if (this.bufferSourceNode) {
-        this.bufferSourceNode.stop();
+        //this.bufferSourceNode.stop();
         this.bufferSourceNode.disconnect()
       }
 
@@ -283,10 +306,11 @@
       this.sample = sample
       this.bufferSourceNode.loop = false;
       this.bufferSourceNode.onended = function () {
+        console.log("Etape 1");
         parent.recreateBuffer();
       }
       this.bufferSourceNode.connect(this.output);
-      this.bufferSourceNode.start();
+      //this.bufferSourceNode.start();
       this.bufferSourceNode.disconnect(this.output);
 
       this.data = [];
@@ -307,7 +331,7 @@
         this.link = document.createElement('a');
         this.link.style.display = 'none';
         this.link.href = this.url;
-        this.link.download = this.fileName+".wav";
+        this.link.download = this.fileName + ".wav";
         document.body.appendChild(this.link);
         this.link.click();
 
@@ -324,7 +348,7 @@
     stopSample() {
       console.log('stop sample');
       if (this.bufferSourceNode) {
-        this.bufferSourceNode.stop();
+        //this.bufferSourceNode.stop();
         this.bufferSourceNode.disconnect();
         this.bufferSourceNode = undefined;
       }
@@ -432,32 +456,32 @@
       }
     }
 
-    createDiv(){
+    createDiv() {
       this.main = this.shadowRoot.querySelector('#main');
       var div = document.createElement("div");
-      div.setAttribute('id','trackN'+this.stateId);
+      div.setAttribute('id', 'trackN' + this.stateId);
       this.main.appendChild(div);
     }
 
-    addTrack(){
+    addTrack() {
       /*
       * TODO: Create a i var for id, the button must to be usable with this js and
       * have 4 track max
       */
-     if(this.shadowRoot.querySelectorAll("[id^=trackN]").length<3){
-      this.createDiv();
-      this.main = this.shadowRoot.querySelector('#trackN'+this.stateId);
-      var track = new Track(this.stateId,this.shadowRoot.querySelector('#onetrack'));
-      var track_clone = track.trackCreation.cloneNode(true);
-      console.log(track.trackCreation);
-      console.log(this.main);
-      this.main.appendChild(track_clone);
-      this.shadowRoot.querySelector("#trackN"+this.stateId+" #title").textContent = track.titleCreation;
-      this.stateId++;
-    } else {
-      console.error("Too much tracks buddy! You need premium.")
+      if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 3) {
+        this.createDiv();
+        this.main = this.shadowRoot.querySelector('#trackN' + this.stateId);
+        var track = new Track(this.stateId, this.shadowRoot.querySelector('#onetrack'));
+        var track_clone = track.trackCreation.cloneNode(true);
+        console.log(track.trackCreation);
+        console.log(this.main);
+        this.main.appendChild(track_clone);
+        this.shadowRoot.querySelector("#trackN" + this.stateId + " #title").textContent = track.titleCreation;
+        this.stateId++;
+      } else {
+        console.error("Too much tracks buddy! You need premium.")
+      }
     }
-  }
 
   });
 })();
