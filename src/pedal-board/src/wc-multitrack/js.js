@@ -40,6 +40,7 @@
       this.playButton;
       this.loopButton;
       this.titleButton;
+      this.addButton;
 
       // Icon buttons element & inner elements
       this.buttonStopImg;
@@ -55,6 +56,7 @@
       this.statePlay = false;
       this.stateMute = false;
       this.stateLoop = false;
+      this.stateId = 1;
 
       //File element
       this.blob;
@@ -68,6 +70,9 @@
       this.url;
       this.link;
       this.fileName = "Untitled track";
+
+      this.main;
+      
     }
 
     getInput() {
@@ -111,7 +116,7 @@
 
       //Extract attribute
       let parent = this;
-      this.title = this.shadowRoot.querySelector('#nameTrack')
+      this.title = this.shadowRoot.querySelector('#title')
 
       // Buttons assigned with query selector
       this.recordButton = this.shadowRoot.querySelector('#record');
@@ -121,6 +126,7 @@
       this.loopButton = this.shadowRoot.querySelector('#loop');
       this.dlButton = this.shadowRoot.querySelector('#download');
       this.titleButton = this.shadowRoot.querySelector('#title');
+      this.addButton = this.shadowRoot.querySelector('#addTrack');
 
       // Buttons icons assigned with query selector
       this.buttonRecImg = this.shadowRoot.querySelector('#btn_rec_img');
@@ -129,7 +135,7 @@
       this.buttonLoopImg = this.shadowRoot.querySelector('#btn_loop_img');
       this.buttonMuteImg = this.shadowRoot.querySelector('#btn_mute_img');
       this.buttonDlImg = this.shadowRoot.querySelector('#btn_dl_img');
-      this.titleInner = this.shadowRoot.querySelector('#title_content');
+      this.titleInner = this.shadowRoot.querySelector('#title');
 
       // Volume range slider assigned with query selector
       this.volumeRange = this.shadowRoot.querySelector('#volume');
@@ -151,6 +157,7 @@
           parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
           parent.loopButton.addEventListener('click', parent.loopTrack.bind(parent));
           parent.titleButton.addEventListener('click',parent.changeTilte.bind(parent));
+          parent.addButton.addEventListener('click', parent.addTrack.bind(parent));
           console.log('recorder is ready');
         });
     }
@@ -424,6 +431,33 @@
         }
       }
     }
+
+    createDiv(){
+      this.main = this.shadowRoot.querySelector('#main');
+      var div = document.createElement("div");
+      div.setAttribute('id','trackN'+this.stateId);
+      this.main.appendChild(div);
+    }
+
+    addTrack(){
+      /*
+      * TODO: Create a i var for id, the button must to be usable with this js and
+      * have 4 track max
+      */
+     if(this.shadowRoot.querySelectorAll("[id^=trackN]").length<3){
+      this.createDiv();
+      this.main = this.shadowRoot.querySelector('#trackN'+this.stateId);
+      var track = new Track(this.stateId,this.shadowRoot.querySelector('#onetrack'));
+      var track_clone = track.trackCreation.cloneNode(true);
+      console.log(track.trackCreation);
+      console.log(this.main);
+      this.main.appendChild(track_clone);
+      this.shadowRoot.querySelector("#trackN"+this.stateId+" #title").textContent = track.titleCreation;
+      this.stateId++;
+    } else {
+      console.error("Too much tracks buddy! You need premium.")
+    }
+  }
 
   });
 })();

@@ -2,13 +2,13 @@ canvas {
 	display: block;
 	background: rgb(85, 85, 85);
   border:2px solid rgb(135, 135, 135);
-  height: 130px;
+  height: 45px;
 	width: 95%;
 }
 
 li.flex-item {
   border:2px solid rgb(135, 135, 135);
-  height:130px;
+  height:45px;
 }
 
 
@@ -25,23 +25,31 @@ iron-icon{
   height:24px;
 }
 
+#main{
+  background-color: #333;
+}
+
 button:not(.titleclass) img { 
   width: 20px;
   height: 20px;
 }
 
 
-button {
+button:not(#addTrack) {
   border: 0px;
   background-color : #333;
   outline:0;
 }
 
 .flex-container {
-
+  background-color:#333;
   list-style: none;
   display: flex;
   align-content: flex-start;
+  margin-top:10px;
+  margin-bottom:0px;
+  height:50px
+
 }
 
 #can {
@@ -49,7 +57,7 @@ button {
   width : 95%;
 }
 
-#title_content{
+#title{
   color:white;
   font-weight: bold;
   padding: -2px -2px;
@@ -61,9 +69,27 @@ input[type=range]::-webkit-slider-thumb {
   height: 36px;
   width: 16px;
   border-radius: 3px;
-  background: #ffffff;
   cursor: grab;
   margin-top: 0px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
   box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
  
 }
+
+#addTrack {
+  border:solid 3px #333;
+  padding-top:10px;
+  margin-left:auto;
+  margin-right:auto;
+  width:100%;
+  height:25px;
+  background-color:#333333;
+  color:white;
+  align-content:center;
+  padding-top:10;
+  border:0px;
+  outline:0;
+}
+
+
+
+

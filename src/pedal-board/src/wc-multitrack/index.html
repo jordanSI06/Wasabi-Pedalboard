@@ -3,10 +3,10 @@
   <div id="div_app">
     <div class="div_app_multitrack">
       <main>
-        <ul class="flex-container">
+        <ul class="flex-container" id="onetrack">
           <li class="flex-item">
             <div id="nameTrack">
-             <button id='title'><p id="title_content">Untitled Track</p></button>
+             <button id='title'>Untitled Track</button>
             </div>
             <div id="buttonList">
               <button id="record">
@@ -18,13 +18,9 @@
               <button id="stop">
                 <iron-icon id="btn_stop_img" icon="av:stop"></iron-icon>
               </button>
-              <button id="?1">
-                <iron-icon id="?1" icon="icons:help-outline"></iron-icon>
-              </button>
-
-
-            </div>
-            <div id="buttonList">
+              <div id="volumePart">
+                <input id="volume" type="range" min="0" max="100">
+              </div>
               <button id="mute">
                 <iron-icon id="btn_mute_img" icon="av:volume-up"></iron-icon>
               </button>
@@ -34,18 +30,23 @@
               <button id="download">
                 <iron-icon id="btn_dl_img" icon="icons:file-download"></iron-icon>
               </button>
-              <button id="?2">
-                <iron-icon id="?2" icon="icons:help-outline"></iron-icon>
-              </button>
+        
+        
             </div>
-            <div id="volumePart">
-              <input id="volume" type="range" min="0" max="100">
+            <div id="buttonList">
+            
+           
             </div>
+            
           </li>
           <li id="can"><canvas width="2000" height="100"></canvas></li>
         </ul>
       </main>
     </div>
   </div>
+  <div id="main"></div>
+  <button id="addTrack">ADD TRACK</button>
 </template>
 <script src="./js.js"></script>
+<script src="./track.js"></script>
+
