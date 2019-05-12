@@ -11,50 +11,38 @@
     constructor() {
       super();
 
-      //Global Context of Pedalboard
+      // Global Context of Pedalboard
       this.ac = GlobalContext.context;
 
       // Graph node creation
       this.input = this.ac.createGain();
       this.input.gain.value = 0;
       this.output = this.ac.createGain();
-      //this.limiter = this.ac.createDynamicsCompressor();
-
-      // For mediaRecording
       this.dest = this.ac.createMediaStreamDestination();
 
-      // build graph
-      //this.input.connect(this.limiter);
-      //this.limiter.connect(this.output);
+      // Build graph
       this.input.connect(this.output);
       this.output.connect(this.dest); // associated to MediaRecorder
 
-      //Graphic Element
-      this.title;
+      // Graphic Element
       this.recordButton;
-      this.stopButton;
-      this.dlButton;
-      this.volumeRange;
-      this.volume = 0.5;
-      this.canvas;
       this.playButton;
+      this.stopButton;
       this.loopButton;
-      this.titleButton;
+      this.dlButton;
+      this.titleTrack;
+      this.volumeRange;
+      this.canvas;
       this.addButton;
 
-      //Start/Pause
-      this.startedAt;
-      this.pausedAt;
-      this.timeEllapsed;
 
-      // Icon buttons element & inner elements
-      this.buttonStopImg;
+      // Icon buttons element
+      this.buttonRecImg;
       this.buttonPlayImg;
+      this.buttonStopImg;
       this.buttonLoopImg;
       this.buttonMuteImg;
       this.buttonDlImg;
-      this.buttonRecImg;
-      this.titleInner;
 
       // Element state
       this.stateRecord = false;
@@ -62,9 +50,17 @@
       this.statePause = false;
       this.stateMute = false;
       this.stateLoop = false;
-      this.stateId = 1;
 
-      //File element
+      // Element value
+      this.volume = 0.5;
+      this.trackId = 1;
+
+      // Start/Pause manager time
+      this.startedAt;
+      this.pausedAt;
+      this.timeEllapsed;
+
+      // File element
       this.blob;
       this.sample;
       this.recordedBlobs = [];
@@ -76,18 +72,15 @@
       this.url;
       this.link;
       this.fileName = "Untitled track";
-
       this.main;
-
     }
 
     getInput() {
       return this.input;
-
     }
+
     getOutput() {
       return this.output;
-
     }
     get is() { return this.nodeName.toLowerCase(); }
 
@@ -120,18 +113,18 @@
       const instance = template.content.cloneNode(true);
       shadowRoot.appendChild(instance);
 
-      //Extract attribute
+      //Extract attribute from parents
       let parent = this;
-      this.title = this.shadowRoot.querySelector('#title')
 
       // Buttons assigned with query selector
+      this.titleTrack = this.shadowRoot.querySelector('#title')
       this.recordButton = this.shadowRoot.querySelector('#record');
       this.stopButton = this.shadowRoot.querySelector('#stop');
       this.playButton = this.shadowRoot.querySelector('#play');
       this.muteButton = this.shadowRoot.querySelector("#mute");
       this.loopButton = this.shadowRoot.querySelector('#loop');
       this.dlButton = this.shadowRoot.querySelector('#download');
-      this.titleButton = this.shadowRoot.querySelector('#title');
+      this.titleTrack = this.shadowRoot.querySelector('#title');
       this.addButton = this.shadowRoot.querySelector('#addTrack');
 
       // Buttons icons assigned with query selector
@@ -141,7 +134,6 @@
       this.buttonLoopImg = this.shadowRoot.querySelector('#btn_loop_img');
       this.buttonMuteImg = this.shadowRoot.querySelector('#btn_mute_img');
       this.buttonDlImg = this.shadowRoot.querySelector('#btn_dl_img');
-      this.titleInner = this.shadowRoot.querySelector('#title');
 
       // Volume range slider assigned with query selector
       this.volumeRange = this.shadowRoot.querySelector('#volume');
@@ -152,7 +144,6 @@
         audio: true
       })
         .then(function (stream) {
-          //parent.title.addEventListener('click', parent.changeTitle.bind(parent));
           parent.recordButton.addEventListener('click', parent.recordingTrack.bind(parent));
           parent.stopButton.addEventListener('click', parent.stopTrack.bind(parent));
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
@@ -162,66 +153,33 @@
           parent.recorder = new MediaRecorder(parent.dest.stream);
           parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
           parent.loopButton.addEventListener('click', parent.loopTrack.bind(parent));
-          parent.titleButton.addEventListener('click', parent.changeTilte.bind(parent));
+          parent.titleTrack.addEventListener('click', parent.changeTilte.bind(parent));
           parent.addButton.addEventListener('click', parent.addTrack.bind(parent));
-          console.log('recorder is ready');
+          //console.log('recorder is ready');
         });
     }
     // ----- METHODS: CUSTOM -----
 
-    stopTrack() {
-      this.bufferSourceNode.stop();
-      this.recreateBuffer();
-    }
-
-    recreateBuffer() {
-      let parent = this;
-      this.statePlay = false;
-      this.buttonLoopImg.setAttribute('style', 'fill : white;');
-      this.bufferSourceNode = this.ac.createBufferSource();
-      this.bufferSourceNode.buffer = this.sample;
-      this.bufferSourceNode.connect(this.output);
-      this.bufferSourceNode.disconnect(this.output);
-      this.bufferSourceNode.onended = function () {
-        console.log("Etape 2");
-        parent.recreateBuffer();
-      }
-      if (this.stateLoop) {
-        this.bufferSourceNode.loop = true;
-        this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
-      }
-      this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
-    }
-
-    loopTrack() {
-      if (this.bufferSourceNode) {
-        if (this.stateLoop == false) {
-          this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
-          this.bufferSourceNode.loop = true;
-        } else {
-          this.buttonLoopImg.setAttribute('style', 'fill : white;')
-          this.bufferSourceNode.loop = false;
-        }
-        this.stateLoop = !this.stateLoop;
-      }
-    }
-
     recordingTrack() {
-      console.log('start recording');
       if (this.stateRecord == false) {
+        //console.log('start recording');
         this.input.gain.value = 1;
+        this.statePlay = false;
+
         this.stopSample();
         this.clearCanvas();
-        this.statePlay = false;
-        this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
         this.recorder.start();
+
+        this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
         this.buttonRecImg.setAttribute('style', 'fill:red;');
         this.buttonDlImg.setAttribute('style', 'fill: #fff');
       }
       if (this.stateRecord == true) {
-        console.log('stop recording');
+        //console.log('stop recording');
         this.input.gain.value = 0;
+
         this.recorder.stop()
+
         this.buttonRecImg.setAttribute('style', 'fill:#fff;');
         this.buttonDlImg.setAttribute('style', 'fill: rgb(191, 255, 194);');
       }
@@ -235,12 +193,13 @@
         if (this.statePlay == false) {
           if (this.pausedAt) {
             // if loop enabled, this will helps!
-            if((this.pausedAt) > (this.bufferSourceNode.buffer.duration * 1000)){
-              this.pausedAt = this.pausedAt - (this.bufferSourceNode.buffer.duration * Math.floor(this.pausedAt / (this.bufferSourceNode.buffer.duration * 1000)))*1000;
+            if ((this.pausedAt) > (this.bufferSourceNode.buffer.duration * 1000)) {
+              this.pausedAt = this.pausedAt - (this.bufferSourceNode.buffer.duration * Math.floor(this.pausedAt / (this.bufferSourceNode.buffer.duration * 1000))) * 1000;
               this.startedAt = Date.now() - this.pausedAt;
             }
             this.timeEllapsed = Date.now() - this.timeEllapsed;
-            this.startedAt += this.timeEllapsed; 
+            this.startedAt += this.timeEllapsed;
+            if (this.pausedAt < 0) this.pausedAt = 0
             this.bufferSourceNode.start(0, this.pausedAt / 1000);
             this.pausedAt = undefined;
           } else {
@@ -260,34 +219,84 @@
         }
         this.statePlay = !this.statePlay;
       } else {
-        console.warn("You cannot play/pause! (There's no file or the track is recording");
+        console.warn("You cannot play/pause! (There's no file or the track isn't recording)");
       }
     }
 
+    //TODO: exception with audio start
+    stopTrack() {
+      if (this.bufferSourceNode && this.statePlay == true) {
+        //this.bufferSourceNode.stop();
+        this.bufferSourceNode.disconnect();
+        this.recreateBuffer();
+        this.pausedAt=undefined;
+      }
+      else if (this.bufferSourceNode && this.statePlay == false) {
+        //this.bufferSourceNode.start();
+        //this.bufferSourceNode.stop();
+        this.bufferSourceNode.disconnect();
+        this.recreateBuffer();
+        this.pausedAt=undefined;
+      }
+      else {
+        console.warn("You cannot stop when a track who doesn't exist!")
+      }
+    }
+
+    recreateBuffer() {
+      let parent = this;
+      this.statePlay = false;
+      //if(this.bufferSourceNode) this.bufferSourceNode.disconnect();
+      this.bufferSourceNode = this.ac.createBufferSource();
+      this.bufferSourceNode.buffer = this.sample;
+
+      //this.bufferSourceNode.connect(this.output);
+      //this.bufferSourceNode.disconnect(this.output);
+
+      this.bufferSourceNode.onended = function () {
+        //console.log("Etape 2");
+        parent.recreateBuffer();
+      }
+      this.buttonLoopImg.setAttribute('style', 'fill : white;');
+      if (this.stateLoop) {
+        this.bufferSourceNode.loop = true;
+        this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
+      }
+      this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
+    }
+
+    loopTrack() {
+      if (this.bufferSourceNode) {
+        if (this.stateLoop == false) {
+          this.bufferSourceNode.loop = true;
+          this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
+        } else {
+          this.bufferSourceNode.loop = false;
+          this.buttonLoopImg.setAttribute('style', 'fill : white;')
+        }
+        this.stateLoop = !this.stateLoop;
+      }
+    }
 
     changeTilte() {
-      let a = prompt('enter value');
-      if (a.length > 20 && a.length > 0) {
+      let nameTrack = prompt('Please type the title of your track (between 1-20 characters): ');
+      if (nameTrack.length > 20 && nameTrack.length > 0) {
         alert("Enter a shorter name (1 to 20 character allowed)");
         this.changeTilte();
       } else {
-        this.titleInner.textContent = a;
-        this.fileName = a;
+        this.titleTrack.textContent = nameTrack;
+        this.fileName = nameTrack;
       }
     }
 
-    /*stopSample() {
-      console.log('record something');
-      this.startRecording();
-    }*/
-
     onRecordingReady(e) {
+      //console.log("onRecordingReady");
+
       let parent = this;
-      console.log("onRecordingReady");
       this.blob = e.data;
       this.recordedBlobs.push(e.data);
-
       this.fileReader = new FileReader();
+
       this.fileReader.onprogress = function () {
         console.log("recording...")
       }
@@ -306,22 +315,11 @@
     useSample(sample) {
       let parent = this;
       if (this.bufferSourceNode) {
-        //this.bufferSourceNode.stop();
         this.bufferSourceNode.disconnect()
       }
 
-      this.bufferSourceNode = this.ac.createBufferSource();
-      this.bufferSourceNode.buffer = sample;
       this.sample = sample
-      this.bufferSourceNode.loop = false;
-      this.bufferSourceNode.onended = function () {
-        console.log("Etape 1");
-        parent.recreateBuffer();
-      }
-      this.bufferSourceNode.connect(this.output);
-      //this.bufferSourceNode.start();
-      this.bufferSourceNode.disconnect(this.output);
-
+      this.recreateBuffer();
       this.data = [];
       this.channelData = sample.getChannelData(0);
 
@@ -335,7 +333,6 @@
     download() {
       if (!this.stateRecord && this.bufferSourceNode) {
         let parent = this;
-        //this.blob = new Blob(this.recordedBlobs, { type: 'audio/wav' });
         this.url = window.URL.createObjectURL(this.blob);
         this.link = document.createElement('a');
         this.link.style.display = 'none';
@@ -357,7 +354,6 @@
     stopSample() {
       console.log('stop sample');
       if (this.bufferSourceNode) {
-        //this.bufferSourceNode.stop();
         this.bufferSourceNode.disconnect();
         this.bufferSourceNode = undefined;
       }
@@ -368,7 +364,6 @@
       if (this.bufferSourceNode) {
         if (!this.stateMute) {
           this.output.gain.value = this.volume;
-          console.log(this.bufferSourceNode.context.currentTime)
         }
       }
     }
@@ -394,10 +389,8 @@
 
       context.fillStyle = 'rgb(85, 85, 85)';
       context.fillRect(0, 0, canvasWidth, canvasHeigth);
-
       context.lineWidth = 1;
       context.strokeStyle = 'rgb(205, 205, 205)';
-
       context.beginPath();
     }
 
@@ -411,10 +404,8 @@
 
       context.fillStyle = 'rgb(85, 85, 85)';
       context.fillRect(0, 0, canvasWidth, canvasHeigth);
-
       context.lineWidth = 1;
       context.strokeStyle = 'rgb(205, 205, 205)';
-
       context.beginPath();
 
       let sliceWidth = canvasWidth * 1.0 / this.bufferLength;
@@ -434,15 +425,13 @@
       }
 
       context.lineTo(canvasWidth, canvasHalfHeight);
-
       context.stroke();
     }
 
     MaximiseSampleInPlace(sample) {
-      console.log('maximise sample in place');
+      //console.log('maximise sample in place');
       let length = sample.length;
       let numChannels = sample.numberOfChannels;
-
       let maxValue = 0;
 
       for (let i = 0; i < numChannels; i++) {
@@ -468,7 +457,7 @@
     createDiv() {
       this.main = this.shadowRoot.querySelector('#main');
       var div = document.createElement("div");
-      div.setAttribute('id', 'trackN' + this.stateId);
+      div.setAttribute('id', 'trackN' + this.trackId);
       this.main.appendChild(div);
     }
 
@@ -479,16 +468,16 @@
       */
       if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 3) {
         this.createDiv();
-        this.main = this.shadowRoot.querySelector('#trackN' + this.stateId);
-        var track = new Track(this.stateId, this.shadowRoot.querySelector('#onetrack'));
+        this.main = this.shadowRoot.querySelector('#trackN' + this.trackId);
+        var track = new Track(this.trackId, this.shadowRoot.querySelector('#onetrack'));
         var track_clone = track.trackCreation.cloneNode(true);
         console.log(track.trackCreation);
         console.log(this.main);
         this.main.appendChild(track_clone);
-        this.shadowRoot.querySelector("#trackN" + this.stateId + " #title").textContent = track.titleCreation;
-        this.stateId++;
+        this.shadowRoot.querySelector("#trackN" + this.trackId + " #title").textContent = track.titleCreation;
+        this.trackId++;
       } else {
-        console.error("Too much tracks buddy! You need premium.")
+        console.warn("Too much tracks buddy! You need premium.")
       }
     }
 
