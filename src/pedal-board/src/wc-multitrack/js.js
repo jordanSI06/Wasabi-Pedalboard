@@ -45,6 +45,7 @@
       //Start/Pause
       this.startedAt;
       this.pausedAt;
+      this.timeEllapsed;
 
       // Icon buttons element & inner elements
       this.buttonStopImg;
@@ -225,13 +226,21 @@
         this.buttonDlImg.setAttribute('style', 'fill: rgb(191, 255, 194);');
       }
       this.stateRecord = !this.stateRecord;
+      this.pausedAt = undefined;
+      this.startedAt = 0;
     }
 
     playingTrack() {
       if (this.bufferSourceNode && this.stateRecord == false) {
         if (this.statePlay == false) {
           if (this.pausedAt) {
-            this.startedAt = Date.now();
+            // if loop enabled, this will helps!
+            if((this.pausedAt) > (this.bufferSourceNode.buffer.duration * 1000)){
+              this.pausedAt = this.pausedAt - (this.bufferSourceNode.buffer.duration * Math.floor(this.pausedAt / (this.bufferSourceNode.buffer.duration * 1000)))*1000;
+              this.startedAt = Date.now() - this.pausedAt;
+            }
+            this.timeEllapsed = Date.now() - this.timeEllapsed;
+            this.startedAt += this.timeEllapsed; 
             this.bufferSourceNode.start(0, this.pausedAt / 1000);
             this.pausedAt = undefined;
           } else {
@@ -245,8 +254,8 @@
           this.bufferSourceNode.stop()
           this.recreateBuffer();
           this.pausedAt = Date.now() - this.startedAt;
-          this.startedAt = Date.now();
-          //this.bufferSourceNode.disconnect(this.output);
+          // time ellapsed allow us to update playAt value when paused/played.
+          this.timeEllapsed = Date.now();
           this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
         }
         this.statePlay = !this.statePlay;
