@@ -34,6 +34,7 @@
       this.volumeRange;
       this.canvas;
       this.addButton;
+      this.deleteButton;
 
 
       // Icon buttons element
@@ -53,8 +54,9 @@
 
       // Element value
       this.volume = 0.5;
-      this.trackId = 1;
-      this.track;
+      this.trackId = 0;
+      this.trackHTML;
+      this.trackEntity = [];
 
       // Start/Pause manager time
       this.startedAt;
@@ -163,7 +165,7 @@
     // ----- METHODS: CUSTOM -----
 
     stockTrack(){
-      this.track = this.shadowRoot.querySelector('#onetrack0'); 
+      this.trackHTML = this.shadowRoot.querySelector('#onetrack0'); 
       this.shadowRoot.querySelector('#onetrack0').remove();
     }
 
@@ -470,6 +472,7 @@
     }
 
     addTrack() {
+      parent=this;
       /*
       * TODO: Create a i var for id, the button must to be usable with this js and
       * have 4 track max
@@ -477,17 +480,33 @@
       if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 3) {
         this.createDiv();
         this.main = this.shadowRoot.querySelector('#trackN' + this.trackId);
-        let track = new Track(this.trackId,this.track);
-        var track_clone = track.trackCreation.cloneNode(true);
-        console.log(track.trackCreation);
+        let track = new Track(this.trackId,this.trackHTML);
+        this.trackEntity.push(track);
+        let track_clone = this.trackEntity[this.trackId].getTrackHTML.cloneNode(true);
+        console.log(track.getTrackHTML);
         console.log(this.main);
         this.main.appendChild(track_clone);
         this.shadowRoot.querySelector("#trackN" + this.trackId + " #title").textContent = track.titleCreation;
         this.trackId++;
+        this.shadowRoot.querySelector('#onetrack0').setAttribute('id','onetrack')
+        this.deleteButton = this.shadowRoot.querySelectorAll("#delete");
+        let elements = this.deleteButton
+        elements.forEach(function(element){
+          element.removeEventListener('click',parent.deleteTrack.bind(parent));
+          element.addEventListener('click',parent.deleteTrack);
+        });
       } else {
         console.warn("Too much tracks buddy! You need premium.")
       }
     }
 
+    deleteTrack(){
+      this.parentNode.parentNode.parentNode.remove();
+    
+    }
+
+    getDivParent(){
+      
+    }
   });
 })();

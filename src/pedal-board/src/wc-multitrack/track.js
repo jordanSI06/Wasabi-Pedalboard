@@ -6,12 +6,18 @@ class Track{
     this.title = "Untitled Track" + id;
   }
 
-  get trackCreation(){
-    console.log(this.mainContainer.querySelectorAll("*"));
+  get getTrackHTML(){
+    console.log(this.mainContainer.childNodes[3].childNodes[2])
     return this.mainContainer;
   }
 
   get titleCreation(){
     return this.title;
   }
+
+  test(){
+    console.log(document.querySelector('#delete'));
+  }
+
 }
+
