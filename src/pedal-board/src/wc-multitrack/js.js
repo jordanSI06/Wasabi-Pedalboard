@@ -54,6 +54,7 @@
       // Element value
       this.volume = 0.5;
       this.trackId = 1;
+      this.track;
 
       // Start/Pause manager time
       this.startedAt;
@@ -144,6 +145,7 @@
         audio: true
       })
         .then(function (stream) {
+          parent.shadowRoot.onload = parent.stockTrack();
           parent.recordButton.addEventListener('click', parent.recordingTrack.bind(parent));
           parent.stopButton.addEventListener('click', parent.stopTrack.bind(parent));
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
@@ -159,6 +161,12 @@
         });
     }
     // ----- METHODS: CUSTOM -----
+
+    stockTrack(){
+      this.track = this.shadowRoot.querySelector('#onetrack0'); 
+      this.shadowRoot.querySelector('#onetrack0').remove();
+    }
+
 
     recordingTrack() {
       if (this.stateRecord == false) {
@@ -469,7 +477,7 @@
       if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 3) {
         this.createDiv();
         this.main = this.shadowRoot.querySelector('#trackN' + this.trackId);
-        var track = new Track(this.trackId, this.shadowRoot.querySelector('#onetrack'));
+        let track = new Track(this.trackId,this.track);
         var track_clone = track.trackCreation.cloneNode(true);
         console.log(track.trackCreation);
         console.log(this.main);

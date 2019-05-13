@@ -7,6 +7,7 @@ class Track{
   }
 
   get trackCreation(){
+    console.log(this.mainContainer.querySelectorAll("*"));
     return this.mainContainer;
   }
 

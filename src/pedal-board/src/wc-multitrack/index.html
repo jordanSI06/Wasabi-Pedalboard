@@ -44,7 +44,46 @@
       </main>
     </div>
   </div>
-  <div id="main"></div>
+  <div id="main">
+    <ul class="flex-container" id="onetrack0">
+      <li class="flex-item">
+        <div id="nameTrack">
+         <button id='title'>Untitled Track</button>
+        </div>
+        <div id="buttonList">
+          <button id="record">
+            <iron-icon id="btn_rec_img" icon="icons:radio-button-checked"></iron-icon>
+          </button>
+          <button id="play">
+            <iron-icon id="btn_play_img" icon="av:play-circle-filled"></iron-icon>
+          </button>
+          <button id="stop">
+            <iron-icon id="btn_stop_img" icon="av:stop"></iron-icon>
+          </button>
+          <div id="volumePart">
+            <input id="volume" type="range" min="0" max="100">
+          </div>
+          <button id="mute">
+            <iron-icon id="btn_mute_img" icon="av:volume-up"></iron-icon>
+          </button>
+          <button id="loop">
+            <iron-icon id="btn_loop_img" icon="icons:refresh"></iron-icon>
+          </button>
+          <button id="download">
+            <iron-icon id="btn_dl_img" icon="icons:file-download"></iron-icon>
+          </button>
+    
+    
+        </div>
+        <div id="buttonList">
+        
+       
+        </div>
+        
+      </li>
+      <li id="can"><canvas width="2000" height="100"></canvas></li>
+    </ul>
+  </div>
   <button id="addTrack">ADD TRACK</button>
 </template>
 <script src="./js.js"></script>
