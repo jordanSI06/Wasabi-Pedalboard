@@ -16,7 +16,7 @@
 
       // Graph node creation
       this.input = this.ac.createGain();
-      this.input.gain.value = 0;
+      this.input.gain.value = 1;
       this.output = this.ac.createGain();
       this.dest = this.ac.createMediaStreamDestination();
 
@@ -478,7 +478,7 @@
     }
 
     addTrack() {
-      if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 3) {
+      if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 4) {
         //Create the div HTML element
         this.createDiv();
         //Select the div to clone the HTML content
@@ -493,6 +493,10 @@
         this.main.appendChild(track_clone);
         //Call the listeners of the track
         track.callListeners();
+        this.input.connect(this.trackEntity[this.trackId].getInput());
+        this.trackEntity[this.trackId].getInput().connect(this.trackEntity[this.trackId].getOutput());
+        this.trackEntity[this.trackId].getOutput().connect(this.output);
+        this.output.connect(this.dest);
         this.trackId++;
       } else {
         console.warn("Too much tracks buddy! You need premium.")
