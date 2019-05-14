@@ -14,5 +14,9 @@ class Track{
     return this.title;
   }
 
+  fileName(title){
+    this.title=title;
+  }
+
 }
 

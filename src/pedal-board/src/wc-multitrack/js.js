@@ -127,7 +127,7 @@
       this.muteButton = this.shadowRoot.querySelector("#mute");
       this.loopButton = this.shadowRoot.querySelector('#loop');
       this.dlButton = this.shadowRoot.querySelector('#download');
-      this.titleTrack = this.shadowRoot.querySelector('#title');
+      //this.titleTrack = this.shadowRoot.querySelector('#title');
       this.addButton = this.shadowRoot.querySelector('#addTrack');
 
       // Buttons icons assigned with query selector
@@ -157,7 +157,7 @@
           parent.recorder = new MediaRecorder(parent.dest.stream);
           parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
           parent.loopButton.addEventListener('click', parent.loopTrack.bind(parent));
-          parent.titleTrack.addEventListener('click', parent.changeTilte.bind(parent));
+          //parent.titleTrack.addEventListener('click', parent.changeTilte.bind(parent));
           parent.addButton.addEventListener('click', parent.addTrack.bind(parent));
           //console.log('recorder is ready');
         });
@@ -288,14 +288,19 @@
       }
     }
 
-    changeTilte() {
+    changeTilte(dom) {
       let nameTrack = prompt('Please type the title of your track (between 1-20 characters): ');
       if (nameTrack.length > 20 && nameTrack.length > 0) {
         alert("Enter a shorter name (1 to 20 character allowed)");
         this.changeTilte();
       } else {
-        this.titleTrack.textContent = nameTrack;
+        let id = parent.getDivParent(dom).id;
+        id = id[id.length -1];
+        parent.trackEntity[id].fileName(nameTrack);
+        dom.textContent = nameTrack;
         this.fileName = nameTrack;
+        console.log(id);
+        console.log(parent.trackEntity[id].titleCreation);
       }
     }
 
@@ -539,7 +544,7 @@
       b5.addEventListener('click', parent.test.bind(parent,b5));
       b6.addEventListener('click', parent.test.bind(parent,b6));
       b7.addEventListener('click', parent.test.bind(parent,b7));
-      b8.addEventListener('click', parent.test.bind(parent,b8));
+      b8.addEventListener('click', parent.changeTilte.bind(parent,b8));
     }
 
     test(test) {
