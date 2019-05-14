@@ -471,85 +471,33 @@
 
     createDiv() {
       this.main = this.shadowRoot.querySelector('#main');
-      var div = document.createElement("div");
+      //The div will be created in the shadow-root
+      let div = document.createElement("div");
       div.setAttribute('id', 'trackN' + this.trackId);
       this.main.appendChild(div);
     }
 
     addTrack() {
-      parent = this;
-      /*
-      * TODO: Create a i var for id, the button must to be usable with this js and
-      * have 4 track max
-      */
       if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 3) {
+        //Create the div HTML element
         this.createDiv();
+        //Select the div to clone the HTML content
         this.main = this.shadowRoot.querySelector('#trackN' + this.trackId);
+        //Create the track object
         let track = new Track(this.trackId, this.trackHTML);
+        //Push the track in array
         this.trackEntity.push(track);
+        //Clone the div template
         let track_clone = this.trackEntity[this.trackId].getTrackHTML.cloneNode(true);
-        //console.log(track.getTrackHTML);
-        //console.log(this.main);
+        //Create the content inside the div
         this.main.appendChild(track_clone);
-        this.shadowRoot.querySelector("#trackN" + this.trackId + " #title").textContent = track.titleCreation;
-        this.eventListenerUpdate("#trackN" + this.trackId);
+        //Call the listeners of the track
+        track.callListeners();
         this.trackId++;
-        this.shadowRoot.querySelector('#onetrack0').setAttribute('id', 'onetrack')
-        this.deleteButton = this.shadowRoot.querySelectorAll("#delete");
-        let elements = this.deleteButton
-        elements.forEach(function (element) {
-          element.removeEventListener('click', parent.deleteTrack.bind(parent));
-          element.addEventListener('click', parent.deleteTrack);
-        });
       } else {
         console.warn("Too much tracks buddy! You need premium.")
       }
     }
 
-    deleteTrack() {
-      parent.getDivParent(this).remove();
-    }
-
-    getDivParent(dom) {
-      let divSearch = dom.parentNode.id;
-      dom = dom.parentNode;
-      divSearch = divSearch.substr(0, divSearch.length - 1);
-      while (divSearch != "trackN") {
-        divSearch = dom.parentNode.id;
-        dom = dom.parentNode;
-        divSearch = divSearch.substr(0, divSearch.length - 1);
-      }
-      return (dom);
-    }
-
-    getChildren(dom) {
-
-    }
-
-    eventListenerUpdate(dom) {
-      let b1 = parent.shadowRoot.querySelector(dom + ' #play');
-      let b2 = parent.shadowRoot.querySelector(dom + ' #title');
-      let b3 = parent.shadowRoot.querySelector(dom + ' #record');
-      let b4 = parent.shadowRoot.querySelector(dom + ' #stop');
-      let b5 = parent.shadowRoot.querySelector(dom + " #mute");
-      let b6 = parent.shadowRoot.querySelector(dom + ' #loop');
-      let b7 = parent.shadowRoot.querySelector(dom + ' #download');
-      let b8 = parent.shadowRoot.querySelector(dom + ' #title');
-
-
-      b1.addEventListener('click', parent.test.bind(parent,b1));
-      b2.addEventListener('click', parent.test.bind(parent,b2));
-      b3.addEventListener('click', parent.test.bind(parent,b3));
-      b4.addEventListener('click', parent.test.bind(parent,b4));
-      b5.addEventListener('click', parent.test.bind(parent,b5));
-      b6.addEventListener('click', parent.test.bind(parent,b6));
-      b7.addEventListener('click', parent.test.bind(parent,b7));
-      b8.addEventListener('click', parent.changeTilte.bind(parent,b8));
-    }
-
-    test(test) {
-      console.log(test);
-      console.log(parent.getDivParent(test));
-    }
   });
 })();
