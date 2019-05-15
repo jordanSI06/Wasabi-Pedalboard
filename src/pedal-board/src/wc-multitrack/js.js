@@ -277,7 +277,7 @@
       this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
     }
 
-    loopTrack() {
+    /*loopTrack() {
       if (this.bufferSourceNode) {
         if (this.stateLoop == false) {
           this.bufferSourceNode.loop = true;
@@ -287,6 +287,21 @@
           this.buttonLoopImg.setAttribute('style', 'fill : white;')
         }
         this.stateLoop = !this.stateLoop;
+      }
+    }*/
+
+    loopTrack() {
+      for (let i = 0; i < this.trackEntity.length; i++) {
+        if (this.trackEntity[i].bufferSourceNode) {
+          if (this.stateLoop == false) {
+            tthis.trackEntity[i].bufferSourceNode.loop = true;
+            this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
+          } else {
+            this.trackEntity[i].bufferSourceNode.loop = false;
+            this.buttonLoopImg.setAttribute('style', 'fill : white;')
+          }
+          this.stateLoop = !this.stateLoop;
+        }
       }
     }
 
