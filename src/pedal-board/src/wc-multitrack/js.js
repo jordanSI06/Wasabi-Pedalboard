@@ -129,6 +129,7 @@
       this.dlButton = this.shadowRoot.querySelector('#download');
       //this.titleTrack = this.shadowRoot.querySelector('#title');
       this.addButton = this.shadowRoot.querySelector('#addTrack');
+      this.deleteButton = this.shadowRoot.querySelector('#delete');
 
       // Buttons icons assigned with query selector
       this.buttonRecImg = this.shadowRoot.querySelector('#btn_rec_img');
@@ -159,6 +160,7 @@
           parent.loopButton.addEventListener('click', parent.loopTrack.bind(parent));
           //parent.titleTrack.addEventListener('click', parent.changeTilte.bind(parent));
           parent.addButton.addEventListener('click', parent.addTrack.bind(parent));
+          parent.deleteButton.addEventListener('click', parent.deleteTrackFromArray.bind(parent));
           //console.log('recorder is ready');
         });
     }
@@ -285,22 +287,6 @@
           this.buttonLoopImg.setAttribute('style', 'fill : white;')
         }
         this.stateLoop = !this.stateLoop;
-      }
-    }
-
-    changeTilte(dom) {
-      let nameTrack = prompt('Please type the title of your track (between 1-20 characters): ');
-      if (nameTrack.length > 20 && nameTrack.length > 0) {
-        alert("Enter a shorter name (1 to 20 character allowed)");
-        this.changeTilte();
-      } else {
-        let id = parent.getDivParent(dom).id;
-        id = id[id.length -1];
-        parent.trackEntity[id].fileName(nameTrack);
-        dom.textContent = nameTrack;
-        this.fileName = nameTrack;
-        console.log(id);
-        console.log(parent.trackEntity[id].titleCreation);
       }
     }
 
@@ -478,6 +464,7 @@
     }
 
     addTrack() {
+      let parent = this;
       if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 4) {
         //Create the div HTML element
         this.createDiv();
@@ -487,20 +474,53 @@
         let track = new Track(this.trackId, this.trackHTML);
         //Push the track in array
         this.trackEntity.push(track);
+        console.log(this.trackEntity);
         //Clone the div template
-        let track_clone = this.trackEntity[this.trackId].getTrackHTML.cloneNode(true);
+        let track_clone = this.trackEntity[this.trackEntity.length-1].getTrackHTML.cloneNode(true);
         //Create the content inside the div
         this.main.appendChild(track_clone);
         //Call the listeners of the track
         track.callListeners();
-        this.input.connect(this.trackEntity[this.trackId].getInput());
-        this.trackEntity[this.trackId].getInput().connect(this.trackEntity[this.trackId].getOutput());
-        this.trackEntity[this.trackId].getOutput().connect(this.output);
+        this.eventListenerUpdate("#trackN" + this.trackId);
+        this.input.connect(this.trackEntity[this.trackEntity.length-1].getInput());
+        this.trackEntity[this.trackEntity.length-1].getInput().connect(this.trackEntity[this.trackEntity.length-1].getOutput());
+        this.trackEntity[this.trackEntity.length-1].getOutput().connect(this.output);
         this.output.connect(this.dest);
         this.trackId++;
       } else {
         console.warn("Too much tracks buddy! You need premium.")
       }
+    }
+
+    eventListenerUpdate(dom) {
+      let parent = this;
+      let btnDelete = this.shadowRoot.querySelector(dom + ' #delete');
+      btnDelete.addEventListener('click', this.deleteTrackFromArray.bind(parent, btnDelete));
+    }
+
+    getDivParent(dom) {
+      let divSearch = dom.parentNode.id;
+      dom = dom.parentNode;
+      divSearch = divSearch.slice(0,6);
+      while (divSearch != "trackN") {
+        divSearch = dom.parentNode.id;
+        dom = dom.parentNode;
+        divSearch = divSearch.slice(0, 6);
+      }
+      return (dom);
+    }
+
+    deleteTrackFromArray(dom){
+      
+      console.log(dom);
+      let element = this.getDivParent(dom);
+      for(let i= 0; i<this.trackEntity.length; i++){
+        if(element == this.trackEntity[i].shadowRoot){
+          console.log(this.trackEntity[i].shadowRoot)
+          this.trackEntity.splice(i, 1);
+        }
+      }
+      console.log(this.trackEntity);
     }
 
   });

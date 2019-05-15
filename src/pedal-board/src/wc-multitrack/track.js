@@ -23,6 +23,7 @@ class Track {
 
     //HTML Element
     // Graphic Element
+    this.playButton;
     this.recordButton;
     this.dlButton;
     this.titleTrack;
@@ -31,6 +32,7 @@ class Track {
     this.deleteButton;
 
     // Icon buttons element
+    this.buttonPlayImg;
     this.buttonRecImg;
     this.buttonMuteImg;
     this.buttonDlImg;
@@ -65,7 +67,6 @@ class Track {
     // Buttons assigned with query selector
     let parent=this;
     this.titleTrack = this.shadowRoot.querySelector('#title');
-    this.titleTrack.textContent=this.title;
     this.deleteButton = this.shadowRoot.querySelector('#delete')
     this.recordButton = this.shadowRoot.querySelector('#record');
     this.stopButton = this.shadowRoot.querySelector('#stop');
@@ -90,11 +91,13 @@ class Track {
     // Canvas assigned with query selector
     this.canvas = this.shadowRoot.querySelector('canvas');
 
+    this.titleTrack.textContent=this.title;
+
     navigator.mediaDevices.getUserMedia({
       audio: true
     })
       .then(function (stream) {
-        navigator.mediaDevices.getUserMedia
+        parent.playButton.addEventListener('click', parent.playingTrack.bind(parent));
         parent.recordButton.addEventListener('click', parent.recordingTrack.bind(parent));
         parent.dlButton.addEventListener('click', parent.download.bind(parent));
         parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
@@ -351,6 +354,41 @@ class Track {
 
   deleteTrack() {
     this.shadowRoot.remove();
+  }
+
+  playingTrack() {
+    if (this.bufferSourceNode && this.stateRecord == false) {
+      if (this.statePlay == false) {
+        if (this.pausedAt) {
+          // if loop enabled, this will helps!
+          if ((this.pausedAt) > (this.bufferSourceNode.buffer.duration * 1000)) {
+            this.pausedAt = this.pausedAt - (this.bufferSourceNode.buffer.duration * Math.floor(this.pausedAt / (this.bufferSourceNode.buffer.duration * 1000))) * 1000;
+            this.startedAt = Date.now() - this.pausedAt;
+          }
+          this.timeEllapsed = Date.now() - this.timeEllapsed;
+          this.startedAt += this.timeEllapsed;
+          if (this.pausedAt < 0) this.pausedAt = 0
+          this.bufferSourceNode.start(0, this.pausedAt / 1000);
+          this.pausedAt = undefined;
+        } else {
+          this.startedAt = Date.now()
+          this.bufferSourceNode.start();
+        }
+
+        this.bufferSourceNode.connect(this.output);
+        this.buttonPlayImg.setAttribute('icon', 'av:pause');
+      } else if (this.statePlay == true) {
+        this.bufferSourceNode.stop()
+        this.recreateBuffer();
+        this.pausedAt = Date.now() - this.startedAt;
+        // time ellapsed allow us to update playAt value when paused/played.
+        this.timeEllapsed = Date.now();
+        this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
+      }
+      this.statePlay = !this.statePlay;
+    } else {
+      console.warn("You cannot play/pause! (There's no file or the track isn't recording)");
+    }
   }
 }
 
