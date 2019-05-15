@@ -291,60 +291,24 @@
     }*/
 
     loopTrack() {
-      for (let i = 0; i < this.trackEntity.length; i++) {
-        if (this.trackEntity[i].bufferSourceNode) {
-          if (this.stateLoop == false) {
+      if (this.stateLoop == false) {
+        for (let i = 0; i < this.trackEntity.length; i++) {
+          if (this.trackEntity[i].bufferSourceNode) {
             this.trackEntity[i].bufferSourceNode.loop = true;
             console.log(this.trackEntity[i].bufferSourceNode.loop);
-            this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
-          } else {
-            this.trackEntity[i].bufferSourceNode.loop = false;
-            this.buttonLoopImg.setAttribute('style', 'fill : white;')
           }
-          this.stateLoop = !this.stateLoop;
         }
+        this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
+      } else if (this.stateLoop == true) {
+        for (let i = 0; i < this.trackEntity.length; i++) {
+          if (this.trackEntity[i].bufferSourceNode) {
+            this.trackEntity[i].bufferSourceNode.loop = false;
+            console.log(this.trackEntity[i].bufferSourceNode.loop);
+          }
+        }
+        this.buttonLoopImg.setAttribute('style', 'fill : white;')
       }
-    }
-
-    onRecordingReady(e) {
-      //console.log("onRecordingReady");
-
-      let parent = this;
-      this.blob = e.data;
-      this.recordedBlobs.push(e.data);
-      this.fileReader = new FileReader();
-
-      this.fileReader.onprogress = function () {
-        console.log("recording...")
-      }
-      this.fileReader.onload = function () {
-        parent.arrayBuffer = this.result;
-        parent.ac.decodeAudioData(parent.arrayBuffer, function (decoded) {
-          console.log('finished!', decoded.length);
-          parent.useSample(decoded);
-        }, function (fail) {
-          console.error('fail!', fail);
-        });
-      }
-      this.fileReader.readAsArrayBuffer(this.blob);
-    }
-
-    useSample(sample) {
-      let parent = this;
-      if (this.bufferSourceNode) {
-        this.bufferSourceNode.disconnect()
-      }
-
-      this.sample = sample
-      this.recreateBuffer();
-      this.data = [];
-      this.channelData = sample.getChannelData(0);
-
-      for (let i = 0; i < this.channelData.length; i++) {
-        this.data.push(this.channelData[i]);
-      }
-
-      this.RenderWave(this.canvas, this.data);
+      this.stateLoop = !this.stateLoop;
     }
 
     download() {
@@ -368,105 +332,13 @@
 
     }
 
-    stopSample() {
-      console.log('stop sample');
-      if (this.bufferSourceNode) {
-        this.bufferSourceNode.disconnect();
-        this.bufferSourceNode = undefined;
-      }
-    }
-
-    changeVolume(e) {
-      this.volume = e.target.value / 100;
-      if (this.bufferSourceNode) {
-        if (!this.stateMute) {
-          this.output.gain.value = this.volume;
-        }
-      }
-    }
-
-    muteVolume() {
-      if (!this.stateMute) {
-        if (this.bufferSourceNode) {
-          this.output.gain.value = 0;
-          this.buttonMuteImg.setAttribute('icon', 'av:volume-off')
-        }
-      } else {
-        this.output.gain.value = this.volume;
-        this.buttonMuteImg.setAttribute('icon', 'av:volume-up')
-      }
-      this.stateMute = !this.stateMute;
-    }
-
-
-    clearCanvas() {
-      let context = this.canvas.getContext('2d');
-      let canvasWidth = this.canvas.width;
-      let canvasHeigth = this.canvas.height;
-
-      context.fillStyle = 'rgb(85, 85, 85)';
-      context.fillRect(0, 0, canvasWidth, canvasHeigth);
-      context.lineWidth = 1;
-      context.strokeStyle = 'rgb(205, 205, 205)';
-      context.beginPath();
-    }
-
-    RenderWave(canvas, data) {
-      let context = this.canvas.getContext('2d');
-      let canvasWidth = this.canvas.width;
-      let canvasHeigth = this.canvas.height;
-      let canvasHalfHeight = canvasHeigth * 0.5;
-
-      this.bufferLength = data.length;
-
-      context.fillStyle = 'rgb(85, 85, 85)';
-      context.fillRect(0, 0, canvasWidth, canvasHeigth);
-      context.lineWidth = 1;
-      context.strokeStyle = 'rgb(205, 205, 205)';
-      context.beginPath();
-
-      let sliceWidth = canvasWidth * 1.0 / this.bufferLength;
-      let x = 0 - sliceWidth;
-
-      for (let i = 0; i < this.bufferLength; i++) {
-        let v = 1 - this.data[i];
-        let y = v * canvasHalfHeight;
-
-        if (i === 0) {
-          context.moveTo(x, y);
-        } else {
-          context.lineTo(x, y);
-        }
-
-        x += sliceWidth;
-      }
-
-      context.lineTo(canvasWidth, canvasHalfHeight);
-      context.stroke();
-    }
-
-    MaximiseSampleInPlace(sample) {
-      //console.log('maximise sample in place');
-      let length = sample.length;
-      let numChannels = sample.numberOfChannels;
-      let maxValue = 0;
-
-      for (let i = 0; i < numChannels; i++) {
-        this.data = sample.getChannelData(i);
-
-        for (let j = 0; j < length; j++) {
-          let value = Math.abs(this.data[j]);
-          maxValue = Math.max(value, maxValue);
-        }
-      }
-
-      let amp = 1.0 / maxValue;
-
-      for (let i = 0; i < numChannels; i++) {
-        //let inData = sample.getChannelData(i);
-        for (let j = 0; j < length; j++) {
-          let value = this.data[j];
-          this.data[j] = value * amp;
+    changeVolume(e){
+      this.volume = e.target.value/100;
+      for(let i = 0; i < this.trackEntity.length; i++){
+        if(this.trackEntity[i].bufferSourceNode){
+          if(!this.trackEntity[i].stateMute){
+            this.output.gain.value = this.volume;
+          }
         }
       }
     }
@@ -487,20 +359,20 @@
         //Select the div to clone the HTML content
         this.main = this.shadowRoot.querySelector('#trackN' + this.trackId);
         //Create the track object
-        let track = new Track(this.trackId, this.trackHTML);
+        let track = new Track(this.trackId, this.trackHTML, this.stateLoop, this.volume);
         //Push the track in array
         this.trackEntity.push(track);
         console.log(this.trackEntity);
         //Clone the div template
-        let track_clone = this.trackEntity[this.trackEntity.length-1].getTrackHTML.cloneNode(true);
+        let track_clone = this.trackEntity[this.trackEntity.length - 1].getTrackHTML.cloneNode(true);
         //Create the content inside the div
         this.main.appendChild(track_clone);
         //Call the listeners of the track
         track.callListeners();
         this.eventListenerUpdate("#trackN" + this.trackId);
-        this.input.connect(this.trackEntity[this.trackEntity.length-1].getInput());
-        this.trackEntity[this.trackEntity.length-1].getInput().connect(this.trackEntity[this.trackEntity.length-1].getOutput());
-        this.trackEntity[this.trackEntity.length-1].getOutput().connect(this.output);
+        this.input.connect(this.trackEntity[this.trackEntity.length - 1].getInput());
+        this.trackEntity[this.trackEntity.length - 1].getInput().connect(this.trackEntity[this.trackEntity.length - 1].getOutput());
+        this.trackEntity[this.trackEntity.length - 1].getOutput().connect(this.output);
         this.output.connect(this.dest);
         this.trackId++;
       } else {
@@ -517,7 +389,7 @@
     getDivParent(dom) {
       let divSearch = dom.parentNode.id;
       dom = dom.parentNode;
-      divSearch = divSearch.slice(0,6);
+      divSearch = divSearch.slice(0, 6);
       while (divSearch != "trackN") {
         divSearch = dom.parentNode.id;
         dom = dom.parentNode;
@@ -526,12 +398,12 @@
       return (dom);
     }
 
-    deleteTrackFromArray(dom){
-      
+    deleteTrackFromArray(dom) {
+
       console.log(dom);
       let element = this.getDivParent(dom);
-      for(let i= 0; i<this.trackEntity.length; i++){
-        if(element == this.trackEntity[i].shadowRoot){
+      for (let i = 0; i < this.trackEntity.length; i++) {
+        if (element == this.trackEntity[i].shadowRoot) {
           console.log(this.trackEntity[i].shadowRoot)
           this.trackEntity.splice(i, 1);
         }

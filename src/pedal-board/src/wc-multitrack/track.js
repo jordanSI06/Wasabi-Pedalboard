@@ -1,5 +1,5 @@
 class Track {
-  constructor(id, content) {
+  constructor(id, content, loopState, volume) {
     //Parameters oh HTML content
     this.id = id;
     this.mainContainer = content;
@@ -42,10 +42,10 @@ class Track {
     this.statePlay = false;
     this.statePause = false;
     this.stateMute = false;
-    this.stateLoop = false;
+    this.stateLoop = loopState;
 
     // Element value
-    this.volume = 0.5;
+    this.volume = volume;
     this.trackId = 0;
 
     // File element
