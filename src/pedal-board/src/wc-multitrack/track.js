@@ -72,7 +72,7 @@ class Track {
     this.stopButton = this.shadowRoot.querySelector('#stop');
     this.playButton = this.shadowRoot.querySelector('#play');
     this.muteButton = this.shadowRoot.querySelector("#mute");
-    //this.loopButton = this.shadowRoot.querySelector('#loop');
+    this.loopButton = this.shadowRoot.querySelector('#loop');
     this.dlButton = this.shadowRoot.querySelector('#download');
     this.titleTrack = this.shadowRoot.querySelector('#title');
     this.addButton = this.shadowRoot.querySelector('#addTrack');
@@ -81,7 +81,7 @@ class Track {
     this.buttonRecImg = this.shadowRoot.querySelector('#btn_rec_img');
     this.buttonStopImg = this.shadowRoot.querySelector('#btn_stop_img');
     this.buttonPlayImg = this.shadowRoot.querySelector('#btn_play_img');
-    //this.buttonLoopImg = this.shadowRoot.querySelector('#btn_loop_img');
+    this.buttonLoopImg = this.shadowRoot.querySelector('#btn_loop_img');
     this.buttonMuteImg = this.shadowRoot.querySelector('#btn_mute_img');
     this.buttonDlImg = this.shadowRoot.querySelector('#btn_dl_img');
 
