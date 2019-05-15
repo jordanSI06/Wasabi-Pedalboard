@@ -154,9 +154,9 @@
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
           parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
           parent.playButton.addEventListener('click', parent.playingTrack.bind(parent));
-          parent.muteButton.addEventListener('click', parent.muteVolume.bind(parent));
+          //parent.muteButton.addEventListener('click', parent.muteVolume.bind(parent));
           parent.recorder = new MediaRecorder(parent.dest.stream);
-          parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
+          //parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
           parent.loopButton.addEventListener('click', parent.loopTrack.bind(parent));
           //parent.titleTrack.addEventListener('click', parent.changeTilte.bind(parent));
           parent.addButton.addEventListener('click', parent.addTrack.bind(parent));
