@@ -44,11 +44,33 @@
       </main>-->
     </div>
   </div>
+  <div id="options">
+    <ul class="flex-container2">
+      <li id="lecteur">
+        <div id="buttonList">
+            <button id="play">
+                <iron-icon id="btn_play_img" icon="av:play-circle-filled"></iron-icon>
+              </button>
+              <button id="stop">
+                  <iron-icon id="btn_stop_img" icon="av:stop"></iron-icon>
+                </button>
+                <div id="volumePart">
+                    <input id="volume" type="range" min="0" max="100">
+                  </div>
+                  <button id="loop">
+                      <iron-icon id="btn_loop_img" icon="icons:refresh"></iron-icon>
+                  </button>
+        </div>
+      </li>
+
+    </ul>
+
+  </div>
   <div id="main">
     <ul class="flex-container" id="onetrack0">
       <li class="flex-item">
         <div id="nameTrack">
-         <button id='title'>Untitled Track</button>
+          <button id='title'>Untitled Track</button>
         </div>
         <div id="buttonList">
           <button id="record">
@@ -72,16 +94,19 @@
           <button id="download">
             <iron-icon id="btn_dl_img" icon="icons:file-download"></iron-icon>
           </button>
-    
+
         </div>
-        
+
       </li>
       <li id="can"><canvas width="2000" height="100"></canvas>
-        <button id="delete"><iron-icon id="btn_dl_img" icon="icons:delete"></iron-icon> </button></li>
+        <button id="delete">
+          <iron-icon id="btn_dl_img" icon="icons:delete"></iron-icon>
+        </button></li>
     </ul>
   </div>
-  <button id="addTrack"> <iron-icon id="btn_dl_img" icon="icons:add"></iron-icon></button>
+  <button id="addTrack">
+    <iron-icon id="btn_dl_img" icon="icons:add"></iron-icon>
+  </button>
 </template>
 <script src="./js.js"></script>
 <script src="./track.js"></script>
-

@@ -6,6 +6,10 @@ canvas {
 	width: 95%;
 }
 
+button {
+  outline:0;
+}
+
 li.flex-item {
   border:2px solid rgb(135, 135, 135);
   height:45px;
@@ -29,16 +33,10 @@ iron-icon{
   background-color: #333;
 }
 
-button:not(.titleclass) img { 
-  width: 20px;
-  height: 20px;
-}
 
-
-button:not(#addTrack) {
+[id^="trackN"] button:not(#addTrack){
   border: 0px;
   background-color : #333;
-  outline:0;
 }
 
 .flex-container {
@@ -49,7 +47,18 @@ button:not(#addTrack) {
   margin-top:10px;
   margin-bottom:0px;
   height:50px
+}
 
+.flex-container2 {
+  background-color:#555;
+  list-style: none;
+  display: flex;
+  align-content: flex-start;
+  margin-top:10px;
+  margin-bottom:0px;
+  height:45px;
+  width:99%;
+  margin-left:750px;
 }
 
 #can {
@@ -101,3 +110,28 @@ input[type=range]::-webkit-slider-thumb {
 
 
 
+#lecteur iron-icon{
+width:35px;
+height:35px;
+}
+
+#options #volume {
+  
+margin-top:10px;
+}
+
+#volumePart #lecteur{
+widows: 35px;
+height:50px;
+}
+
+#options button {
+  background-color: #555;
+  border: #555;
+}
+
+#options {
+  background-color:#555;
+  margin-top:9px;
+  border: solid 1px #0d0d0d;
+}
