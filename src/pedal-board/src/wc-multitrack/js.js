@@ -294,7 +294,8 @@
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (this.trackEntity[i].bufferSourceNode) {
           if (this.stateLoop == false) {
-            tthis.trackEntity[i].bufferSourceNode.loop = true;
+            this.trackEntity[i].bufferSourceNode.loop = true;
+            console.log(this.trackEntity[i].bufferSourceNode.loop);
             this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
           } else {
             this.trackEntity[i].bufferSourceNode.loop = false;
