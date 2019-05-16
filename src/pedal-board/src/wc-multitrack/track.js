@@ -283,33 +283,48 @@ class Track {
     let canvasWidth = this.canvas.width;
     let canvasHeigth = this.canvas.height;
     let canvasHalfHeight = canvasHeigth * 0.5;
-
+ 
     this.bufferLength = data.length;
-
+ 
     context.fillStyle = 'rgb(85, 85, 85)';
     context.fillRect(0, 0, canvasWidth, canvasHeigth);
     context.lineWidth = 1;
     context.strokeStyle = 'rgb(205, 205, 205)';
     context.beginPath();
-
-    let sliceWidth = canvasWidth * 1.0 / this.bufferLength;
+ 
+    // 8640000 correspond to 3 mins. To get one sec: 8640000/3/60. This values will be a var soon.
+    let sliceWidth = canvasWidth * 1.0 / 8640000;
     let x = 0 - sliceWidth;
-
+    console.log(sliceWidth);
+    console.log(this.bufferLength);
+ 
     for (let i = 0; i < this.bufferLength; i++) {
       let v = 1 - this.data[i];
       let y = v * canvasHalfHeight;
-
+ 
       if (i === 0) {
         context.moveTo(x, y);
       } else {
         context.lineTo(x, y);
       }
-
+ 
       x += sliceWidth;
     }
-
+    canvas.addEventListener('click',this.timerWave.bind(this,canvas));
+    context.lineTo(this.bufferLength+1, canvasHalfHeight);
     context.lineTo(canvasWidth, canvasHalfHeight);
     context.stroke();
+  }
+ 
+  timerWave(canvas,e){
+     // 8640000 correspond to 3 mins. To get one sec: 8640000/3/60. This values will be a var soon.
+    let maxDuration = 8640000/48000
+    let pos = (e.clientX - canvas.offsetLeft) / canvas.offsetWidth;
+    let timeStamp = Math.floor(pos * maxDuration * 1000);
+    let min = Math.floor(timeStamp/1000/60);
+    let sec = Math.floor((timeStamp/1000 - min * 60)*100)/100;
+  console.log("TimeStamp =  "+ timeStamp);
+  console.log(min + " minutes et "+ sec+" secondes.")
   }
 
   MaximiseSampleInPlace(sample) {
