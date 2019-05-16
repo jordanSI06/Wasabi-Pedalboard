@@ -59,7 +59,7 @@
       this.startedAt;
       this.pausedAt;
       this.timeEllapsed;
-
+      
       // File element
       this.blob;
       this.sample;
@@ -159,33 +159,54 @@
         });
     }
     // ----- METHODS: CUSTOM -----
-  
+
     // ----- Method of the menu -----
     stockTrack() {
       this.trackHTML = this.shadowRoot.querySelector('#onetrack0');
       this.shadowRoot.querySelector('#onetrack0').remove();
     }
 
-    setPlayTrack(){
-      for(let i = 0; i < this.trackEntity.length; i++){
+    setPlayTrack() {
+      for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].playingTrack();
       }
+      if (this.statePlay == false) this.buttonPlayImg.setAttribute('icon', 'av:pause');
+      else if (this.statePlay == true) this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
+      this.statePlay = !this.statePlay;
     }
 
-    setStopTrack(){
-      for(let i = 0; i < this.trackEntity.length; i++){
+    setStopTrack() {
+      for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].stopTrack();
       }
     }
 
     setLoopTrack() {
-      for(let i = 0; i < this.trackEntity.length; i++){
-        this.trackEntity[i].loopTrack();
+      if (this.stateLoop == false) {
+        for (let i = 0; i < this.trackEntity.length; i++) {
+          this.trackEntity[i].loopTrack();
+          this.trackEntity[i].stateLoop=true;
+        }
+        this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
+      }
+      else if (this.stateLoop == true) {
+        for (let i = 0; i < this.trackEntity.length; i++) {
+          this.trackEntity[i].loopTrack();
+          this.trackEntity[i].stateLoop=false;
+        }
+        this.buttonLoopImg.setAttribute('style', 'fill : white;')
       }
       this.stateLoop = !this.stateLoop;
     }
 
-    //TODO: check the max time
+    /*checkMaxTime(){
+      for (let i = 0; i < this.trackEntity.length; i++) {
+        if(this.trackEntity[i+1].bufferSourceNode.buffer.duration > this.trackEntity[i].bufferSourceNode.buffer.duration);{
+          this.maxTime=this.trackEntity[i+1].bufferSourceNode.buffer.duration;
+          this.trackEntity[i+1].bufferSourceNode.buffer.duration = this.maxTime;
+        }
+      }
+    }*/
 
     download() {
       if (!this.stateRecord && this.bufferSourceNode) {
@@ -208,11 +229,11 @@
 
     }
 
-    changeVolume(e){
-      this.volume = e.target.value/100;
-      for(let i = 0; i < this.trackEntity.length; i++){
-        if(this.trackEntity[i].bufferSourceNode){
-          if(!this.trackEntity[i].stateMute){
+    changeVolume(e) {
+      this.volume = e.target.value / 100;
+      for (let i = 0; i < this.trackEntity.length; i++) {
+        if (this.trackEntity[i].bufferSourceNode) {
+          if (!this.trackEntity[i].stateMute) {
             this.output.gain.value = this.volume;
           }
         }
@@ -286,6 +307,7 @@
           this.trackEntity.splice(i, 1);
         }
       }
+      this.checkMaxTime();
       console.log(this.trackEntity);
     }
 

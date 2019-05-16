@@ -205,7 +205,7 @@ class Track {
   }
 
   useSample(sample) {
-    let parent = this;
+    //this.MaximiseSampleInPlace(sample);
     if (this.bufferSourceNode) {
       this.bufferSourceNode.disconnect()
     }
@@ -327,7 +327,7 @@ class Track {
   console.log(min + " minutes et "+ sec+" secondes.")
   }
 
-  MaximiseSampleInPlace(sample) {
+  /*MaximiseSampleInPlace(sample) {
     //console.log('maximise sample in place');
     let length = sample.length;
     let numChannels = sample.numberOfChannels;
@@ -351,7 +351,7 @@ class Track {
         this.data[j] = value * amp;
       }
     }
-  }
+  }*/
 
   deleteTrack() {
     this.shadowRoot.remove();
