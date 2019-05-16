@@ -25,7 +25,6 @@
       this.output.connect(this.dest); // associated to MediaRecorder
 
       // Graphic Element
-      this.recordButton;
       this.playButton;
       this.stopButton;
       this.loopButton;
@@ -38,7 +37,6 @@
 
 
       // Icon buttons element
-      this.buttonRecImg;
       this.buttonPlayImg;
       this.buttonStopImg;
       this.buttonLoopImg;
@@ -46,7 +44,6 @@
       this.buttonDlImg;
 
       // Element state
-      this.stateRecord = false;
       this.statePlay = false;
       this.statePause = false;
       this.stateMute = false;
@@ -121,7 +118,6 @@
 
       // Buttons assigned with query selector
       this.titleTrack = this.shadowRoot.querySelector('#title')
-      this.recordButton = this.shadowRoot.querySelector('#record');
       this.stopButton = this.shadowRoot.querySelector('#stop');
       this.playButton = this.shadowRoot.querySelector('#play');
       this.muteButton = this.shadowRoot.querySelector("#mute");
@@ -132,7 +128,6 @@
       this.deleteButton = this.shadowRoot.querySelector('#delete');
 
       // Buttons icons assigned with query selector
-      this.buttonRecImg = this.shadowRoot.querySelector('#btn_rec_img');
       this.buttonStopImg = this.shadowRoot.querySelector('#btn_stop_img');
       this.buttonPlayImg = this.shadowRoot.querySelector('#btn_play_img');
       this.buttonLoopImg = this.shadowRoot.querySelector('#btn_loop_img');
@@ -149,15 +144,14 @@
       })
         .then(function (stream) {
           parent.shadowRoot.onload = parent.stockTrack();
-          parent.recordButton.addEventListener('click', parent.recordingTrack.bind(parent));
-          parent.stopButton.addEventListener('click', parent.stopTrack.bind(parent));
+          parent.stopButton.addEventListener('click', parent.setStopTrack.bind(parent));
           parent.dlButton.addEventListener('click', parent.download.bind(parent));
           parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
-          parent.playButton.addEventListener('click', parent.playingTrack.bind(parent));
+          parent.playButton.addEventListener('click', parent.setPlayTrack.bind(parent));
           //parent.muteButton.addEventListener('click', parent.muteVolume.bind(parent));
           parent.recorder = new MediaRecorder(parent.dest.stream);
           //parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
-          parent.loopButton.addEventListener('click', parent.loopTrack.bind(parent));
+          parent.loopButton.addEventListener('click', parent.setLoopTrack.bind(parent));
           //parent.titleTrack.addEventListener('click', parent.changeTilte.bind(parent));
           parent.addButton.addEventListener('click', parent.addTrack.bind(parent));
           parent.deleteButton.addEventListener('click', parent.deleteTrackFromArray.bind(parent));
@@ -165,151 +159,33 @@
         });
     }
     // ----- METHODS: CUSTOM -----
-
+  
+    // ----- Method of the menu -----
     stockTrack() {
       this.trackHTML = this.shadowRoot.querySelector('#onetrack0');
       this.shadowRoot.querySelector('#onetrack0').remove();
     }
 
-
-    recordingTrack() {
-      if (this.stateRecord == false) {
-        //console.log('start recording');
-        this.input.gain.value = 1;
-        this.statePlay = false;
-
-        this.stopSample();
-        this.clearCanvas();
-        this.recorder.start();
-
-        this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
-        this.buttonRecImg.setAttribute('style', 'fill:red;');
-        this.buttonDlImg.setAttribute('style', 'fill: #fff');
-      }
-      if (this.stateRecord == true) {
-        //console.log('stop recording');
-        this.input.gain.value = 0;
-
-        this.recorder.stop()
-
-        this.buttonRecImg.setAttribute('style', 'fill:#fff;');
-        this.buttonDlImg.setAttribute('style', 'fill: rgb(191, 255, 194);');
-      }
-      this.stateRecord = !this.stateRecord;
-      this.pausedAt = undefined;
-      this.startedAt = 0;
-    }
-
-    playingTrack() {
-      if (this.bufferSourceNode && this.stateRecord == false) {
-        if (this.statePlay == false) {
-          if (this.pausedAt) {
-            // if loop enabled, this will helps!
-            if ((this.pausedAt) > (this.bufferSourceNode.buffer.duration * 1000)) {
-              this.pausedAt = this.pausedAt - (this.bufferSourceNode.buffer.duration * Math.floor(this.pausedAt / (this.bufferSourceNode.buffer.duration * 1000))) * 1000;
-              this.startedAt = Date.now() - this.pausedAt;
-            }
-            this.timeEllapsed = Date.now() - this.timeEllapsed;
-            this.startedAt += this.timeEllapsed;
-            if (this.pausedAt < 0) this.pausedAt = 0
-            this.bufferSourceNode.start(0, this.pausedAt / 1000);
-            this.pausedAt = undefined;
-          } else {
-            this.startedAt = Date.now()
-            this.bufferSourceNode.start();
-          }
-
-          this.bufferSourceNode.connect(this.output);
-          this.buttonPlayImg.setAttribute('icon', 'av:pause');
-        } else if (this.statePlay == true) {
-          this.bufferSourceNode.stop()
-          this.recreateBuffer();
-          this.pausedAt = Date.now() - this.startedAt;
-          // time ellapsed allow us to update playAt value when paused/played.
-          this.timeEllapsed = Date.now();
-          this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
-        }
-        this.statePlay = !this.statePlay;
-      } else {
-        console.warn("You cannot play/pause! (There's no file or the track isn't recording)");
+    setPlayTrack(){
+      for(let i = 0; i < this.trackEntity.length; i++){
+        this.trackEntity[i].playingTrack();
       }
     }
 
-    //TODO: exception with audio start
-    stopTrack() {
-      if (this.bufferSourceNode && this.statePlay == true) {
-        //this.bufferSourceNode.stop();
-        this.bufferSourceNode.disconnect();
-        this.recreateBuffer();
-        this.pausedAt = undefined;
-      }
-      else if (this.bufferSourceNode && this.statePlay == false) {
-        //this.bufferSourceNode.start();
-        //this.bufferSourceNode.stop();
-        this.bufferSourceNode.disconnect();
-        this.recreateBuffer();
-        this.pausedAt = undefined;
-      }
-      else {
-        console.warn("You cannot stop when a track who doesn't exist!")
+    setStopTrack(){
+      for(let i = 0; i < this.trackEntity.length; i++){
+        this.trackEntity[i].stopTrack();
       }
     }
 
-    recreateBuffer() {
-      let parent = this;
-      this.statePlay = false;
-      //if(this.bufferSourceNode) this.bufferSourceNode.disconnect();
-      this.bufferSourceNode = this.ac.createBufferSource();
-      this.bufferSourceNode.buffer = this.sample;
-
-      //this.bufferSourceNode.connect(this.output);
-      //this.bufferSourceNode.disconnect(this.output);
-
-      this.bufferSourceNode.onended = function () {
-        //console.log("Etape 2");
-        parent.recreateBuffer();
-      }
-      this.buttonLoopImg.setAttribute('style', 'fill : white;');
-      if (this.stateLoop) {
-        this.bufferSourceNode.loop = true;
-        this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
-      }
-      this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
-    }
-
-    /*loopTrack() {
-      if (this.bufferSourceNode) {
-        if (this.stateLoop == false) {
-          this.bufferSourceNode.loop = true;
-          this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
-        } else {
-          this.bufferSourceNode.loop = false;
-          this.buttonLoopImg.setAttribute('style', 'fill : white;')
-        }
-        this.stateLoop = !this.stateLoop;
-      }
-    }*/
-
-    loopTrack() {
-      if (this.stateLoop == false) {
-        for (let i = 0; i < this.trackEntity.length; i++) {
-          if (this.trackEntity[i].bufferSourceNode) {
-            this.trackEntity[i].bufferSourceNode.loop = true;
-            console.log(this.trackEntity[i].bufferSourceNode.loop);
-          }
-        }
-        this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
-      } else if (this.stateLoop == true) {
-        for (let i = 0; i < this.trackEntity.length; i++) {
-          if (this.trackEntity[i].bufferSourceNode) {
-            this.trackEntity[i].bufferSourceNode.loop = false;
-            console.log(this.trackEntity[i].bufferSourceNode.loop);
-          }
-        }
-        this.buttonLoopImg.setAttribute('style', 'fill : white;')
+    setLoopTrack() {
+      for(let i = 0; i < this.trackEntity.length; i++){
+        this.trackEntity[i].loopTrack();
       }
       this.stateLoop = !this.stateLoop;
     }
+
+    //TODO: check the max time
 
     download() {
       if (!this.stateRecord && this.bufferSourceNode) {
@@ -342,6 +218,8 @@
         }
       }
     }
+
+    // ----- Method of the creation of track -----
 
     createDiv() {
       this.main = this.shadowRoot.querySelector('#main');

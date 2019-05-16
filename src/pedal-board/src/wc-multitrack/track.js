@@ -23,7 +23,7 @@ class Track {
 
     //HTML Element
     // Graphic Element
-    this.playButton;
+    //this.playButton;
     this.recordButton;
     this.dlButton;
     this.titleTrack;
@@ -32,7 +32,7 @@ class Track {
     this.deleteButton;
 
     // Icon buttons element
-    this.buttonPlayImg;
+    //this.buttonPlayImg;
     this.buttonRecImg;
     this.buttonMuteImg;
     this.buttonDlImg;
@@ -69,19 +69,15 @@ class Track {
     this.titleTrack = this.shadowRoot.querySelector('#title');
     this.deleteButton = this.shadowRoot.querySelector('#delete')
     this.recordButton = this.shadowRoot.querySelector('#record');
-    this.stopButton = this.shadowRoot.querySelector('#stop');
-    this.playButton = this.shadowRoot.querySelector('#play');
+    //this.playButton = this.shadowRoot.querySelector('#play');
     this.muteButton = this.shadowRoot.querySelector("#mute");
-    this.loopButton = this.shadowRoot.querySelector('#loop');
     this.dlButton = this.shadowRoot.querySelector('#download');
     this.titleTrack = this.shadowRoot.querySelector('#title');
     this.addButton = this.shadowRoot.querySelector('#addTrack');
 
     // Buttons icons assigned with query selector
     this.buttonRecImg = this.shadowRoot.querySelector('#btn_rec_img');
-    this.buttonStopImg = this.shadowRoot.querySelector('#btn_stop_img');
     this.buttonPlayImg = this.shadowRoot.querySelector('#btn_play_img');
-    this.buttonLoopImg = this.shadowRoot.querySelector('#btn_loop_img');
     this.buttonMuteImg = this.shadowRoot.querySelector('#btn_mute_img');
     this.buttonDlImg = this.shadowRoot.querySelector('#btn_dl_img');
 
@@ -97,7 +93,7 @@ class Track {
       audio: true
     })
       .then(function (stream) {
-        parent.playButton.addEventListener('click', parent.playingTrack.bind(parent));
+        //parent.playButton.addEventListener('click', parent.playingTrack.bind(parent));
         parent.recordButton.addEventListener('click', parent.recordingTrack.bind(parent));
         parent.dlButton.addEventListener('click', parent.download.bind(parent));
         parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
@@ -118,7 +114,6 @@ class Track {
   }
 
   get getTrackHTML() {
-    console.log(this.mainContainer.childNodes[3].childNodes[2])
     return this.mainContainer;
   }
 
@@ -128,7 +123,6 @@ class Track {
 
   recordingTrack() {
     if (this.stateRecord == false) {
-      //console.log('start recording');
       this.input.gain.value = 1;
       this.statePlay = false;
 
@@ -141,7 +135,6 @@ class Track {
       this.buttonDlImg.setAttribute('style', 'fill: #fff');
     }
     if (this.stateRecord == true) {
-      //console.log('stop recording');
       this.input.gain.value = 0;
 
       this.recorder.stop()
@@ -165,22 +158,15 @@ class Track {
   recreateBuffer() {
     let parent = this;
     this.statePlay = false;
-    //if(this.bufferSourceNode) this.bufferSourceNode.disconnect();
     this.bufferSourceNode = this.ac.createBufferSource();
     this.bufferSourceNode.buffer = this.sample;
-
-    //this.bufferSourceNode.connect(this.output);
-    //this.bufferSourceNode.disconnect(this.output);
-
     this.bufferSourceNode.onended = function () {
-      //console.log("Etape 2");
       parent.recreateBuffer();
     }
-    this.buttonLoopImg.setAttribute('style', 'fill : white;');
     if (this.stateLoop) {
       this.bufferSourceNode.loop = true;
-      this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
     }
+    //TODO: erase it
     this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
   }
   
@@ -390,5 +376,35 @@ class Track {
       console.warn("You cannot play/pause! (There's no file or the track isn't recording)");
     }
   }
+
+  loopTrack() {
+      if (this.bufferSourceNode) {
+        if (this.stateLoop == false) {
+          this.bufferSourceNode.loop = true;
+        } else {
+          this.bufferSourceNode.loop = false;
+        }
+        this.stateLoop = !this.stateLoop;
+      }
+    }
+
+    stopTrack() {
+      if (this.bufferSourceNode && this.statePlay == true) {
+        //this.bufferSourceNode.stop();
+        this.bufferSourceNode.disconnect();
+        this.recreateBuffer();
+        this.pausedAt = undefined;
+      }
+      else if (this.bufferSourceNode && this.statePlay == false) {
+        //this.bufferSourceNode.start();
+        //this.bufferSourceNode.stop();
+        this.bufferSourceNode.disconnect();
+        this.recreateBuffer();
+        this.pausedAt = undefined;
+      }
+      else {
+        console.warn("You cannot stop when a track who doesn't exist!")
+      }
+    }
 }
 
