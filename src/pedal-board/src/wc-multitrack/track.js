@@ -61,6 +61,7 @@ class Track {
     this.link;
     this.fileName = "Untitled track";
     this.main;
+
   }
 
   callListeners() {
@@ -102,6 +103,7 @@ class Track {
         parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
         parent.titleTrack.addEventListener('click', parent.changeTitle.bind(parent));
         parent.deleteButton.addEventListener('click', parent.deleteTrack.bind(parent));
+        parent.canvas.addEventListener('click',parent.timerWave.bind(parent,parent.canvas));
       });
   }
 
@@ -120,6 +122,7 @@ class Track {
   get titleCreation() {
     return this.title;
   }
+  
 
   recordingTrack() {
     if (this.stateRecord == false) {
@@ -129,7 +132,6 @@ class Track {
       this.stopSample();
       this.clearCanvas();
       this.recorder.start();
-
       this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
       this.buttonRecImg.setAttribute('style', 'fill:red;');
       this.buttonDlImg.setAttribute('style', 'fill: #fff');
@@ -293,13 +295,13 @@ class Track {
     context.beginPath();
  
     // 8640000 correspond to 3 mins. To get one sec: 8640000/3/60. This values will be a var soon.
-    let sliceWidth = canvasWidth * 1.0 / 8640000;
+    let sliceWidth = canvasWidth * 1.0 / 8640000 *100;
     let x = 0 - sliceWidth;
-    console.log(sliceWidth);
-    console.log(this.bufferLength);
+    //console.log(sliceWidth);
+    //console.log(this.bufferLength);
  
-    for (let i = 0; i < this.bufferLength; i++) {
-      let v = 1 - this.data[i];
+    for (let i = 0; i < this.bufferLength/100; i++) {
+      let v = 1 - this.data[i*100];
       let y = v * canvasHalfHeight;
  
       if (i === 0) {
@@ -310,21 +312,38 @@ class Track {
  
       x += sliceWidth;
     }
-    canvas.addEventListener('click',this.timerWave.bind(this,canvas));
     context.lineTo(this.bufferLength+1, canvasHalfHeight);
     context.lineTo(canvasWidth, canvasHalfHeight);
     context.stroke();
   }
- 
+
   timerWave(canvas,e){
+    if(this.bufferSourceNode){
      // 8640000 correspond to 3 mins. To get one sec: 8640000/3/60. This values will be a var soon.
-    let maxDuration = 8640000/48000
+     this.clearCanvas();
+     this.RenderWave(this.canvas, this.data)
+     let playBar = this.canvas.getContext('2d');
+     //playBar.fillStyle = 'red';
+     playBar.lineWidth = 5;
+     playBar.strokeStyle = 'red';
+     let canvasWidth = this.canvas.width;
+     let canvasHeigth = this.canvas.height;
+     let canvasHalfHeight = canvasHeigth * 0.5;
+     let maxDuration = 8640000/48000;
     let pos = (e.clientX - canvas.offsetLeft) / canvas.offsetWidth;
     let timeStamp = Math.floor(pos * maxDuration * 1000);
     let min = Math.floor(timeStamp/1000/60);
     let sec = Math.floor((timeStamp/1000 - min * 60)*100)/100;
-  console.log("TimeStamp =  "+ timeStamp);
-  console.log(min + " minutes et "+ sec+" secondes.")
+    //console.log(pos);
+  //console.log("TimeStamp =  "+ timeStamp);
+  //console.log(min + " minutes et "+ sec+" secondes.");
+  playBar.beginPath();
+  playBar.moveTo(canvasWidth*pos,0);
+  playBar.lineTo(canvasWidth*pos,canvasHeigth);
+  playBar.stroke();
+    } else {
+      console.log("this buffer source node doesnt exists");
+    }
   }
 
   MaximiseSampleInPlace(sample) {
