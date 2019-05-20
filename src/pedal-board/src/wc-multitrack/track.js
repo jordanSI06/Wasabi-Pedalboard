@@ -30,6 +30,7 @@ class Track {
     this.volumeRange;
     this.canvas;
     this.deleteButton;
+    this.playBar;
 
     // Icon buttons element
     //this.buttonPlayImg;
@@ -64,6 +65,9 @@ class Track {
     this.link;
     this.fileName = "Untitled track";
     this.main;
+
+    // xcor
+    this.xcor;
 
   }
 
@@ -105,7 +109,7 @@ class Track {
         parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
         parent.titleTrack.addEventListener('click', parent.changeTitle.bind(parent));
         parent.deleteButton.addEventListener('click', parent.deleteTrack.bind(parent));
-        parent.canvas.addEventListener('click', parent.timerWave.bind(parent, parent.canvas));
+       // parent.canvas.addEventListener('click', parent.timerWave.bind(parent, parent.canvas));
       });
   }
 
@@ -288,25 +292,24 @@ class Track {
     context.beginPath();
   }
 
+  clearBar(){
+// clear the bar here
+// we should change renderBar
+  }
+
   RenderWave(canvas, data) {
     let context = this.canvas.getContext('2d');
     let canvasWidth = this.canvas.width;
     let canvasHeigth = this.canvas.height;
     let canvasHalfHeight = canvasHeigth * 0.5;
-
     this.bufferLength = data.length;
     context.fillStyle = 'rgb(85, 85, 85)';
     context.fillRect(0, 0, canvasWidth, canvasHeigth);
     context.lineWidth = 1;
     context.strokeStyle = 'rgb(205, 205, 205)';
     context.beginPath();
-
-    // 8640000 correspond to 3 mins. To get one sec: 8640000/3/60. This values will be a var soon.
     let sliceWidth = canvasWidth * 1.0 / this.bufferLength * 100;
     let x = 0 - sliceWidth;
-    //console.log(sliceWidth);
-    //console.log(this.bufferLength);
-
     for (let i = 0; i < this.bufferLength / 100; i++) {
       let v = 1 - this.data[i * 100];
       let y = v * canvasHalfHeight;
@@ -324,30 +327,29 @@ class Track {
     context.stroke();
   }
 
-  timerWave(canvas, e) {
+  renderBar(canvas, xcor) {
     if (this.bufferSourceNode) {
-      // 8640000 correspond to 3 mins. To get one sec: 8640000/3/60. This values will be a var soon.
       this.clearCanvas();
       this.RenderWave(this.canvas, this.data)
-      let playBar = this.canvas.getContext('2d');
-      //playBar.fillStyle = 'red';
-      playBar.lineWidth = 5;
-      playBar.strokeStyle = 'red';
+      this.playBar = this.canvas.getContext('2d');
+      this.playBar.lineWidth = 3;
+      this.playBar.strokeStyle = 'red';
       let canvasWidth = this.canvas.width;
       let canvasHeigth = this.canvas.height;
-      let canvasHalfHeight = canvasHeigth * 0.5;
+      //let canvasHalfHeight = canvasHeigth * 0.5;
       let maxDuration = this.bufferLength / 48000;
-      let pos = (e.clientX - canvas.offsetLeft) / canvas.offsetWidth;
+      console.log(xcor);
+      let pos = (xcor - canvas.offsetLeft) / canvas.offsetWidth;
       let timeStamp = Math.floor(pos * maxDuration * 1000);
       let min = Math.floor(timeStamp / 1000 / 60);
       let sec = Math.floor((timeStamp / 1000 - min * 60) * 100) / 100;
       console.log(pos);
       console.log("TimeStamp =  " + timeStamp);
       console.log(min + " minutes et " + sec + " secondes.");
-      playBar.beginPath();
-      playBar.moveTo(canvasWidth * pos, 0);
-      playBar.lineTo(canvasWidth * pos, canvasHeigth);
-      playBar.stroke();
+      this.playBar.beginPath();
+      this.playBar.moveTo(canvasWidth * pos, 0);
+      this.playBar.lineTo(canvasWidth * pos, canvasHeigth);
+      this.playBar.stroke();
     } else {
       console.log("this buffer source node doesnt exists");
     }
@@ -456,12 +458,9 @@ class Track {
       let context = new AudioContext;
       length = length * 48000;
       let arrayBuffer = context.createBuffer(2, length, 48000);
-      console.log(this.bufferSourceNode);
       let buffer = this.appendBuffer(this.bufferSourceNode.buffer, arrayBuffer);
       this.bufferSourceNode = this.ac.createBufferSource();
       this.bufferSourceNode.buffer = buffer;
-      console.log(this.bufferSourceNode);
-      console.log(this.sample);
       this.bufferSourceNode.onended = function () {
         parent.recreateBuffer();
       }

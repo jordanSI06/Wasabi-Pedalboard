@@ -73,6 +73,9 @@
       this.link;
       this.fileName = "Untitled track";
       this.main;
+
+      // mouse coordinate
+      this.xcor;
     }
 
     getInput() {
@@ -159,6 +162,9 @@
         });
     }
     // ----- METHODS: CUSTOM -----
+
+    getMouseX(e){
+      this.xcor = e.clientX;}
 
     // ----- Method of the menu -----
     stockTrack() {
@@ -280,11 +286,13 @@
     }
 
     eventListenerUpdate(dom) {
-      let parent = this;
       let btnDelete = this.shadowRoot.querySelector(dom + ' #delete');
       let btnRecord = this.shadowRoot.querySelector(dom + ' #record');
-      btnDelete.addEventListener('click', this.deleteTrackFromArray.bind(parent, btnDelete));
-      btnRecord.addEventListener('mouseup', this.regulateTime.bind(parent, btnRecord));
+      let canvas = this.shadowRoot.querySelector(dom + ' canvas');
+      btnDelete.addEventListener('click', this.deleteTrackFromArray.bind(this, btnDelete));
+      btnRecord.addEventListener('mouseup', this.regulateTime.bind(this, btnRecord));
+      canvas.addEventListener('click', this.getMouseX.bind(this));
+      canvas.addEventListener('click', this.timeSelector.bind(this, canvas));
     }
 
     getDivParent(dom) {
@@ -300,7 +308,6 @@
     }
 
     deleteTrackFromArray(dom) {
-
       console.log(dom);
       let element = this.getDivParent(dom);
       for (let i = 0; i < this.trackEntity.length; i++) {
@@ -313,7 +320,6 @@
       console.log(this.trackEntity);
     }
 
-    
     regulateTime(){
       let time = this.checkMaxTime();
       let addtime=0;
@@ -327,22 +333,29 @@
         }
       }
     }
-
+    
     checkMaxTime() {
-      this.trackDurationMax = 0;
+      let trackDurationMax = 0;
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (this.trackEntity[i].bufferSourceNode) {
-          this.trackDurationMax = Math.max(this.trackEntity[i].bufferSourceNode.buffer.duration,this.trackDurationMax);
+          trackDurationMax = Math.max(this.trackEntity[i].bufferSourceNode.buffer.duration,trackDurationMax);
         }
       }
       //console.log(this.terackDurationMax);
-      return this.trackDurationMax;
+      return trackDurationMax;
     }
-
- 
- 
+  
+   timeSelector(e){
+     console.log(this.xcor);
+     for(let i = 0 ; i < this.trackEntity.length ; i++){
+       if(this.trackEntity[i].bufferSourceNode){
+        this.trackEntity[i].renderBar(this.trackEntity[i].canvas,this.xcor);
+       }
+     }
+   }
  
  
 
   });
 })();
+
