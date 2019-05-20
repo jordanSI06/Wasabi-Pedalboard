@@ -355,32 +355,6 @@ class Track {
     }
   }
 
-  /*MaximiseSampleInPlace(sample) {
-    //console.log('maximise sample in place');
-    let length = sample.length;
-    let numChannels = sample.numberOfChannels;
-    let maxValue = 0;
-
-    for (let i = 0; i < numChannels; i++) {
-      this.data = sample.getChannelData(i);
-
-      for (let j = 0; j < length; j++) {
-        let value = Math.abs(this.data[j]);
-        maxValue = Math.max(value, maxValue);
-      }
-    }
-
-    let amp = 1.0 / maxValue;
-
-    for (let i = 0; i < numChannels; i++) {
-      //let inData = sample.getChannelData(i);
-      for (let j = 0; j < length; j++) {
-        let value = this.data[j];
-        this.data[j] = value * amp;
-      }
-    }
-  }*/
-
   deleteTrack() {
     this.shadowRoot.remove();
   }
