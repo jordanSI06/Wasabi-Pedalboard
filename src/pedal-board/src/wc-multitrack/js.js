@@ -282,7 +282,9 @@
     eventListenerUpdate(dom) {
       let parent = this;
       let btnDelete = this.shadowRoot.querySelector(dom + ' #delete');
+      let btnRecord = this.shadowRoot.querySelector(dom + ' #record');
       btnDelete.addEventListener('click', this.deleteTrackFromArray.bind(parent, btnDelete));
+      btnRecord.addEventListener('mouseup', this.regulateTime.bind(parent, btnRecord));
     }
 
     getDivParent(dom) {
@@ -310,6 +312,37 @@
       this.checkMaxTime();
       console.log(this.trackEntity);
     }
+
+    
+    regulateTime(){
+      let time = this.checkMaxTime();
+      let addtime=0;
+      for(let i=0 ; i < this.trackEntity.length; i++){
+        if(this.trackEntity[i].bufferSourceNode){
+          addtime = time - this.trackEntity[i].bufferSourceNode.buffer.duration;
+          if(addtime>0){
+          this.trackEntity[i].addTime = addtime;
+          this.trackEntity[i].addEmptyAudio();
+          }
+        }
+      }
+    }
+
+    checkMaxTime() {
+      this.trackDurationMax = 0;
+      for (let i = 0; i < this.trackEntity.length; i++) {
+        if (this.trackEntity[i].bufferSourceNode) {
+          this.trackDurationMax = Math.max(this.trackEntity[i].bufferSourceNode.buffer.duration,this.trackDurationMax);
+        }
+      }
+      //console.log(this.terackDurationMax);
+      return this.trackDurationMax;
+    }
+
+ 
+ 
+ 
+ 
 
   });
 })();

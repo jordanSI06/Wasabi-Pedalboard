@@ -43,10 +43,12 @@ class Track {
     this.statePause = false;
     this.stateMute = false;
     this.stateLoop = loopState;
+    this.needResize = false;
 
     // Element value
     this.volume = volume;
     this.trackId = 0;
+    this.addTime = 0;
 
     // File element
     this.blob;
@@ -55,6 +57,7 @@ class Track {
     this.fileReader;
     this.arrayBuffer;
     this.bufferSourceNode;
+    this.oldBufferSourceNode;
     this.data;
     this.channelData;
     this.url;
@@ -66,7 +69,7 @@ class Track {
 
   callListeners() {
     // Buttons assigned with query selector
-    let parent=this;
+    let parent = this;
     this.titleTrack = this.shadowRoot.querySelector('#title');
     this.deleteButton = this.shadowRoot.querySelector('#delete')
     this.recordButton = this.shadowRoot.querySelector('#record');
@@ -88,14 +91,13 @@ class Track {
     // Canvas assigned with query selector
     this.canvas = this.shadowRoot.querySelector('canvas');
 
-    this.titleTrack.textContent=this.title;
-
+    this.titleTrack.textContent = this.title;
     navigator.mediaDevices.getUserMedia({
       audio: true
     })
       .then(function (stream) {
         //parent.playButton.addEventListener('click', parent.playingTrack.bind(parent));
-        parent.recordButton.addEventListener('click', parent.recordingTrack.bind(parent));
+        parent.recordButton.addEventListener('mousedown', parent.recordingTrack.bind(parent));
         parent.dlButton.addEventListener('click', parent.download.bind(parent));
         parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
         parent.muteButton.addEventListener('click', parent.muteVolume.bind(parent));
@@ -103,7 +105,7 @@ class Track {
         parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
         parent.titleTrack.addEventListener('click', parent.changeTitle.bind(parent));
         parent.deleteButton.addEventListener('click', parent.deleteTrack.bind(parent));
-        parent.canvas.addEventListener('click',parent.timerWave.bind(parent,parent.canvas));
+        parent.canvas.addEventListener('click', parent.timerWave.bind(parent, parent.canvas));
       });
   }
 
@@ -122,9 +124,10 @@ class Track {
   get titleCreation() {
     return this.title;
   }
-  
+
 
   recordingTrack() {
+    if(!this.needResize){
     if (this.stateRecord == false) {
       this.input.gain.value = 1;
       this.statePlay = false;
@@ -138,16 +141,17 @@ class Track {
     }
     if (this.stateRecord == true) {
       this.input.gain.value = 0;
-
       this.recorder.stop()
-
       this.buttonRecImg.setAttribute('style', 'fill:#fff;');
       this.buttonDlImg.setAttribute('style', 'fill: rgb(191, 255, 194);');
     }
     this.stateRecord = !this.stateRecord;
     this.pausedAt = undefined;
     this.startedAt = 0;
+  } else {
+    this.needResize = false;
   }
+}
 
   stopSample() {
     console.log('stop sample');
@@ -160,8 +164,14 @@ class Track {
   recreateBuffer() {
     let parent = this;
     this.statePlay = false;
+    if(this.addTime>0){
+      this.oldBufferSourceNode = this.bufferSourceNode;
+      this.bufferSourceNode = this.ac.createBufferSource();
+      this.bufferSourceNode.buffer = this.oldBufferSourceNode.buffer;
+    } else {
     this.bufferSourceNode = this.ac.createBufferSource();
     this.bufferSourceNode.buffer = this.sample;
+    }
     this.bufferSourceNode.onended = function () {
       parent.recreateBuffer();
     }
@@ -171,7 +181,7 @@ class Track {
     //TODO: erase it
     this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
   }
-  
+
   changeTitle() {
     let nameTrack = prompt('Please type the title of your track (between 1-20 characters): ');
     if (nameTrack.length > 20 && nameTrack.length > 0) {
@@ -185,7 +195,6 @@ class Track {
 
   onRecordingReady(e) {
     //console.log("onRecordingReady");
-
     let parent = this;
     this.blob = e.data;
     this.recordedBlobs.push(e.data);
@@ -204,6 +213,7 @@ class Track {
       });
     }
     this.fileReader.readAsArrayBuffer(this.blob);
+  
   }
 
   useSample(sample) {
@@ -211,8 +221,7 @@ class Track {
     if (this.bufferSourceNode) {
       this.bufferSourceNode.disconnect()
     }
-
-    this.sample = sample
+    this.sample = sample;
     this.recreateBuffer();
     this.data = [];
     this.channelData = sample.getChannelData(0);
@@ -220,7 +229,6 @@ class Track {
     for (let i = 0; i < this.channelData.length; i++) {
       this.data.push(this.channelData[i]);
     }
-
     this.RenderWave(this.canvas, this.data);
   }
 
@@ -285,62 +293,61 @@ class Track {
     let canvasWidth = this.canvas.width;
     let canvasHeigth = this.canvas.height;
     let canvasHalfHeight = canvasHeigth * 0.5;
- 
+
     this.bufferLength = data.length;
- 
     context.fillStyle = 'rgb(85, 85, 85)';
     context.fillRect(0, 0, canvasWidth, canvasHeigth);
     context.lineWidth = 1;
     context.strokeStyle = 'rgb(205, 205, 205)';
     context.beginPath();
- 
+
     // 8640000 correspond to 3 mins. To get one sec: 8640000/3/60. This values will be a var soon.
-    let sliceWidth = canvasWidth * 1.0 / 8640000 *100;
+    let sliceWidth = canvasWidth * 1.0 / this.bufferLength * 100;
     let x = 0 - sliceWidth;
     //console.log(sliceWidth);
     //console.log(this.bufferLength);
- 
-    for (let i = 0; i < this.bufferLength/100; i++) {
-      let v = 1 - this.data[i*100];
+
+    for (let i = 0; i < this.bufferLength / 100; i++) {
+      let v = 1 - this.data[i * 100];
       let y = v * canvasHalfHeight;
- 
+
       if (i === 0) {
         context.moveTo(x, y);
       } else {
         context.lineTo(x, y);
       }
- 
+
       x += sliceWidth;
     }
-    context.lineTo(this.bufferLength+1, canvasHalfHeight);
+    context.lineTo(this.bufferLength + 1, canvasHalfHeight);
     context.lineTo(canvasWidth, canvasHalfHeight);
     context.stroke();
   }
 
-  timerWave(canvas,e){
-    if(this.bufferSourceNode){
-     // 8640000 correspond to 3 mins. To get one sec: 8640000/3/60. This values will be a var soon.
-     this.clearCanvas();
-     this.RenderWave(this.canvas, this.data)
-     let playBar = this.canvas.getContext('2d');
-     //playBar.fillStyle = 'red';
-     playBar.lineWidth = 5;
-     playBar.strokeStyle = 'red';
-     let canvasWidth = this.canvas.width;
-     let canvasHeigth = this.canvas.height;
-     let canvasHalfHeight = canvasHeigth * 0.5;
-     let maxDuration = 8640000/48000;
-    let pos = (e.clientX - canvas.offsetLeft) / canvas.offsetWidth;
-    let timeStamp = Math.floor(pos * maxDuration * 1000);
-    let min = Math.floor(timeStamp/1000/60);
-    let sec = Math.floor((timeStamp/1000 - min * 60)*100)/100;
-    //console.log(pos);
-  //console.log("TimeStamp =  "+ timeStamp);
-  //console.log(min + " minutes et "+ sec+" secondes.");
-  playBar.beginPath();
-  playBar.moveTo(canvasWidth*pos,0);
-  playBar.lineTo(canvasWidth*pos,canvasHeigth);
-  playBar.stroke();
+  timerWave(canvas, e) {
+    if (this.bufferSourceNode) {
+      // 8640000 correspond to 3 mins. To get one sec: 8640000/3/60. This values will be a var soon.
+      this.clearCanvas();
+      this.RenderWave(this.canvas, this.data)
+      let playBar = this.canvas.getContext('2d');
+      //playBar.fillStyle = 'red';
+      playBar.lineWidth = 5;
+      playBar.strokeStyle = 'red';
+      let canvasWidth = this.canvas.width;
+      let canvasHeigth = this.canvas.height;
+      let canvasHalfHeight = canvasHeigth * 0.5;
+      let maxDuration = this.bufferLength / 48000;
+      let pos = (e.clientX - canvas.offsetLeft) / canvas.offsetWidth;
+      let timeStamp = Math.floor(pos * maxDuration * 1000);
+      let min = Math.floor(timeStamp / 1000 / 60);
+      let sec = Math.floor((timeStamp / 1000 - min * 60) * 100) / 100;
+      console.log(pos);
+      console.log("TimeStamp =  " + timeStamp);
+      console.log(min + " minutes et " + sec + " secondes.");
+      playBar.beginPath();
+      playBar.moveTo(canvasWidth * pos, 0);
+      playBar.lineTo(canvasWidth * pos, canvasHeigth);
+      playBar.stroke();
     } else {
       console.log("this buffer source node doesnt exists");
     }
@@ -412,33 +419,70 @@ class Track {
   }
 
   loopTrack() {
-      if (this.bufferSourceNode) {
-        if (this.stateLoop == false) {
-          this.bufferSourceNode.loop = true;
-        } else {
-          this.bufferSourceNode.loop = false;
-        }
-        this.stateLoop = !this.stateLoop;
+    if (this.bufferSourceNode) {
+      if (this.stateLoop == false) {
+        this.bufferSourceNode.loop = true;
+      } else {
+        this.bufferSourceNode.loop = false;
       }
+      this.stateLoop = !this.stateLoop;
     }
+  }
 
-    stopTrack() {
-      if (this.bufferSourceNode && this.statePlay == true) {
-        //this.bufferSourceNode.stop();
-        this.bufferSourceNode.disconnect();
-        this.recreateBuffer();
-        this.pausedAt = undefined;
-      }
-      else if (this.bufferSourceNode && this.statePlay == false) {
-        //this.bufferSourceNode.start();
-        //this.bufferSourceNode.stop();
-        this.bufferSourceNode.disconnect();
-        this.recreateBuffer();
-        this.pausedAt = undefined;
-      }
-      else {
-        console.warn("You cannot stop when a track who doesn't exist!")
-      }
+  stopTrack() {
+    if (this.bufferSourceNode && this.statePlay == true) {
+      //this.bufferSourceNode.stop();
+      this.bufferSourceNode.disconnect();
+      this.recreateBuffer();
+      this.pausedAt = undefined;
     }
+    else if (this.bufferSourceNode && this.statePlay == false) {
+      //this.bufferSourceNode.start();
+      //this.bufferSourceNode.stop();
+      this.bufferSourceNode.disconnect();
+      this.recreateBuffer();
+      this.pausedAt = undefined;
+    }
+    else {
+      console.warn("You cannot stop when a track who doesn't exist!")
+    }
+  }
+
+  addEmptyAudio() {
+    if (this.addTime > 0) {
+      let n = this.addTime;
+      parent = this;
+      let length = n;
+      let context = new AudioContext;
+      length = length * 48000;
+      let arrayBuffer = context.createBuffer(2, length, 48000);
+      console.log(this.bufferSourceNode);
+      let buffer = this.appendBuffer(this.bufferSourceNode.buffer, arrayBuffer);
+      this.bufferSourceNode = this.ac.createBufferSource();
+      this.bufferSourceNode.buffer = buffer;
+      console.log(this.bufferSourceNode);
+      console.log(this.sample);
+      this.bufferSourceNode.onended = function () {
+        parent.recreateBuffer();
+      }
+      if (this.stateLoop) {
+        this.bufferSourceNode.loop = true;
+      }
+      this.useSample(buffer);
+      this.addTime = 0;
+    }
+  }
+
+  appendBuffer(buffer1, buffer2) {
+    let context = new AudioContext;
+    let numberOfChannels = Math.min(buffer1.numberOfChannels, buffer2.numberOfChannels);
+    let tmp = context.createBuffer(numberOfChannels, (buffer1.length + buffer2.length), buffer1.sampleRate);
+    for (let i = 0; i < numberOfChannels; i++) {
+      let channel = tmp.getChannelData(i);
+      channel.set(buffer1.getChannelData(i), 0);
+      channel.set(buffer2.getChannelData(i), buffer1.length);
+    }
+    return tmp;
+  }
 }
 
