@@ -33,7 +33,6 @@ class Track {
     this.playBar;
 
     // Icon buttons element
-    //this.buttonPlayImg;
     this.buttonRecImg;
     this.buttonMuteImg;
     this.buttonDlImg;
@@ -45,6 +44,7 @@ class Track {
     this.stateMute = false;
     this.stateLoop = loopState;
     this.needResize = false;
+    this.playbarExists = false;
 
     // Element value
     this.volume = volume;
@@ -66,8 +66,9 @@ class Track {
     this.fileName = "Untitled track";
     this.main;
 
-    // xcor
+    // Coordinates
     this.xcor;
+    this.playbarCor;
 
   }
 
@@ -85,7 +86,6 @@ class Track {
 
     // Buttons icons assigned with query selector
     this.buttonRecImg = this.shadowRoot.querySelector('#btn_rec_img');
-    this.buttonPlayImg = this.shadowRoot.querySelector('#btn_play_img');
     this.buttonMuteImg = this.shadowRoot.querySelector('#btn_mute_img');
     this.buttonDlImg = this.shadowRoot.querySelector('#btn_dl_img');
 
@@ -109,7 +109,7 @@ class Track {
         parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
         parent.titleTrack.addEventListener('click', parent.changeTitle.bind(parent));
         parent.deleteButton.addEventListener('click', parent.deleteTrack.bind(parent));
-       // parent.canvas.addEventListener('click', parent.timerWave.bind(parent, parent.canvas));
+        // parent.canvas.addEventListener('click', parent.timerWave.bind(parent, parent.canvas));
       });
   }
 
@@ -131,31 +131,30 @@ class Track {
 
 
   recordingTrack() {
-    if(!this.needResize){
-    if (this.stateRecord == false) {
-      this.input.gain.value = 1;
-      this.statePlay = false;
+    if (!this.needResize) {
+      if (this.stateRecord == false) {
+        this.input.gain.value = 1;
+        this.statePlay = false;
 
-      this.stopSample();
-      this.clearCanvas();
-      this.recorder.start();
-      this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
-      this.buttonRecImg.setAttribute('style', 'fill:red;');
-      this.buttonDlImg.setAttribute('style', 'fill: #fff');
+        this.stopSample();
+        this.clearCanvas();
+        this.recorder.start();
+        this.buttonRecImg.setAttribute('style', 'fill:red;');
+        this.buttonDlImg.setAttribute('style', 'fill: #fff');
+      }
+      if (this.stateRecord == true) {
+        this.input.gain.value = 0;
+        this.recorder.stop()
+        this.buttonRecImg.setAttribute('style', 'fill:#fff;');
+        this.buttonDlImg.setAttribute('style', 'fill: rgb(191, 255, 194);');
+      }
+      this.stateRecord = !this.stateRecord;
+      this.pausedAt = undefined;
+      this.startedAt = 0;
+    } else {
+      this.needResize = false;
     }
-    if (this.stateRecord == true) {
-      this.input.gain.value = 0;
-      this.recorder.stop()
-      this.buttonRecImg.setAttribute('style', 'fill:#fff;');
-      this.buttonDlImg.setAttribute('style', 'fill: rgb(191, 255, 194);');
-    }
-    this.stateRecord = !this.stateRecord;
-    this.pausedAt = undefined;
-    this.startedAt = 0;
-  } else {
-    this.needResize = false;
   }
-}
 
   stopSample() {
     console.log('stop sample');
@@ -168,13 +167,13 @@ class Track {
   recreateBuffer() {
     let parent = this;
     this.statePlay = false;
-    if(this.addTime>0){
+    if (this.addTime > 0) {
       this.oldBufferSourceNode = this.bufferSourceNode;
       this.bufferSourceNode = this.ac.createBufferSource();
       this.bufferSourceNode.buffer = this.oldBufferSourceNode.buffer;
     } else {
-    this.bufferSourceNode = this.ac.createBufferSource();
-    this.bufferSourceNode.buffer = this.sample;
+      this.bufferSourceNode = this.ac.createBufferSource();
+      this.bufferSourceNode.buffer = this.sample;
     }
     this.bufferSourceNode.onended = function () {
       parent.recreateBuffer();
@@ -183,7 +182,6 @@ class Track {
       this.bufferSourceNode.loop = true;
     }
     //TODO: erase it
-    this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
   }
 
   changeTitle() {
@@ -217,7 +215,7 @@ class Track {
       });
     }
     this.fileReader.readAsArrayBuffer(this.blob);
-  
+
   }
 
   useSample(sample) {
@@ -292,9 +290,31 @@ class Track {
     context.beginPath();
   }
 
-  clearBar(){
-// clear the bar here
-// we should change renderBar
+  clearBar() {
+    let imin = Math.floor(this.data.length * (this.playbarCor - 0.05));
+    let imax = Math.floor(this.data.length * (this.playbarCor + 0.05));
+    let context = this.canvas.getContext('2d');
+    let canvasWidth = this.canvas.width;
+    let canvasHeigth = this.canvas.height;
+    let canvasHalfHeight = canvasHeigth * 0.5;
+    this.bufferLength = this.data.length;
+    context.fillStyle = 'rgb(85, 85, 85)';
+    context.lineWidth = 1;
+    context.strokeStyle = 'rgb(255, 255, 255)';
+    context.beginPath();
+    let sliceWidth = canvasWidth * 1.0 / this.bufferLength;
+    let xstart = sliceWidth * imin - sliceWidth
+    let ystart = sliceWidth * imax - sliceWidth - xstart;
+    context.fillRect(xstart, 0, ystart, canvasHeigth);
+    let x = sliceWidth * imin - sliceWidth;
+    for (imin; imin < imax; imin++) {
+      let v = 1 - this.data[imin];
+      let y = v * canvasHalfHeight; 
+      context.lineTo(x, y);
+
+      x += sliceWidth;
+    }
+    context.stroke();
   }
 
   RenderWave(canvas, data) {
@@ -306,12 +326,12 @@ class Track {
     context.fillStyle = 'rgb(85, 85, 85)';
     context.fillRect(0, 0, canvasWidth, canvasHeigth);
     context.lineWidth = 1;
-    context.strokeStyle = 'rgb(205, 205, 205)';
+    context.strokeStyle = 'rgb(255, 255, 255)';
     context.beginPath();
-    let sliceWidth = canvasWidth * 1.0 / this.bufferLength * 100;
+    let sliceWidth = canvasWidth * 1.0 / this.bufferLength;
     let x = 0 - sliceWidth;
-    for (let i = 0; i < this.bufferLength / 100; i++) {
-      let v = 1 - this.data[i * 100];
+    for (let i = 0; i < this.bufferLength; i++) {
+      let v = 1 - this.data[i];
       let y = v * canvasHalfHeight;
 
       if (i === 0) {
@@ -329,27 +349,27 @@ class Track {
 
   renderBar(canvas, xcor) {
     if (this.bufferSourceNode) {
-      this.clearCanvas();
-      this.RenderWave(this.canvas, this.data)
+      if (this.playbarExists) {
+        this.clearBar();
+        this.playbarExists = !this.playbarExists;
+        // if playbar exists, we delete the wave form around play bar, recreate the wave form and recreate bar in another place
+      }
       this.playBar = this.canvas.getContext('2d');
       this.playBar.lineWidth = 3;
       this.playBar.strokeStyle = 'red';
       let canvasWidth = this.canvas.width;
       let canvasHeigth = this.canvas.height;
-      //let canvasHalfHeight = canvasHeigth * 0.5;
       let maxDuration = this.bufferLength / 48000;
-      console.log(xcor);
       let pos = (xcor - canvas.offsetLeft) / canvas.offsetWidth;
+      this.playbarCor = pos;
       let timeStamp = Math.floor(pos * maxDuration * 1000);
       let min = Math.floor(timeStamp / 1000 / 60);
       let sec = Math.floor((timeStamp / 1000 - min * 60) * 100) / 100;
-      console.log(pos);
-      console.log("TimeStamp =  " + timeStamp);
-      console.log(min + " minutes et " + sec + " secondes.");
       this.playBar.beginPath();
       this.playBar.moveTo(canvasWidth * pos, 0);
       this.playBar.lineTo(canvasWidth * pos, canvasHeigth);
       this.playBar.stroke();
+      this.playbarExists = !this.playbarExists;
     } else {
       console.log("this buffer source node doesnt exists");
     }
@@ -379,7 +399,6 @@ class Track {
         }
 
         this.bufferSourceNode.connect(this.output);
-        this.buttonPlayImg.setAttribute('icon', 'av:pause');
       } else if (this.statePlay == true) {
         this.bufferSourceNode.stop()
         this.recreateBuffer();

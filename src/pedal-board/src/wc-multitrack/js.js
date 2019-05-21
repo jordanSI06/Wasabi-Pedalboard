@@ -346,7 +346,6 @@
     }
   
    timeSelector(e){
-     console.log(this.xcor);
      for(let i = 0 ; i < this.trackEntity.length ; i++){
        if(this.trackEntity[i].bufferSourceNode){
         this.trackEntity[i].renderBar(this.trackEntity[i].canvas,this.xcor);
