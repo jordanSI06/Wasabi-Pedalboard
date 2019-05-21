@@ -365,6 +365,9 @@ class Track {
       let timeStamp = Math.floor(pos * maxDuration * 1000);
       let min = Math.floor(timeStamp / 1000 / 60);
       let sec = Math.floor((timeStamp / 1000 - min * 60) * 100) / 100;
+      //console.log(pos);
+      //console.log("TimeStamp =  " + timeStamp);
+      //console.log(min + " minutes et " + sec + " secondes.");
       this.playBar.beginPath();
       this.playBar.moveTo(canvasWidth * pos, 0);
       this.playBar.lineTo(canvasWidth * pos, canvasHeigth);
