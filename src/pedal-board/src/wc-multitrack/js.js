@@ -267,7 +267,7 @@
         let track = new Track(this.trackId, this.trackHTML, this.stateLoop, this.volume);
         //Push the track in array
         this.trackEntity.push(track);
-        console.log(this.trackEntity);
+        //console.log(this.trackEntity);
         //Clone the div template
         let track_clone = this.trackEntity[this.trackEntity.length - 1].getTrackHTML.cloneNode(true);
         //Create the content inside the div
@@ -308,11 +308,11 @@
     }
 
     deleteTrackFromArray(dom) {
-      console.log(dom);
+     // console.log(dom);
       let element = this.getDivParent(dom);
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (element == this.trackEntity[i].shadowRoot) {
-          console.log(this.trackEntity[i].shadowRoot)
+       //   console.log(this.trackEntity[i].shadowRoot)
           this.trackEntity.splice(i, 1);
         }
       }

@@ -157,7 +157,7 @@ class Track {
   }
 
   stopSample() {
-    console.log('stop sample');
+    //console.log('stop sample');
     if (this.bufferSourceNode) {
       this.bufferSourceNode.disconnect();
       this.bufferSourceNode = undefined;
@@ -203,12 +203,12 @@ class Track {
     this.fileReader = new FileReader();
 
     this.fileReader.onprogress = function () {
-      console.log("recording...")
+      //console.log("recording...")
     }
     this.fileReader.onload = function () {
       parent.arrayBuffer = this.result;
       parent.ac.decodeAudioData(parent.arrayBuffer, function (decoded) {
-        console.log('finished!', decoded.length);
+        //console.log('finished!', decoded.length);
         parent.useSample(decoded);
       }, function (fail) {
         console.error('fail!', fail);
@@ -291,8 +291,8 @@ class Track {
   }
 
   clearBar() {
-    let imin = Math.floor(this.data.length * (this.playbarCor - 0.05));
-    let imax = Math.floor(this.data.length * (this.playbarCor + 0.05));
+    let imin = Math.floor(this.data.length * (this.playbarCor - 0.01));
+    let imax = Math.floor(this.data.length * (this.playbarCor + 0.01));
     let context = this.canvas.getContext('2d');
     let canvasWidth = this.canvas.width;
     let canvasHeigth = this.canvas.height;
@@ -408,7 +408,7 @@ class Track {
         this.pausedAt = Date.now() - this.startedAt;
         // time ellapsed allow us to update playAt value when paused/played.
         this.timeEllapsed = Date.now();
-        this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
+        //this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
       }
       this.statePlay = !this.statePlay;
     } else {
