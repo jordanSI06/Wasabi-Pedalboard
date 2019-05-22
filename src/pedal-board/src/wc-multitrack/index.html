@@ -15,7 +15,9 @@
             <iron-icon id="btn_stop_img" icon="av:stop"></iron-icon>
           </button>
           <div id="volumePart">
-            <input id="volume" type="range" min="0" max="100">
+            <webaudio-knob id="volume" class="knob" min="0" max="100" value="50" sprites="99" step="1"
+            midilearn="true" src="./img/knobs/nux_black_white_stripe.png" width="32" height="32" diameter="24">
+          </webaudio-knob>
           </div>
           <button id="loop">
             <iron-icon id="btn_loop_img" icon="icons:refresh"></iron-icon>
@@ -37,7 +39,9 @@
             <iron-icon id="btn_rec_img" icon="icons:radio-button-checked"></iron-icon>
           </button>
           <div id="volumePart">
-            <input id="volume" type="range" min="0" max="100">
+            <webaudio-knob id="volume" class="knob" min="0" max="100" value="50" sprites="99" step="1"
+            midilearn="true" src="./img/knobs/nux_black_white_stripe.png" width="20" height="20" diameter="24">
+          </webaudio-knob>
           </div>
           <button id="mute">
             <iron-icon id="btn_mute_img" icon="av:volume-up"></iron-icon>
@@ -45,9 +49,8 @@
           <button id="download">
             <iron-icon id="btn_dl_img" icon="icons:file-download"></iron-icon>
           </button>
-
+          <input id="panner" type="range" min="-1" max="1" value="0" step="0.01">
         </div>
-
       </li>
       <li id="can"><canvas width="2000" height="100"></canvas>
         <button id="delete">

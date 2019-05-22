@@ -276,6 +276,7 @@
         track.callListeners();
         this.eventListenerUpdate("#trackN" + this.trackId);
         this.input.connect(this.trackEntity[this.trackEntity.length - 1].getInput());
+        //this.trackEntity[this.trackEntity.length - 1].getOutput().connect(this.output);
         this.trackEntity[this.trackEntity.length - 1].getInput().connect(this.trackEntity[this.trackEntity.length - 1].getOutput());
         this.trackEntity[this.trackEntity.length - 1].getOutput().connect(this.output);
         this.output.connect(this.dest);
@@ -352,8 +353,6 @@
        }
      }
    }
- 
- 
 
   });
 })();

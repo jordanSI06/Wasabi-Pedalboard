@@ -12,11 +12,13 @@ class Track {
     // Graph node creation
     this.input = this.ac.createGain();
     this.input.gain.value = 0;
+    this.panner = this.ac.createStereoPanner();
     this.output = this.ac.createGain();
     this.dest = this.ac.createMediaStreamDestination();
 
     // Build graph
-    this.input.connect(this.output);
+    this.input.connect(this.panner);
+    this.panner.connect(this.output);
     this.output.connect(this.dest); // associated to MediaRecorder
 
     this.shadowRoot = document.querySelector('#pedalboard').shadowRoot.querySelector('#wc-multitrack').shadowRoot.querySelector('#trackN' + this.id);
@@ -31,6 +33,7 @@ class Track {
     this.canvas;
     this.deleteButton;
     this.playBar;
+    this.pannerInput
 
     // Icon buttons element
     this.buttonRecImg;
@@ -48,6 +51,7 @@ class Track {
 
     // Element value
     this.volume = volume;
+    this.pannerValue = 0;
     this.trackId = 0;
     this.addTime = 0;
 
@@ -83,6 +87,7 @@ class Track {
     this.dlButton = this.shadowRoot.querySelector('#download');
     this.titleTrack = this.shadowRoot.querySelector('#title');
     this.addButton = this.shadowRoot.querySelector('#addTrack');
+    this.pannerInput = this.shadowRoot.querySelector('#panner');
 
     // Buttons icons assigned with query selector
     this.buttonRecImg = this.shadowRoot.querySelector('#btn_rec_img');
@@ -109,6 +114,7 @@ class Track {
         parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
         parent.titleTrack.addEventListener('click', parent.changeTitle.bind(parent));
         parent.deleteButton.addEventListener('click', parent.deleteTrack.bind(parent));
+        parent.pannerInput.addEventListener('input', parent.changePanner.bind(parent));
         // parent.canvas.addEventListener('click', parent.timerWave.bind(parent, parent.canvas));
       });
   }
@@ -264,6 +270,14 @@ class Track {
     }
   }
 
+  changePanner(e) {
+    this.pannerValue = e.target.value;
+    if(this.bufferSourceNode){
+      this.panner.pan.value= this.pannerValue;
+      console.log(this.panner.pan);
+    }
+  }
+
   muteVolume() {
     if (!this.stateMute) {
       if (this.bufferSourceNode) {
@@ -401,7 +415,7 @@ class Track {
           this.bufferSourceNode.start();
         }
 
-        this.bufferSourceNode.connect(this.output);
+        this.bufferSourceNode.connect(this.panner);
       } else if (this.statePlay == true) {
         this.bufferSourceNode.stop()
         this.recreateBuffer();
