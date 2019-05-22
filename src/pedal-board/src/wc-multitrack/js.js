@@ -18,11 +18,11 @@
       this.input = this.ac.createGain();
       this.input.gain.value = 1;
       this.output = this.ac.createGain();
-      this.dest = this.ac.createMediaStreamDestination();
+      //this.dest = this.ac.createMediaStreamDestination();
 
       // Build graph
-      this.input.connect(this.output);
-      this.output.connect(this.dest); // associated to MediaRecorder
+      //this.input.connect(this.output);
+      //this.output.connect(this.dest); // associated to MediaRecorder
 
       // Graphic Element
       this.playButton;
@@ -152,7 +152,7 @@
           parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
           parent.playButton.addEventListener('click', parent.setPlayTrack.bind(parent));
           //parent.muteButton.addEventListener('click', parent.muteVolume.bind(parent));
-          parent.recorder = new MediaRecorder(parent.dest.stream);
+          //parent.recorder = new MediaRecorder(parent.dest.stream);
           //parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
           parent.loopButton.addEventListener('click', parent.setLoopTrack.bind(parent));
           //parent.titleTrack.addEventListener('click', parent.changeTilte.bind(parent));
@@ -276,10 +276,7 @@
         track.callListeners();
         this.eventListenerUpdate("#trackN" + this.trackId);
         this.input.connect(this.trackEntity[this.trackEntity.length - 1].getInput());
-        //this.trackEntity[this.trackEntity.length - 1].getOutput().connect(this.output);
-        this.trackEntity[this.trackEntity.length - 1].getInput().connect(this.trackEntity[this.trackEntity.length - 1].getOutput());
         this.trackEntity[this.trackEntity.length - 1].getOutput().connect(this.output);
-        this.output.connect(this.dest);
         this.trackId++;
       } else {
         console.warn("Too much tracks buddy! You need premium.")
@@ -314,6 +311,7 @@
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (element == this.trackEntity[i].shadowRoot) {
        //   console.log(this.trackEntity[i].shadowRoot)
+          this.trackEntity[i].bufferSourceNode.disconnect();
           this.trackEntity.splice(i, 1);
         }
       }

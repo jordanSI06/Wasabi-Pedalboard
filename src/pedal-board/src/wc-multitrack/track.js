@@ -462,18 +462,14 @@ class Track {
 
   addEmptyAudio() {
     if (this.addTime > 0) {
-      let n = this.addTime;
-      parent = this;
-      let length = n;
-      let context = new AudioContext;
-      length = length * 48000;
-      let arrayBuffer = context.createBuffer(2, length, 48000);
+      let length = this.addTime * 48000;
+      let arrayBuffer = this.ac.createBuffer(2, length, 48000);
       let buffer = this.appendBuffer(this.bufferSourceNode.buffer, arrayBuffer);
-      this.bufferSourceNode = this.ac.createBufferSource();
-      this.bufferSourceNode.buffer = buffer;
-      this.bufferSourceNode.onended = function () {
+      //this.bufferSourceNode = this.ac.createBufferSource();
+      //this.bufferSourceNode.buffer = buffer;
+      /*this.bufferSourceNode.onended = function () {
         parent.recreateBuffer();
-      }
+      }*/
       if (this.stateLoop) {
         this.bufferSourceNode.loop = true;
       }
