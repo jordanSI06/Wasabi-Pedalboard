@@ -157,6 +157,8 @@
           parent.loopButton.addEventListener('click', parent.setLoopTrack.bind(parent));
           //parent.titleTrack.addEventListener('click', parent.changeTilte.bind(parent));
           parent.addButton.addEventListener('click', parent.addTrack.bind(parent));
+          parent.addButton.addEventListener('mouseover', parent.addTrackButtonOver.bind(parent));
+          parent.addButton.addEventListener('mouseout', parent.addTrackButtonOut.bind(parent));
           parent.deleteButton.addEventListener('click', parent.deleteTrackFromArray.bind(parent));
           //console.log('recorder is ready');
         });
@@ -167,6 +169,13 @@
       this.xcor = e.clientX;
     }
 
+    addTrackButtonOver(){
+      this.addButton.setAttribute('style', 'background-color: #888')
+    }
+
+    addTrackButtonOut(){
+      this.addButton.setAttribute('style', 'background-color: #333')
+    }
     // ----- Method of the menu -----
     stockTrack() {
       this.trackHTML = this.shadowRoot.querySelector('#onetrack0');
@@ -289,7 +298,7 @@
       let btnRecord = this.shadowRoot.querySelector(dom + ' #record');
       let canvas = this.shadowRoot.querySelector(dom + ' canvas');
       btnDelete.addEventListener('click', this.deleteTrackFromArray.bind(this, btnDelete));
-      btnRecord.addEventListener('mouseup', this.regulateTime.bind(this, btnRecord));
+      btnRecord.addEventListener('blur', this.regulateTime.bind(this, btnRecord));
       canvas.addEventListener('click', this.getMouseX.bind(this));
       canvas.addEventListener('click', this.timeSelector.bind(this, canvas));
     }
