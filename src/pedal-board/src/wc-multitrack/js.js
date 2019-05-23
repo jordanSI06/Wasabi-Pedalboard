@@ -59,7 +59,7 @@
       this.startedAt;
       this.pausedAt;
       this.timeEllapsed;
-      
+
       // File element
       this.blob;
       this.sample;
@@ -163,8 +163,9 @@
     }
     // ----- METHODS: CUSTOM -----
 
-    getMouseX(e){
-      this.xcor = e.clientX;}
+    getMouseX(e) {
+      this.xcor = e.clientX;
+    }
 
     // ----- Method of the menu -----
     stockTrack() {
@@ -191,14 +192,14 @@
       if (this.stateLoop == false) {
         for (let i = 0; i < this.trackEntity.length; i++) {
           this.trackEntity[i].loopTrack();
-          this.trackEntity[i].stateLoop=true;
+          this.trackEntity[i].stateLoop = true;
         }
         this.buttonLoopImg.setAttribute('style', 'fill : rgb(191, 255, 194);')
       }
       else if (this.stateLoop == true) {
         for (let i = 0; i < this.trackEntity.length; i++) {
           this.trackEntity[i].loopTrack();
-          this.trackEntity[i].stateLoop=false;
+          this.trackEntity[i].stateLoop = false;
         }
         this.buttonLoopImg.setAttribute('style', 'fill : white;')
       }
@@ -306,12 +307,14 @@
     }
 
     deleteTrackFromArray(dom) {
-     // console.log(dom);
+      // console.log(dom);
       let element = this.getDivParent(dom);
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (element == this.trackEntity[i].shadowRoot) {
-       //   console.log(this.trackEntity[i].shadowRoot)
-          this.trackEntity[i].bufferSourceNode.disconnect();
+          //   console.log(this.trackEntity[i].shadowRoot)
+          if (this.trackEntity[i].bufferSourceNode) {
+            this.trackEntity[i].bufferSourceNode.disconnect();
+          }
           this.trackEntity.splice(i, 1);
         }
       }
@@ -319,38 +322,38 @@
       console.log(this.trackEntity);
     }
 
-    regulateTime(){
+    regulateTime() {
       let time = this.checkMaxTime();
-      let addtime=0;
-      for(let i=0 ; i < this.trackEntity.length; i++){
-        if(this.trackEntity[i].bufferSourceNode){
+      let addtime = 0;
+      for (let i = 0; i < this.trackEntity.length; i++) {
+        if (this.trackEntity[i].bufferSourceNode) {
           addtime = time - this.trackEntity[i].bufferSourceNode.buffer.duration;
-          if(addtime>0){
-          this.trackEntity[i].addTime = addtime;
-          this.trackEntity[i].addEmptyAudio();
+          if (addtime > 0) {
+            this.trackEntity[i].addTime = addtime;
+            this.trackEntity[i].addEmptyAudio();
           }
         }
       }
     }
-    
+
     checkMaxTime() {
       let trackDurationMax = 0;
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (this.trackEntity[i].bufferSourceNode) {
-          trackDurationMax = Math.max(this.trackEntity[i].bufferSourceNode.buffer.duration,trackDurationMax);
+          trackDurationMax = Math.max(this.trackEntity[i].bufferSourceNode.buffer.duration, trackDurationMax);
         }
       }
       //console.log(this.terackDurationMax);
       return trackDurationMax;
     }
-  
-   timeSelector(e){
-     for(let i = 0 ; i < this.trackEntity.length ; i++){
-       if(this.trackEntity[i].bufferSourceNode){
-        this.trackEntity[i].renderBar(this.trackEntity[i].canvas,this.xcor);
-       }
-     }
-   }
+
+    timeSelector(e) {
+      for (let i = 0; i < this.trackEntity.length; i++) {
+        if (this.trackEntity[i].bufferSourceNode) {
+          this.trackEntity[i].renderBar(this.trackEntity[i].canvas, this.xcor);
+        }
+      }
+    }
 
   });
 })();

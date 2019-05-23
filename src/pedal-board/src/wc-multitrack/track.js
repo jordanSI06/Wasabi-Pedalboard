@@ -182,6 +182,7 @@ class Track {
       this.bufferSourceNode.buffer = this.sample;
     }
     this.bufferSourceNode.onended = function () {
+      parent.bufferSourceNode.disconnect();
       parent.recreateBuffer();
     }
     if (this.stateLoop) {
@@ -418,6 +419,7 @@ class Track {
         this.bufferSourceNode.connect(this.panner);
       } else if (this.statePlay == true) {
         this.bufferSourceNode.stop()
+        this.bufferSourceNode.disconnect();
         this.recreateBuffer();
         this.pausedAt = Date.now() - this.startedAt;
         // time ellapsed allow us to update playAt value when paused/played.
