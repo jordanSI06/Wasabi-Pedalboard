@@ -322,10 +322,7 @@
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (element == this.trackEntity[i].shadowRoot) {
           //   console.log(this.trackEntity[i].shadowRoot)
-          if (this.trackEntity[i].bufferSourceNode) {
-            this.trackEntity[i].bufferSourceNode.stop();
-            this.trackEntity[i].bufferSourceNode.disconnect();
-          }
+          this.trackEntity[i].stopSample();
           this.trackEntity.splice(i, 1);
         }
       }
