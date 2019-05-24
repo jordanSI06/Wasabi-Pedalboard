@@ -51,6 +51,7 @@ class Track {
 
     // Element value
     this.volume = volume;
+    this.volumeMax = 100;
     this.pannerValue = 0;
     this.trackId = 0;
     this.addTime = 0;
@@ -267,6 +268,11 @@ class Track {
     this.volume = e.target.value / 100;
     if (this.bufferSourceNode) {
       if (!this.stateMute) {
+        if(this.volume>this.volumeMax/100){
+          this.volume=this.volumeMax/100;
+        }
+        console.log(this.volumeMax);
+        console.log(this.volume);
         this.output.gain.value = this.volume;
       }
     }
@@ -482,7 +488,7 @@ class Track {
   }
 
   appendBuffer(buffer1, buffer2) {
-    let context = new AudioContext;
+    //let context = new AudioContext;
     let numberOfChannels = Math.min(buffer1.numberOfChannels, buffer2.numberOfChannels);
     let tmp = context.createBuffer(numberOfChannels, (buffer1.length + buffer2.length), buffer1.sampleRate);
     for (let i = 0; i < numberOfChannels; i++) {

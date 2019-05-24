@@ -277,6 +277,7 @@
         let track = new Track(this.trackId, this.trackHTML, this.stateLoop, this.volume);
         //Push the track in array
         this.trackEntity.push(track);
+        this.checkVolumeMax();
         //console.log(this.trackEntity);
         //Clone the div template
         let track_clone = this.trackEntity[this.trackEntity.length - 1].getTrackHTML.cloneNode(true);
@@ -328,6 +329,7 @@
         }
       }
       this.checkMaxTime();
+      this.checkVolumeMax();
       console.log(this.trackEntity);
     }
 
@@ -361,6 +363,13 @@
         if (this.trackEntity[i].bufferSourceNode) {
           this.trackEntity[i].renderBar(this.trackEntity[i].canvas, this.xcor);
         }
+      }
+    }
+
+    checkVolumeMax(){
+      for(let i = 0; i < this.trackEntity.length; i++){
+        this.trackEntity[i].volume=this.trackEntity[i].volume/this.trackEntity.length;
+        this.trackEntity[i].volumeMax = 100/this.trackEntity.length;
       }
     }
 
