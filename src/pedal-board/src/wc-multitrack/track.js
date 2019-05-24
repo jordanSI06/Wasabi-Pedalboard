@@ -355,9 +355,15 @@ class Track {
     context.lineWidth = 1;
     context.strokeStyle = 'rgb(255, 255, 255)';
     context.beginPath();
-    let sliceWidth = canvasWidth * 1.0 / this.bufferLength;
+    let calcul;
+    if(this.bufferSourceNode.buffer.duration >= 60){
+      calcul = Math.floor(((this.bufferLength / this.bufferSourceNode.buffer.sampleRate)*4));
+    }else{
+      calcul=1;
+    }
+    let sliceWidth = canvasWidth * 1.0 / (this.bufferLength / calcul);
     let x = 0 - sliceWidth;
-    for (let i = 0; i < this.bufferLength; i++) {
+    for (let i = 0; i < this.bufferLength; i+=calcul) {
       let v = 1 - this.data[i];
       let y = v * canvasHalfHeight;
 
@@ -386,7 +392,7 @@ class Track {
       this.playBar.strokeStyle = 'red';
       let canvasWidth = this.canvas.width;
       let canvasHeigth = this.canvas.height;
-      let maxDuration = this.bufferLength / 48000;
+      let maxDuration = this.bufferLength / this.bufferSourceNode.sampleRate;
       let pos = (xcor - this.canvas.offsetLeft) / this.canvas.offsetWidth;
       this.playbarCor = pos;
       let timeStamp = Math.floor(pos * maxDuration * 1000);
@@ -476,8 +482,8 @@ class Track {
 
   addEmptyAudio() {
     if (this.addTime > 0) {
-      let length = this.addTime * 48000;
-      let arrayBuffer = this.ac.createBuffer(2, length, 48000);
+      let length = this.addTime * this.bufferSourceNode.sampleRate;
+      let arrayBuffer = this.ac.createBuffer(2, length, this.bufferSourceNode.buffer.sampleRate);
       let buffer = this.appendBuffer(this.bufferSourceNode.buffer, arrayBuffer);
       //this.bufferSourceNode = this.ac.createBufferSource();
       //this.bufferSourceNode.buffer = buffer;
