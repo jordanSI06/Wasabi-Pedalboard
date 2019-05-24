@@ -300,8 +300,8 @@
       let canvas = this.shadowRoot.querySelector(dom + ' canvas');
       btnDelete.addEventListener('click', this.deleteTrackFromArray.bind(this, btnDelete));
       btnRecord.addEventListener('blur', this.regulateTime.bind(this, btnRecord));
-      canvas.addEventListener('click', this.getMouseX.bind(this));
-      canvas.addEventListener('click', this.timeSelector.bind(this, canvas));
+      canvas.addEventListener('mousedown', this.getMouseX.bind(this));
+      canvas.addEventListener('mousedown', this.timeSelector.bind(this, canvas));
     }
 
     getDivParent(dom) {
@@ -359,7 +359,7 @@
     timeSelector(e) {
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (this.trackEntity[i].bufferSourceNode) {
-          this.trackEntity[i].renderBar(this.trackEntity[i].canvas, this.xcor);
+          this.trackEntity[i].renderBar(this.xcor);
         }
       }
     }

@@ -35,6 +35,7 @@ class Track {
     this.canvas;
     this.deleteButton;
     this.playBar;
+    this.audioFileChooser;
     this.pannerInput
 
     // Icon buttons element
@@ -85,6 +86,7 @@ class Track {
     this.titleTrack = this.shadowRoot.querySelector('#title');
     this.deleteButton = this.shadowRoot.querySelector('#delete')
     this.recordButton = this.shadowRoot.querySelector('#record');
+    this.audioFileChooser= this.shadowRoot.querySelector('#audioFileChooser');
     //this.playButton = this.shadowRoot.querySelector('#play');
     this.muteButton = this.shadowRoot.querySelector("#mute");
     this.dlButton = this.shadowRoot.querySelector('#download');
@@ -118,6 +120,7 @@ class Track {
         parent.titleTrack.addEventListener('click', parent.changeTitle.bind(parent));
         parent.deleteButton.addEventListener('click', parent.deleteTrack.bind(parent));
         parent.pannerInput.addEventListener('input', parent.changePanner.bind(parent));
+        parent.audioFileChooser.addEventListener('change', parent.uploadAudio.bind(parent));
         // parent.canvas.addEventListener('click', parent.timerWave.bind(parent, parent.canvas));
       });
   }
@@ -241,7 +244,7 @@ class Track {
     for (let i = 0; i < this.channelData.length; i++) {
       this.data.push(this.channelData[i]);
     }
-    this.RenderWave(this.canvas, this.data);
+    this.RenderWave(this.data);
     this.recordButton.blur();
   }
 
@@ -341,7 +344,7 @@ class Track {
     context.stroke();
   }
 
-  RenderWave(canvas, data) {
+  RenderWave(data) {
     let context = this.canvas.getContext('2d');
     let canvasWidth = this.canvas.width;
     let canvasHeigth = this.canvas.height;
@@ -371,7 +374,7 @@ class Track {
     context.stroke();
   }
 
-  renderBar(canvas, xcor) {
+  renderBar(xcor) {
     if (this.bufferSourceNode) {
       if (this.playbarExists) {
         this.clearBar();
@@ -384,7 +387,7 @@ class Track {
       let canvasWidth = this.canvas.width;
       let canvasHeigth = this.canvas.height;
       let maxDuration = this.bufferLength / 48000;
-      let pos = (xcor - canvas.offsetLeft) / canvas.offsetWidth;
+      let pos = (xcor - this.canvas.offsetLeft) / this.canvas.offsetWidth;
       this.playbarCor = pos;
       let timeStamp = Math.floor(pos * maxDuration * 1000);
       let min = Math.floor(timeStamp / 1000 / 60);
@@ -499,6 +502,29 @@ class Track {
       channel.set(buffer2.getChannelData(i), buffer1.length);
     }
     return tmp;
+  }
+
+  uploadAudio() {
+    let parent = this;
+    let file = new FileReader();
+    file.readAsArrayBuffer(this.audioFileChooser.files[0])
+    file.onload = function (e) {
+      parent.stockAudioFile(e.target.result);
+    }
+  }
+ 
+  stockAudioFile(file) {
+    let parent = this;
+    console.log(this.ac);
+    this.ac.decodeAudioData(file, function (buffer) {
+      parent.bufferSourceNode = parent.ac.createBufferSource();
+      parent.bufferSourceNode.buffer = buffer;
+      parent.bufferSourceNode.loop = parent.stateLoop;
+    }).then( function (){
+      parent.useSample(parent.bufferSourceNode.buffer);
+      console.log(parent.bufferSourceNode);
+    }
+    );
   }
 }
 
