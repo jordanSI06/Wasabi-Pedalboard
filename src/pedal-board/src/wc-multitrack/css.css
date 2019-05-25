@@ -16,6 +16,9 @@ li.flex-item {
   padding-right:10px;
 }
 
+#audioFileChooser{
+  display:none;
+}
 
 
 #buttonList{
