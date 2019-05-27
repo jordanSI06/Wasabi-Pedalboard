@@ -72,6 +72,7 @@ class Track {
     this.link;
     this.fileName = "Untitled track";
     this.main;
+    this.file; //for file imported
 
     // Coordinates
     this.xcor;
@@ -254,7 +255,11 @@ class Track {
   download() {
     if (!this.stateRecord && this.bufferSourceNode) {
       let parent = this;
-      this.url = window.URL.createObjectURL(this.blob);
+      if(this.blob){
+        this.url = window.URL.createObjectURL(this.blob);  
+      }else{  
+        this.url = window.URL.createObjectURL(this.audioFileChooser.files[0]);
+      }
       this.link = document.createElement('a');
       this.link.style.display = 'none';
       this.link.href = this.url;
@@ -502,7 +507,6 @@ class Track {
   }
 
   appendBuffer(buffer1, buffer2) {
-    //let context = new AudioContext;
     let numberOfChannels = Math.min(buffer1.numberOfChannels, buffer2.numberOfChannels);
     let tmp = this.ac.createBuffer(numberOfChannels, (buffer1.length + buffer2.length), buffer1.sampleRate);
     for (let i = 0; i < numberOfChannels; i++) {
@@ -519,8 +523,10 @@ class Track {
     let file = new FileReader();
     file.readAsArrayBuffer(this.audioFileChooser.files[0])
     file.onload = function (e) {
+      parent.file=e.target.result;
       parent.stockAudioFile(e.target.result);
-      console.log(parent.shadowRoot);   }
+      //console.log(parent.shadowRoot);   
+    }
   }
  
   stockAudioFile(file) {
@@ -532,6 +538,7 @@ class Track {
       parent.bufferSourceNode.loop = parent.stateLoop;
     }).then( function (){
       parent.useSample(parent.bufferSourceNode.buffer);
+      parent.blob=null
       console.log(parent.bufferSourceNode);
     }
     );
