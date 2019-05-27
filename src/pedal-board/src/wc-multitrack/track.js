@@ -104,6 +104,10 @@ class Track {
     // Canvas assigned with query selector
     this.canvas = this.shadowRoot.querySelector('canvas');
 
+    // setting up individual ID for label and input type = file.
+    this.shadowRoot.querySelector('#labelFile').setAttribute('for','audioFileChooser'+this.id);
+    this.shadowRoot.querySelector('#audioFileChooser').setAttribute('id','audioFileChooser'+this.id);
+
     this.titleTrack.textContent = this.title;
     navigator.mediaDevices.getUserMedia({
       audio: true
@@ -511,16 +515,17 @@ class Track {
 
   uploadAudio() {
     let parent = this;
+    console.log(this.shadowRoot);
     let file = new FileReader();
     file.readAsArrayBuffer(this.audioFileChooser.files[0])
     file.onload = function (e) {
       parent.stockAudioFile(e.target.result);
-    }
+      console.log(parent.shadowRoot);   }
   }
  
   stockAudioFile(file) {
     let parent = this;
-    console.log(this.ac);
+    console.log(this.shadowRoot);
     this.ac.decodeAudioData(file, function (buffer) {
       parent.bufferSourceNode = parent.ac.createBufferSource();
       parent.bufferSourceNode.buffer = buffer;

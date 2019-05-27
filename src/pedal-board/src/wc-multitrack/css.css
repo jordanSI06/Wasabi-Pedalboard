@@ -16,7 +16,7 @@ li.flex-item {
   padding-right:10px;
 }
 
-#audioFileChooser, #audioFileDrag{
+[id^="audioFileChooser"]{
   display:none;
 }
 
