@@ -326,27 +326,36 @@ class Track {
   }
 
   clearBar() {
+    let rate = this.bufferSourceNode.buffer.sampleRate;
     let imin = Math.floor(this.data.length * (this.playbarCor - 0.01));
     let imax = Math.floor(this.data.length * (this.playbarCor + 0.01));
     let context = this.canvas.getContext('2d');
     let canvasWidth = this.canvas.width;
     let canvasHeigth = this.canvas.height;
     let canvasHalfHeight = canvasHeigth * 0.5;
-    this.bufferLength = this.data.length;
     context.fillStyle = 'rgb(85, 85, 85)';
     context.lineWidth = 1;
     context.strokeStyle = 'rgb(255, 255, 255)';
     context.beginPath();
-    let sliceWidth = canvasWidth * 1.0 / this.bufferLength;
+    let calcul;
+    if(this.bufferSourceNode.buffer.duration >= 60){
+      calcul = Math.floor(((this.bufferLength / rate)*6));
+    }else{
+      calcul=1;
+    }
+    imin = Math.floor(imin/calcul)*calcul
+    imax = Math.floor(imax/calcul)*(calcul+1)
+    let sliceWidth = canvasWidth * 1.0 / (this.bufferLength);
     let xstart = sliceWidth * imin - sliceWidth
     let ystart = sliceWidth * imax - sliceWidth - xstart;
     context.fillRect(xstart, 0, ystart, canvasHeigth);
     let x = sliceWidth * imin - sliceWidth;
-    for (imin; imin < imax; imin++) {
+
+    sliceWidth = canvasWidth * 1.0 / (this.bufferLength/calcul);
+    for (imin; imin < imax; imin+=calcul) {
       let v = 1 - this.data[imin];
       let y = v * canvasHalfHeight; 
       context.lineTo(x, y);
-
       x += sliceWidth;
     }
     context.stroke();
@@ -365,7 +374,7 @@ class Track {
     context.beginPath();
     let calcul;
     if(this.bufferSourceNode.buffer.duration >= 60){
-      calcul = Math.floor(((this.bufferLength / this.bufferSourceNode.buffer.sampleRate)*4));
+      calcul = Math.floor(((this.bufferLength / this.bufferSourceNode.buffer.sampleRate)*6));
     }else{
       calcul=1;
     }
