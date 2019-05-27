@@ -1,4 +1,5 @@
 class Track {
+  //TODO, content to remove
   constructor(id, content, loopState, volume) {
     //Parameters oh HTML content
     this.id = id;

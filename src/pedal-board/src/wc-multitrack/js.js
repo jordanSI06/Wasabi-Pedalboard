@@ -323,12 +323,14 @@
         if (element == this.trackEntity[i].shadowRoot) {
           //   console.log(this.trackEntity[i].shadowRoot)
           this.trackEntity[i].stopSample();
+          this.input.disconnect(this.trackEntity[i].getInput());
+          this.trackEntity[i].getOutput().disconnect(this.output);
           this.trackEntity.splice(i, 1);
         }
       }
       this.checkMaxTime();
       this.checkVolumeMax();
-      console.log(this.trackEntity);
+      //console.log(this.trackEntity);
     }
 
     regulateTime() {
