@@ -10,8 +10,6 @@ class Track {
     //Global Context of Pedalboard
     this.ac = GlobalContext.context;
 
-    this.empty=GlobalContext.context;
-
     // Graph node creation
     this.input = this.ac.createGain();
     this.input.gain.value = 0;
@@ -483,7 +481,7 @@ class Track {
 
   addEmptyAudio() {
     if (this.addTime > 0) {
-      let length = this.addTime * this.bufferSourceNode.sampleRate;
+      let length = this.addTime * this.bufferSourceNode.buffer.sampleRate;
       let arrayBuffer = this.ac.createBuffer(2, length, this.bufferSourceNode.buffer.sampleRate);
       let buffer = this.appendBuffer(this.bufferSourceNode.buffer, arrayBuffer);
       //this.bufferSourceNode = this.ac.createBufferSource();
@@ -502,7 +500,7 @@ class Track {
   appendBuffer(buffer1, buffer2) {
     //let context = new AudioContext;
     let numberOfChannels = Math.min(buffer1.numberOfChannels, buffer2.numberOfChannels);
-    let tmp = this.empty.createBuffer(numberOfChannels, (buffer1.length + buffer2.length), buffer1.sampleRate);
+    let tmp = this.ac.createBuffer(numberOfChannels, (buffer1.length + buffer2.length), buffer1.sampleRate);
     for (let i = 0; i < numberOfChannels; i++) {
       let channel = tmp.getChannelData(i);
       channel.set(buffer1.getChannelData(i), 0);
