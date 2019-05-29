@@ -77,6 +77,9 @@ class Track {
     // Coordinates
     this.xcor;
     this.playbarCor;
+    this.canvasBar;
+    this.test;
+    this.raf;
 
   }
 
@@ -104,6 +107,7 @@ class Track {
 
     // Canvas assigned with query selector
     this.canvas = this.shadowRoot.querySelector('canvas');
+    this.canvasBar =this.shadowRoot.querySelector('#bar');
 
     // setting up individual ID for label and input type = file.
     this.shadowRoot.querySelector('#labelFile').setAttribute('for','audioFileChooser'+this.id);
@@ -157,6 +161,7 @@ class Track {
         this.recorder.start();
         this.buttonRecImg.setAttribute('style', 'fill:red;');
         this.buttonDlImg.setAttribute('style', 'fill: #fff');
+        this.canvasBar.getContext('2d').clearRect(0,0,this.canvasBar.width,this.canvasBar.height)
       }
       if (this.stateRecord == true) {
         this.input.gain.value = 0;
@@ -325,6 +330,7 @@ class Track {
     context.beginPath();
   }
 
+  /*
   clearBar() {
     let rate = this.bufferSourceNode.buffer.sampleRate;
     let imin = Math.floor(this.data.length * (this.playbarCor - 0.01));
@@ -359,9 +365,12 @@ class Track {
       x += sliceWidth;
     }
     context.stroke();
-  }
+  }*/
 
   RenderWave(data) {
+    let context2 = this.canvasBar.getContext('2d');
+    context2.globalAlpha = 0;
+    context2.fillRect(0,0,this.canvasBar.width,this.canvasBar.height);
     let context = this.canvas.getContext('2d');
     let canvasWidth = this.canvas.width;
     let canvasHeigth = this.canvas.height;
@@ -374,7 +383,7 @@ class Track {
     context.beginPath();
     let calcul;
     if(this.bufferSourceNode.buffer.duration >= 60){
-      calcul = Math.floor(((this.bufferLength / this.bufferSourceNode.buffer.sampleRate)*6));
+      calcul = Math.floor(((this.bufferLength / this.bufferSourceNode.buffer.sampleRate)));
     }else{
       calcul=1;
     }
@@ -399,18 +408,18 @@ class Track {
 
   renderBar(xcor) {
     if (this.bufferSourceNode) {
-      if (this.playbarExists) {
-        this.clearBar();
-        this.playbarExists = !this.playbarExists;
-        // if playbar exists, we delete the wave form around play bar, recreate the wave form and recreate bar in another place
-      }
-      this.playBar = this.canvas.getContext('2d');
+      let a=Date.now();
+      this.playBar = this.canvasBar.getContext('2d');
+      this.playBar.globalAlpha = 0;
+      this.playBar.clearRect(0,0,this.canvasBar.width,this.canvasBar.height);
+      this.playBar.globalAlpha = 1;
       this.playBar.lineWidth = 3;
       this.playBar.strokeStyle = 'red';
       let canvasWidth = this.canvas.width;
       let canvasHeigth = this.canvas.height;
       let maxDuration = this.bufferLength / this.bufferSourceNode.sampleRate;
       let pos = (xcor - this.canvas.offsetLeft) / this.canvas.offsetWidth;
+      console.log(this.canvas.offsetLeft);
       this.playbarCor = pos;
       let timeStamp = Math.floor(pos * maxDuration * 1000);
       let min = Math.floor(timeStamp / 1000 / 60);
@@ -422,11 +431,50 @@ class Track {
       this.playBar.moveTo(canvasWidth * pos, 0);
       this.playBar.lineTo(canvasWidth * pos, canvasHeigth);
       this.playBar.stroke();
-      this.playbarExists = !this.playbarExists;
-    } else {
-      console.log("this buffer source node doesnt exists");
+      console.log("time ellapsed: "+ (a-Date.now()));
     }
   }
+
+  
+  drawBarDuration(){
+    let context = this.canvasBar.getContext('2d');
+    let height = this.canvasBar.height;
+    let width = this.canvasBar.width;
+    let time = this.bufferSourceNode.buffer.duration*1000;
+    let sliceWidth = width/time;
+    this.test = {
+      x: 0,
+      y: 0,
+      vx: sliceWidth,
+      color: 'red',
+      draw: function() {
+        context.beginPath();
+        context.fillRect(this.x,this.y,10,height)
+        context.closePath();
+        context.stroke();
+        context.fillStyle = this.color;
+        context.fill();
+      }
+    };
+    
+  }
+
+
+    evolution() {
+    let context = this.canvasBar.getContext('2d');
+    context.clearRect(0,0, this.canvasBar.width, this.canvasBar.height);
+    this.test.draw();
+    this.test.x += this.test.vx;
+  
+    if (this.test.x + this.test.vx > canvas.width ||
+      this.test.x + this.test.vx < 0) {
+        this.x=0;
+        ref=windows.requestAnimationFrame()
+    }
+   window.cancelAnimationFrame(this.draw);
+
+}
+
 
   deleteTrack() {
     this.shadowRoot.remove();

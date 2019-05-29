@@ -297,7 +297,7 @@
     eventListenerUpdate(dom) {
       let btnDelete = this.shadowRoot.querySelector(dom + ' #delete');
       let btnRecord = this.shadowRoot.querySelector(dom + ' #record');
-      let canvas = this.shadowRoot.querySelector(dom + ' canvas');
+      let canvas = this.shadowRoot.querySelector(dom + ' #bar');
       btnDelete.addEventListener('click', this.deleteTrackFromArray.bind(this, btnDelete));
       btnRecord.addEventListener('blur', this.regulateTime.bind(this, btnRecord));
       canvas.addEventListener('mousedown', this.getMouseX.bind(this));
@@ -337,6 +337,8 @@
       let time = this.checkMaxTime();
       let addtime = 0;
       for (let i = 0; i < this.trackEntity.length; i++) {
+        this.trackEntity[i].canvasBar.getContext('2d').clearRect(
+          0,0,this.trackEntity[i].canvasBar.width,this.trackEntity[i].canvasBar.height)
         if (this.trackEntity[i].bufferSourceNode) {
           addtime = time - this.trackEntity[i].bufferSourceNode.buffer.duration;
           if (addtime > 0) {
