@@ -597,6 +597,9 @@ class Track {
       parent.useSample(parent.bufferSourceNode.buffer);
       parent.blob=null
       console.log(parent.bufferSourceNode);
+      // focus and blur in ord
+      parent.recordButton.focus();
+      parent.recordButton.blur();
     }
     );
   }
