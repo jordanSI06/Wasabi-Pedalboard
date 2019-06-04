@@ -169,11 +169,11 @@
       this.xcor = e.clientX;
     }
 
-    addTrackButtonOver(){
+    addTrackButtonOver() {
       this.addButton.setAttribute('style', 'background-color: #888')
     }
 
-    addTrackButtonOut(){
+    addTrackButtonOut() {
       this.addButton.setAttribute('style', 'background-color: #333')
     }
     // ----- Method of the menu -----
@@ -186,8 +186,20 @@
       for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].playingTrack();
       }
-      if (this.statePlay == false) this.buttonPlayImg.setAttribute('icon', 'av:pause');
-      else if (this.statePlay == true) this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
+      if (this.statePlay == false) {
+        this.buttonPlayImg.setAttribute('icon', 'av:pause');
+        for (let i = 0; i < this.trackEntity.length; i++) {
+          console.log(this.trackEntity[i]);
+          this.trackEntity[i].raf = window.requestAnimationFrame(() => this.trackEntity[i].draw());
+          this.trackEntity[i].timestp = Date.now();
+        }
+      }
+      else {
+        this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
+        for (let i = 0; i < this.trackEntity.length; i++) {
+         window.cancelAnimationFrame(this.trackEntity[i].raf);
+        }
+      }
       this.statePlay = !this.statePlay;
     }
 
@@ -338,13 +350,15 @@
       let addtime = 0;
       for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].canvasBar.getContext('2d').clearRect(
-          0,0,this.trackEntity[i].canvasBar.width,this.trackEntity[i].canvasBar.height)
+          0, 0, this.trackEntity[i].canvasBar.width, this.trackEntity[i].canvasBar.height)
         if (this.trackEntity[i].bufferSourceNode) {
           addtime = time - this.trackEntity[i].bufferSourceNode.buffer.duration;
           if (addtime > 0) {
             this.trackEntity[i].addTime = addtime;
             this.trackEntity[i].addEmptyAudio();
           }
+          this.sliceUpdate();
+          console.log(this.trackEntity[i].playBarDisplay.vx);
         }
       }
     }
@@ -368,13 +382,23 @@
       }
     }
 
-    checkVolumeMax(){
-      for(let i = 0; i < this.trackEntity.length; i++){
-        this.trackEntity[i].volume=this.trackEntity[i].volume/this.trackEntity.length;
-        this.trackEntity[i].volumeMax = 100/this.trackEntity.length;
+    checkVolumeMax() {
+      for (let i = 0; i < this.trackEntity.length; i++) {
+        this.trackEntity[i].volume = this.trackEntity[i].volume / this.trackEntity.length;
+        this.trackEntity[i].volumeMax = 100 / this.trackEntity.length;
       }
     }
 
+    sliceUpdate() {
+      for (let i = 0; i < this.trackEntity.length; i++) {
+        if (this.trackEntity[i].bufferSourceNode) {
+          this.trackEntity[i].playBarDisplay.vx = this.trackEntity[i].canvasDiv.clientWidth / (this.checkMaxTime() * 60);
+        }
+      }
+    }
+
+    // HERE, WE ARE GOING TO CREATE THE GESTURE OF DYNAMIC BAR. WE SHOULD CALL THE STATE IN TRACK.JS AND MAKE SURE THAT EVERY SLICE ARE THE SAME. SHOULD CONFIGURE THIS HERE
+    //this.trackEntity[i].playBarDisplay.vx = this.trackEntity[i].canvasDiv.clientWidth / (this.trackEntity[i].bufferSourceNode.buffer.duration * 60);
   });
 })();
 
