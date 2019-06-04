@@ -37,6 +37,25 @@ class Track {
     this.audioFileChooser;
     this.pannerInput
 
+    // Request animation frame part
+    this.playBarDisplay = {
+      x: 0,
+      y: 0,
+      vx: 0,
+      color: 'red',
+      draw: function(ctx) {
+        ctx.beginPath();
+        ctx.fillRect(this.x,0,2,canvas.height);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+    };
+    this.timestart=0;
+    this.biais=0;
+    this.raf;
+
     // Icon buttons element
     this.buttonRecImg;
     this.buttonMuteImg;
@@ -108,6 +127,7 @@ class Track {
     // Canvas assigned with query selector
     this.canvas = this.shadowRoot.querySelector('canvas');
     this.canvasBar =this.shadowRoot.querySelector('#bar');
+    this.canvasDiv = this.shadowRoot.querySelector('#can')
 
     // setting up individual ID for label and input type = file.
     this.shadowRoot.querySelector('#labelFile').setAttribute('for','audioFileChooser'+this.id);
@@ -404,22 +424,27 @@ class Track {
     context.lineTo(this.bufferLength + 1, canvasHalfHeight);
     context.lineTo(canvasWidth, canvasHalfHeight);
     context.stroke();
+    this.playBarDisplay.vx=this.canvasDiv.clientWidth/(this.bufferSourceNode.buffer.duration*60);
+    console.log(this.playBarDisplay);
   }
+
+
+  
 
   renderBar(xcor) {
     if (this.bufferSourceNode) {
-      let a=Date.now();
+      console.log(xcor);
       this.playBar = this.canvasBar.getContext('2d');
       this.playBar.globalAlpha = 0;
       this.playBar.clearRect(0,0,this.canvasBar.width,this.canvasBar.height);
       this.playBar.globalAlpha = 1;
       this.playBar.lineWidth = 3;
       this.playBar.strokeStyle = 'red';
-      let canvasWidth = this.canvas.width;
+      let canvasWidth = this.canvasDiv.clientWidth;
       let canvasHeigth = this.canvas.height;
       let maxDuration = this.bufferLength / this.bufferSourceNode.sampleRate;
-      let pos = (xcor - this.canvas.offsetLeft) / this.canvas.offsetWidth;
-      console.log(this.canvas.offsetLeft);
+      let pos = (xcor - this.canvasDiv.offsetLeft) / canvasWidth;
+      console.log('offset'+this.canvasDiv.offsetLeft);
       this.playbarCor = pos;
       let timeStamp = Math.floor(pos * maxDuration * 1000);
       let min = Math.floor(timeStamp / 1000 / 60);
@@ -428,35 +453,35 @@ class Track {
       //console.log("TimeStamp =  " + timeStamp);
       //console.log(min + " minutes et " + sec + " secondes.");
       this.playBar.beginPath();
-      this.playBar.moveTo(canvasWidth * pos, 0);
-      this.playBar.lineTo(canvasWidth * pos, canvasHeigth);
+      this.playBar.moveTo(this.canvasBar.width * pos, 0);
+      this.playBar.lineTo(this.canvasBar.width * pos, canvasHeigth);
       this.playBar.stroke();
-      console.log("time ellapsed: "+ (a-Date.now()));
     }
   }
 
+  // in progress __________________________________________________________________________________________________________________________
+draw() {
+    let ctx = this.canvasBar.getContext('2d');
+    this.biais = timestart;
+    this.timestart = Date.now();
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+     this.playBarDisplay.caca(ctx);
+     this.playBarDisplay.x +=  this.playBarDisplay.vx;
   
-  drawBarDuration(){
-    let context = this.canvasBar.getContext('2d');
-    let height = this.canvasBar.height;
-    let width = this.canvasBar.width;
-    let time = this.bufferSourceNode.buffer.duration*1000;
-    let sliceWidth = width/time;
-    this.test = {
-      x: 0,
-      y: 0,
-      vx: sliceWidth,
-      color: 'red',
-      draw: function() {
-        context.beginPath();
-        context.fillRect(this.x,this.y,10,height)
-        context.closePath();
-        context.stroke();
-        context.fillStyle = this.color;
-        context.fill();
-      }
-    };
-    
+    if ( this.playBarDisplay.x > (canvas.width+slice)) {
+      this.playBarDisplay.x=0
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+      this.playBarDisplay.draw(ctx);
+      window.cancelAnimationFrame(raf);
+      state=!state;
+      console.log((Date.now() - timestp)/1000);
+      timestp = 0;
+    } else {
+    setTimeout(function(){
+    raf = window.requestAnimationFrame(draw);
+      timestart = timestart - Date.now();
+    },time - Math.abs(biais));
+    }
   }
 
 
