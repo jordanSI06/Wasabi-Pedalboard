@@ -369,7 +369,7 @@
             this.trackEntity[i].addTime = addtime;
             this.trackEntity[i].addEmptyAudio();
           }
-          console.log(this.trackEntity[i].stateRecord);
+          //console.log(this.trackEntity[i].stateRecord);
           this.setStopTrack();}
         }
 

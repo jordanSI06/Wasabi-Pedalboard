@@ -454,7 +454,7 @@ class Track {
       let timeStamp = Math.floor(pos * maxDuration * 1000);
       let min = Math.floor(timeStamp / 1000 / 60);
       let sec = Math.floor((timeStamp / 1000 - min * 60) * 100) / 100;
-      console.log(pos);
+      //console.log(pos);     // this line is important in order to put the music and the bar at a specific time
       //console.log("TimeStamp =  " + timeStamp);
       //console.log(min + " minutes et " + sec + " secondes.");
       this.playBar.beginPath();
