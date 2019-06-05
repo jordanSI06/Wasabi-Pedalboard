@@ -23,7 +23,8 @@ class Track {
     this.output.connect(this.dest); // associated to MediaRecorder
 
     this.shadowRoot = document.querySelector('#pedalboard').shadowRoot.querySelector('#wc-multitrack').shadowRoot.querySelector('#trackN' + this.id);
-
+    this.parentPlayButton = document.querySelector('#pedalboard').shadowRoot.querySelector('#wc-multitrack').shadowRoot.querySelector('#btn_play_img');
+    
     //HTML Element
     // Graphic Element
     //this.playButton;
@@ -40,14 +41,16 @@ class Track {
     // Request animation frame part
     this.playBarDisplay = {
       x: 0,
+      oldx: 0,
       vx: 0,
       color: 'red',
       draw: function (ctx) {
+        ctx.fillStyle = this.color;
+        ctx.clearRect(0, 0, 2000, 100);
         ctx.beginPath();
         ctx.fillRect(this.x, 0, 5, 200);
         ctx.closePath();
         ctx.stroke();
-        ctx.fillStyle = this.color;
         ctx.fill();
       }
     };
@@ -55,6 +58,7 @@ class Track {
     this.biais = 0;
     this.raf;
     this.timestp;
+    this.stockCurrentTime;
 
     // Icon buttons element
     this.buttonRecImg;
@@ -132,6 +136,7 @@ class Track {
     // setting up individual ID for label and input type = file.
     this.shadowRoot.querySelector('#labelFile').setAttribute('for', 'audioFileChooser' + this.id);
     this.shadowRoot.querySelector('#audioFileChooser').setAttribute('id', 'audioFileChooser' + this.id);
+    
 
     this.titleTrack.textContent = this.title;
     navigator.mediaDevices.getUserMedia({
@@ -218,6 +223,7 @@ class Track {
     }
     this.bufferSourceNode.onended = function () {
       //parent.bufferSourceNode.disconnect();
+      parent.parentPlayButton.setAttribute('icon', 'av:play-circle-filled');
       parent.recreateBuffer();
     }
     if (this.stateLoop) {
@@ -424,6 +430,7 @@ class Track {
     context.lineTo(this.bufferLength + 1, canvasHalfHeight);
     context.lineTo(canvasWidth, canvasHalfHeight);
     context.stroke();
+    if (this.bufferSourceNode) this.renderBar(context2.offsetLeft);
   }
 
 
@@ -442,46 +449,45 @@ class Track {
       let canvasHeigth = this.canvas.height;
       let maxDuration = this.bufferLength / this.bufferSourceNode.sampleRate;
       let pos = (xcor - this.canvasDiv.offsetLeft) / canvasWidth;
-     // console.log('offset' + this.canvasDiv.offsetLeft);
+      // console.log('offset' + this.canvasDiv.offsetLeft);
       this.playbarCor = pos;
       let timeStamp = Math.floor(pos * maxDuration * 1000);
       let min = Math.floor(timeStamp / 1000 / 60);
       let sec = Math.floor((timeStamp / 1000 - min * 60) * 100) / 100;
-      //console.log(pos);
+      console.log(pos);
       //console.log("TimeStamp =  " + timeStamp);
       //console.log(min + " minutes et " + sec + " secondes.");
       this.playBar.beginPath();
       this.playBar.moveTo(this.canvasBar.width * pos, 0);
       this.playBar.lineTo(this.canvasBar.width * pos, canvasHeigth);
       this.playBar.stroke();
-      console.log(window);
     }
   }
 
   // in progress __________________________________________________________________________________________________________________________
   draw() {
-    let parent = this;
+    if(this.bufferSourceNode){
+    //let parent = this;
     //console.log(this.playBarDisplay.x);
     let ctx = this.canvasBar.getContext('2d');
-    this.biais = this.timestart;
-    this.timestart = Date.now();
+    //this.biais = this.timestart;
+    //this.timestart = Date.now();
     ctx.clearRect(0, 0, this.canvasBar.width, this.canvasBar.height);
     this.playBarDisplay.draw(ctx);
-    this.playBarDisplay.x += this.playBarDisplay.vx;
-    if (this.playBarDisplay.x > (this.canvasBar.width + this.playBarDisplay.vx)) {
-      this.playBarDisplay.x = 0
+    this.playBarDisplay.x = ((Date.now() - this.stockCurrentTime)/this.bufferSourceNode.buffer.duration)*2 + this.playBarDisplay.oldx;
+    if (this.playBarDisplay.x > 2000) {
+      this.playBarDisplay.x = 0;
+      this.playBarDisplay.oldx = 0;
       ctx.clearRect(0, 0, this.canvasBar.width, this.canvasBar.height);
       this.playBarDisplay.draw(ctx);
       window.cancelAnimationFrame(this.raf);
       // this.state=!state;
       // console.log((Date.now() - timestp)/1000);
-      this.timestp = 0;
+      //this.timestp = 0;
     } else {
-      setTimeout(function () {
-        parent.raf = window.requestAnimationFrame(()=> parent.draw());
-        parent.timestart = parent.timestart - Date.now();
-      }, this.bufferSourceNode.buffer.duration - Math.abs(this.biais));
+      this.raf = window.requestAnimationFrame(() => this.draw()); // parent?
     }
+  }
   }
 
 
@@ -506,10 +512,11 @@ class Track {
         } else {
           this.startedAt = Date.now()
           this.bufferSourceNode.start();
+          this.parentPlayButton.setAttribute('icon', 'av:play-circle-filled');
         }
 
         this.bufferSourceNode.connect(this.panner);
-      } else if (this.statePlay == true) {
+      } else {
         this.bufferSourceNode.stop()
         //this.bufferSourceNode.disconnect();
         this.recreateBuffer();
@@ -536,16 +543,14 @@ class Track {
   }
 
   stopTrack() {
-    if (this.bufferSourceNode && this.statePlay == true) {
+    if (this.bufferSourceNode) {
       //this.bufferSourceNode.stop();
       this.bufferSourceNode.disconnect();
-      this.recreateBuffer();
       this.pausedAt = undefined;
-    }
-    else if (this.bufferSourceNode && this.statePlay == false) {
-      //this.bufferSourceNode.start();
-      //this.bufferSourceNode.stop();
-      this.bufferSourceNode.disconnect();
+      this.playBarDisplay.x=0;
+      this.playBarDisplay.oldx=0;
+      window.cancelAnimationFrame(this.raf);
+      this.playBarDisplay.draw(this.canvasBar.getContext('2d'));
       this.recreateBuffer();
       this.pausedAt = undefined;
     }

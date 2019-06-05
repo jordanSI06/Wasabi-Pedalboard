@@ -35,7 +35,6 @@
       this.addButton;
       this.deleteButton;
 
-
       // Icon buttons element
       this.buttonPlayImg;
       this.buttonStopImg;
@@ -48,7 +47,8 @@
       this.statePause = false;
       this.stateMute = false;
       this.stateLoop = false;
-
+      this.stateNewBar = true;
+      this.countStateRecord=0;
       // Element value
       this.volume = 0.5;
       this.trackId = 0;
@@ -183,21 +183,27 @@
     }
 
     setPlayTrack() {
+      let parent = this;
+      if (this.buttonPlayImg.icon == 'av:play-circle-filled') this.statePlay = false;
       for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].playingTrack();
       }
       if (this.statePlay == false) {
         this.buttonPlayImg.setAttribute('icon', 'av:pause');
+        let time = Date.now();
         for (let i = 0; i < this.trackEntity.length; i++) {
-          console.log(this.trackEntity[i]);
-          this.trackEntity[i].raf = window.requestAnimationFrame(() => this.trackEntity[i].draw());
+          this.trackEntity[i].stockCurrentTime = time;
+          this.trackEntity[i].raf = window.requestAnimationFrame(() => this.trackEntity[i].draw(this.trackEntity[i].canvasBar.getContext('2d')));
           this.trackEntity[i].timestp = Date.now();
         }
       }
       else {
         this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
         for (let i = 0; i < this.trackEntity.length; i++) {
-         window.cancelAnimationFrame(this.trackEntity[i].raf);
+          window.cancelAnimationFrame(this.trackEntity[i].raf);
+        }
+        for (let i = 0; i < this.trackEntity.length; i++) {
+          this.trackEntity[i].playBarDisplay.oldx = this.trackEntity[i].playBarDisplay.x;
         }
       }
       this.statePlay = !this.statePlay;
@@ -207,6 +213,8 @@
       for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].stopTrack();
       }
+      this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
+      this.statePlay = false;
     }
 
     setLoopTrack() {
@@ -346,27 +354,32 @@
     }
 
     regulateTime() {
+      this.countStateRecord=0;
       let time = this.checkMaxTime();
       let addtime = 0;
+      for(let i=0;i<this.trackEntity.length;i++){
+        if(this.trackEntity[i].stateRecord) {this.countStateRecord += 42;}
+      }
       for (let i = 0; i < this.trackEntity.length; i++) {
-        this.trackEntity[i].canvasBar.getContext('2d').clearRect(
-          0, 0, this.trackEntity[i].canvasBar.width, this.trackEntity[i].canvasBar.height)
+        this.trackEntity[i].canvasBar.getContext('2d').clearRect(0, 0, 2000, 100)
         if (this.trackEntity[i].bufferSourceNode) {
+          if (this.countStateRecord==0) {
           addtime = time - this.trackEntity[i].bufferSourceNode.buffer.duration;
           if (addtime > 0) {
             this.trackEntity[i].addTime = addtime;
             this.trackEntity[i].addEmptyAudio();
           }
-          this.sliceUpdate();
-          console.log(this.trackEntity[i].playBarDisplay.vx);
+          console.log(this.trackEntity[i].stateRecord);
+          this.setStopTrack();}
         }
+
       }
     }
 
     checkMaxTime() {
       let trackDurationMax = 0;
       for (let i = 0; i < this.trackEntity.length; i++) {
-        if (this.trackEntity[i].bufferSourceNode) {
+        if (this.trackEntity[i].bufferSourceNode && !this.trackEntity[i].stateRecord) {
           trackDurationMax = Math.max(this.trackEntity[i].bufferSourceNode.buffer.duration, trackDurationMax);
         }
       }
@@ -386,14 +399,6 @@
       for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].volume = this.trackEntity[i].volume / this.trackEntity.length;
         this.trackEntity[i].volumeMax = 100 / this.trackEntity.length;
-      }
-    }
-
-    sliceUpdate() {
-      for (let i = 0; i < this.trackEntity.length; i++) {
-        if (this.trackEntity[i].bufferSourceNode) {
-          this.trackEntity[i].playBarDisplay.vx = this.trackEntity[i].canvasDiv.clientWidth / (this.checkMaxTime() * 60);
-        }
       }
     }
 
