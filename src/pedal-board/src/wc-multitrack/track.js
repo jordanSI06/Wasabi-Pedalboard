@@ -74,6 +74,7 @@ class Track {
     this.needResize = false;
     this.playbarExists = false;
     this.stateBegin = true;
+    this.keepPlaying = false;
 
     // Element value
     this.volume = volume;
@@ -458,6 +459,7 @@ class Track {
       window.cancelAnimationFrame(this.raf)
       if(this.statePlay){
       this.playingTrack();
+      this.keepPlaying=true;
       localState = true}
       this.pausedAt=this.bufferSourceNode.buffer.duration*pos*1000;
       this.startedAt = Date.now() - this.pausedAt;
@@ -540,6 +542,7 @@ class Track {
     } else {
       console.warn("You cannot play/pause! (There's no file or the track isn't recording)");
     }
+    this.keepPlaying = false;
   }
 
   loopTrack() {

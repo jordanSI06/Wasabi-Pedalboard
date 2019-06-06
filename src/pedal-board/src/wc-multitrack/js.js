@@ -319,6 +319,7 @@
       btnRecord.addEventListener('blur', this.regulateTime.bind(this, btnRecord));
       canvas.addEventListener('mousedown', this.getMouseX.bind(this));
       canvas.addEventListener('mousedown', this.timeSelector.bind(this, canvas));
+      canvas.addEventListener('mouseup', this.changeTarget.bind(this, canvas));
     }
 
     getDivParent(dom) {
@@ -398,6 +399,16 @@
         this.trackEntity[i].volume = this.trackEntity[i].volume / this.trackEntity.length;
         this.trackEntity[i].volumeMax = 100 / this.trackEntity.length;
       }
+    }
+
+    changeTarget(){
+      for(let i=0;i<this.trackEntity.length;i++){
+        if(this.trackEntity[i].keepPlaying){
+          this.setPlayTrack();
+        break;
+        }
+      }
+      this.playButton.focus();
     }
 
     // HERE, WE ARE GOING TO CREATE THE GESTURE OF DYNAMIC BAR. WE SHOULD CALL THE STATE IN TRACK.JS AND MAKE SURE THAT EVERY SLICE ARE THE SAME. SHOULD CONFIGURE THIS HERE
