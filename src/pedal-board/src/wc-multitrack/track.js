@@ -24,7 +24,7 @@ class Track {
 
     this.shadowRoot = document.querySelector('#pedalboard').shadowRoot.querySelector('#wc-multitrack').shadowRoot.querySelector('#trackN' + this.id);
     this.parentPlayButton = document.querySelector('#pedalboard').shadowRoot.querySelector('#wc-multitrack').shadowRoot.querySelector('#btn_play_img');
-
+    
     //HTML Element
     // Graphic Element
     //this.playButton;
@@ -136,7 +136,7 @@ class Track {
     // setting up individual ID for label and input type = file.
     this.shadowRoot.querySelector('#labelFile').setAttribute('for', 'audioFileChooser' + this.id);
     this.shadowRoot.querySelector('#audioFileChooser').setAttribute('id', 'audioFileChooser' + this.id);
-
+    
 
     this.titleTrack.textContent = this.title;
     navigator.mediaDevices.getUserMedia({
@@ -223,11 +223,9 @@ class Track {
     }
     this.bufferSourceNode.onended = function () {
       //parent.bufferSourceNode.disconnect();
-      if (parent.playBarDisplay.x > 1950 && !parent.stateLoop) {
-        parent.parentPlayButton.setAttribute('icon', 'av:play-circle-filled');
-        //parent.bufferSourceNode.disconnect();
-        parent.recreateBuffer();
-      }
+      parent.parentPlayButton.setAttribute('icon', 'av:play-circle-filled');
+      parent.bufferSourceNode.disconnect();
+      parent.recreateBuffer();
     }
     if (this.stateLoop) {
       this.bufferSourceNode.loop = true;
@@ -469,30 +467,28 @@ class Track {
 
   // in progress __________________________________________________________________________________________________________________________
   draw() {
-    if (this.bufferSourceNode) {
-      if (!this.stateLoop) {
-        //let parent = this;
-        //console.log(this.playBarDisplay.x);
-        let ctx = this.canvasBar.getContext('2d');
-        //this.biais = this.timestart;
-        //this.timestart = Date.now();
-        ctx.clearRect(0, 0, this.canvasBar.width, this.canvasBar.height);
-        this.playBarDisplay.draw(ctx);
-        this.playBarDisplay.x = ((Date.now() - this.stockCurrentTime) / this.bufferSourceNode.buffer.duration) * 2 + this.playBarDisplay.oldx;
-        if (this.playBarDisplay.x > 2000) {
-          this.playBarDisplay.x = 0;
-          this.playBarDisplay.oldx = 0;
-          ctx.clearRect(0, 0, this.canvasBar.width, this.canvasBar.height);
-          this.playBarDisplay.draw(ctx);
-          window.cancelAnimationFrame(this.raf);
-          // this.state=!state;
-          // console.log((Date.now() - timestp)/1000);
-          //this.timestp = 0;
-        } else {
-          this.raf = window.requestAnimationFrame(() => this.draw()); // parent?
-        }
-      }
+    if(this.bufferSourceNode){
+    //let parent = this;
+    //console.log(this.playBarDisplay.x);
+    let ctx = this.canvasBar.getContext('2d');
+    //this.biais = this.timestart;
+    //this.timestart = Date.now();
+    ctx.clearRect(0, 0, this.canvasBar.width, this.canvasBar.height);
+    this.playBarDisplay.draw(ctx);
+    this.playBarDisplay.x = ((Date.now() - this.stockCurrentTime)/this.bufferSourceNode.buffer.duration)*2 + this.playBarDisplay.oldx;
+    if (this.playBarDisplay.x > 2000) {
+      this.playBarDisplay.x = 0;
+      this.playBarDisplay.oldx = 0;
+      ctx.clearRect(0, 0, this.canvasBar.width, this.canvasBar.height);
+      this.playBarDisplay.draw(ctx);
+      window.cancelAnimationFrame(this.raf);
+      // this.state=!state;
+      // console.log((Date.now() - timestp)/1000);
+      //this.timestp = 0;
+    } else {
+      this.raf = window.requestAnimationFrame(() => this.draw()); // parent?
     }
+  }
   }
 
 
@@ -552,8 +548,8 @@ class Track {
       //this.bufferSourceNode.stop();
       this.bufferSourceNode.disconnect();
       this.pausedAt = undefined;
-      this.playBarDisplay.x = 0;
-      this.playBarDisplay.oldx = 0;
+      this.playBarDisplay.x=0;
+      this.playBarDisplay.oldx=0;
       window.cancelAnimationFrame(this.raf);
       this.playBarDisplay.draw(this.canvasBar.getContext('2d'));
       this.recreateBuffer();
