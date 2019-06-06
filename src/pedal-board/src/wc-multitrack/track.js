@@ -441,6 +441,7 @@ class Track {
 
 
   renderBar(xcor) {
+    let localState=false;
     if (this.bufferSourceNode) {
       //console.log(xcor);
       this.playBar = this.canvasBar.getContext('2d');
@@ -454,28 +455,37 @@ class Track {
       let maxDuration = this.bufferLength / this.bufferSourceNode.sampleRate;
       let pos = (xcor - this.canvasDiv.offsetLeft) / canvasWidth;
       // console.log('offset' + this.canvasDiv.offsetLeft);
+      window.cancelAnimationFrame(this.raf)
+      if(this.statePlay){
+      this.playingTrack();
+      localState = true}
+      this.pausedAt=this.bufferSourceNode.buffer.duration*pos*1000;
+      this.startedAt = Date.now() - this.pausedAt;
       this.playbarCor = pos;
+      this.playBarDisplay.oldx=pos*2000;
+      this.playBarDisplay.x=pos*2000;
+      this.stockCurrentTime=Date.now();
+      this.playBarDisplay.draw(this.canvasBar.getContext('2d'));
+
+      /*
       let timeStamp = Math.floor(pos * maxDuration * 1000);
       let min = Math.floor(timeStamp / 1000 / 60);
       let sec = Math.floor((timeStamp / 1000 - min * 60) * 100) / 100;
-      //console.log(pos);     // this line is important in order to put the music and the bar at a specific time
+      console.log(pos);     // this line is important in order to put the music and the bar at a specific time
       //console.log("TimeStamp =  " + timeStamp);
       //console.log(min + " minutes et " + sec + " secondes.");
       this.playBar.beginPath();
       this.playBar.moveTo(this.canvasBar.width * pos, 0);
       this.playBar.lineTo(this.canvasBar.width * pos, canvasHeigth);
       this.playBar.stroke();
+      */
     }
   }
 
   // in progress __________________________________________________________________________________________________________________________
   draw() {
     if(this.bufferSourceNode){
-    //let parent = this;
-    //console.log(this.playBarDisplay.x);
     let ctx = this.canvasBar.getContext('2d');
-    //this.biais = this.timestart;
-    //this.timestart = Date.now();
     ctx.clearRect(0, 0, this.canvasBar.width, this.canvasBar.height);
     this.playBarDisplay.draw(ctx);
     this.playBarDisplay.x = ((Date.now() - this.stockCurrentTime)/this.bufferSourceNode.buffer.duration)*2 + this.playBarDisplay.oldx;
@@ -485,9 +495,6 @@ class Track {
       ctx.clearRect(0, 0, this.canvasBar.width, this.canvasBar.height);
       this.playBarDisplay.draw(ctx);
       window.cancelAnimationFrame(this.raf);
-      // this.state=!state;
-      // console.log((Date.now() - timestp)/1000);
-      //this.timestp = 0;
     } else {
       this.raf = window.requestAnimationFrame(() => this.draw()); // parent?
     }

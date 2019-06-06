@@ -183,7 +183,6 @@
     }
 
     setPlayTrack() {
-      let parent = this;
       if (this.buttonPlayImg.icon == 'av:play-circle-filled') this.statePlay = false;
       for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].playingTrack();
@@ -194,7 +193,6 @@
         for (let i = 0; i < this.trackEntity.length; i++) {
           this.trackEntity[i].stockCurrentTime = time;
           this.trackEntity[i].raf = window.requestAnimationFrame(() => this.trackEntity[i].draw(this.trackEntity[i].canvasBar.getContext('2d')));
-          this.trackEntity[i].timestp = Date.now();
         }
       }
       else {
@@ -287,7 +285,6 @@
     }
 
     addTrack() {
-      let parent = this;
       if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 4) {
         //Create the div HTML element
         this.createDiv();
