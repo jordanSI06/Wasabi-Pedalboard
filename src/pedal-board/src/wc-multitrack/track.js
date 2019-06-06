@@ -73,6 +73,7 @@ class Track {
     this.stateLoop = loopState;
     this.needResize = false;
     this.playbarExists = false;
+    this.stateBegin = true;
 
     // Element value
     this.volume = volume;
@@ -197,6 +198,7 @@ class Track {
       this.stateRecord = !this.stateRecord;
       this.pausedAt = undefined;
       this.startedAt = 0;
+      this.stateBegin=true;
     } else {
       this.needResize = false;
     }
@@ -226,6 +228,7 @@ class Track {
       parent.parentPlayButton.setAttribute('icon', 'av:play-circle-filled');
       parent.bufferSourceNode.disconnect();
       parent.recreateBuffer();
+      parent.stateBegin=true;
     }
     if (this.stateLoop) {
       this.bufferSourceNode.loop = true;
@@ -545,8 +548,7 @@ class Track {
 
   stopTrack() {
     if (this.bufferSourceNode) {
-      //this.bufferSourceNode.stop();
-      this.bufferSourceNode.disconnect();
+      if(!this.stateBegin || this.statePlay)  this.bufferSourceNode.stop();
       this.pausedAt = undefined;
       this.playBarDisplay.x=0;
       this.playBarDisplay.oldx=0;
