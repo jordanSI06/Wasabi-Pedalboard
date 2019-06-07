@@ -436,11 +436,19 @@ class Track {
       this.playBarDisplay.draw(ctx);
       this.playBarDisplay.x = ((Date.now() - this.stockCurrentTime) / this.bufferSourceNode.buffer.duration) * 2 + this.playBarDisplay.oldx;
       if (this.playBarDisplay.x > 2000) {
+        if(!this.stateLoop){
         this.playBarDisplay.x = 0;
         this.playBarDisplay.oldx = 0;
         ctx.clearRect(0, 0, this.canvasBar.width, this.canvasBar.height);
         this.playBarDisplay.draw(ctx);
         window.cancelAnimationFrame(this.raf);
+        } else {
+          this.playBarDisplay.x =0;
+          this.playBarDisplay.oldx =0;
+          this.stockCurrentTime = Date.now();
+          ctx.clearRect(0, 0, this.canvasBar.width, this.canvasBar.height);
+          this.raf = window.requestAnimationFrame(() => this.draw()); // parent?
+        }
       } else {
         this.raf = window.requestAnimationFrame(() => this.draw()); // parent?
       }
