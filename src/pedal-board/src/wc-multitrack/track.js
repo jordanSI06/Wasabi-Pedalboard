@@ -547,10 +547,12 @@ class Track {
     let file = new FileReader();
     let name = this.audioFileChooser.files[0].name;
     file.readAsArrayBuffer(this.audioFileChooser.files[0])
-    file.onload = function (e) {
+    file.onloadend = function (e) {
       parent.file = e.target.result;
       parent.stockAudioFile(e.target.result);
-      parent.titleTrack.textContent  = name.substr(0,name.length-4)
+      parent.titleTrack.textContent  = name.substr(0,name.length-4);
+      parent.fileName = name.substr(0,name.length-4);
+      parent.buttonDlImg.setAttribute('style', 'fill: rgb(191, 255, 194);');
     }
   }
 
