@@ -48,7 +48,7 @@
       this.stateMute = false;
       this.stateLoop = false;
       this.stateNewBar = true;
-      this.countStateRecord=0;
+      this.countStateRecord = 0;
       // Element value
       this.volume = 0.5;
       this.trackId = 0;
@@ -285,13 +285,13 @@
     }
 
     addTrack() {
-      if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 4) {
+      if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 6) {
         //Create the div HTML element
         this.createDiv();
         //Select the div to clone the HTML content
         this.main = this.shadowRoot.querySelector('#trackN' + this.trackId);
         //Create the track object
-        let track = new Track(this.trackId, this.trackHTML, this.stateLoop, this.volume);
+        let track = new Track(this.trackId, this.trackHTML, this.stateLoop, 1);
         //Push the track in array
         this.trackEntity.push(track);
         this.checkVolumeMax();
@@ -319,7 +319,7 @@
       btnRecord.addEventListener('blur', this.regulateTime.bind(this, btnRecord));
       canvas.addEventListener('mousedown', this.getMouseX.bind(this));
       canvas.addEventListener('mousedown', this.timeSelector.bind(this, canvas));
-      canvas.addEventListener('mouseup', this.changeTarget.bind(this, canvas));
+      window.addEventListener('mouseup', this.changeTarget.bind(this, canvas));
     }
 
     getDivParent(dom) {
@@ -335,40 +335,37 @@
     }
 
     deleteTrackFromArray(dom) {
-      // console.log(dom);
       let element = this.getDivParent(dom);
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (element == this.trackEntity[i].shadowRoot) {
-          //   console.log(this.trackEntity[i].shadowRoot)
           this.trackEntity[i].stopSample();
           this.input.disconnect(this.trackEntity[i].getInput());
           this.trackEntity[i].getOutput().disconnect(this.output);
           this.trackEntity.splice(i, 1);
         }
       }
-      this.checkMaxTime();
+     // this.checkMaxTime();        //************************/
       this.checkVolumeMax();
-      //console.log(this.trackEntity);
     }
 
     regulateTime() {
-      this.countStateRecord=0;
+      this.countStateRecord = 0;
       let time = this.checkMaxTime();
       let addtime = 0;
-      for(let i=0;i<this.trackEntity.length;i++){
-        if(this.trackEntity[i].stateRecord) {this.countStateRecord += 42;}
+      for (let i = 0; i < this.trackEntity.length; i++) {
+        if (this.trackEntity[i].stateRecord) { this.countStateRecord += 42; }
       }
       for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].canvasBar.getContext('2d').clearRect(0, 0, 2000, 100)
         if (this.trackEntity[i].bufferSourceNode) {
-          if (this.countStateRecord==0) {
-          addtime = time - this.trackEntity[i].bufferSourceNode.buffer.duration;
-          if (addtime > 0) {
-            this.trackEntity[i].addTime = addtime;
-            this.trackEntity[i].addEmptyAudio();
+          if (this.countStateRecord == 0) {
+            addtime = time - this.trackEntity[i].bufferSourceNode.buffer.duration;
+            if (addtime > 0) {
+              this.trackEntity[i].addTime = addtime;
+              this.trackEntity[i].addEmptyAudio();
+            }
+            this.setStopTrack();
           }
-          //console.log(this.trackEntity[i].stateRecord);
-          this.setStopTrack();}
 
         }
 
@@ -394,25 +391,25 @@
       }
     }
 
+    // part need to be fixed...
     checkVolumeMax() {
-      for (let i = 0; i < this.trackEntity.length; i++) {
+     /* for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].volume = this.trackEntity[i].volume / this.trackEntity.length;
         this.trackEntity[i].volumeMax = 100 / this.trackEntity.length;
-      }
+      }*/
     }
 
-    changeTarget(){
-      for(let i=0;i<this.trackEntity.length;i++){
-        if(this.trackEntity[i].keepPlaying){
+    changeTarget() {
+      for (let i = 0; i < this.trackEntity.length; i++) {
+        if (this.trackEntity[i].keepPlaying) {
           this.setPlayTrack();
-        break;
+          break;
         }
       }
       this.playButton.focus();
     }
 
-    // HERE, WE ARE GOING TO CREATE THE GESTURE OF DYNAMIC BAR. WE SHOULD CALL THE STATE IN TRACK.JS AND MAKE SURE THAT EVERY SLICE ARE THE SAME. SHOULD CONFIGURE THIS HERE
-    //this.trackEntity[i].playBarDisplay.vx = this.trackEntity[i].canvasDiv.clientWidth / (this.trackEntity[i].bufferSourceNode.buffer.duration * 60);
+
   });
 })();
 
