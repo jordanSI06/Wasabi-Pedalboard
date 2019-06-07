@@ -564,6 +564,7 @@ class Track {
   stockAudioFile(file) {
     let parent = this;
     this.ac.decodeAudioData(file, function (buffer) {
+      parent.stopSample();
       parent.bufferSourceNode = parent.ac.createBufferSource();
       parent.bufferSourceNode.buffer = buffer;
       parent.bufferSourceNode.loop = parent.stateLoop;
