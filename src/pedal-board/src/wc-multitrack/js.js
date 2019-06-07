@@ -294,7 +294,7 @@
         let track = new Track(this.trackId, this.trackHTML, this.stateLoop, 1);
         //Push the track in array
         this.trackEntity.push(track);
-        this.checkVolumeMax();
+       // this.checkVolumeMax();
         //console.log(this.trackEntity);
         //Clone the div template
         let track_clone = this.trackEntity[this.trackEntity.length - 1].getTrackHTML.cloneNode(true);
@@ -345,7 +345,7 @@
         }
       }
       this.checkMaxTime();        //************************/
-      this.checkVolumeMax();
+     // this.checkVolumeMax();
     }
 
     regulateTime() {
