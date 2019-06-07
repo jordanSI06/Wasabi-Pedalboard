@@ -468,6 +468,7 @@ class Track {
           if ((this.pausedAt) > (this.bufferSourceNode.buffer.duration * 1000)) {
             this.pausedAt = this.pausedAt - (this.bufferSourceNode.buffer.duration * Math.floor(this.pausedAt / (this.bufferSourceNode.buffer.duration * 1000))) * 1000;
             this.startedAt = Date.now() - this.pausedAt;
+            this.timeEllapsed = Date.now();
           }
           this.timeEllapsed = Date.now() - this.timeEllapsed;
           this.startedAt += this.timeEllapsed;
