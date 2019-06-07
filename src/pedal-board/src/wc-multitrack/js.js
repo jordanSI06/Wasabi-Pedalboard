@@ -319,7 +319,7 @@
       btnRecord.addEventListener('blur', this.regulateTime.bind(this, btnRecord));
       canvas.addEventListener('mousedown', this.getMouseX.bind(this));
       canvas.addEventListener('mousedown', this.timeSelector.bind(this, canvas));
-      window.addEventListener('mouseup', this.changeTarget.bind(this, canvas));
+      canvas.addEventListener('mouseup', this.changeTarget.bind(this, canvas));
     }
 
     getDivParent(dom) {
@@ -344,13 +344,14 @@
           this.trackEntity.splice(i, 1);
         }
       }
-     // this.checkMaxTime();        //************************/
+      this.checkMaxTime();        //************************/
       this.checkVolumeMax();
     }
 
     regulateTime() {
       this.countStateRecord = 0;
       let time = this.checkMaxTime();
+      console.log(time);
       let addtime = 0;
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (this.trackEntity[i].stateRecord) { this.countStateRecord += 42; }
@@ -393,10 +394,10 @@
 
     // part need to be fixed...
     checkVolumeMax() {
-     /* for (let i = 0; i < this.trackEntity.length; i++) {
+      for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].volume = this.trackEntity[i].volume / this.trackEntity.length;
         this.trackEntity[i].volumeMax = 100 / this.trackEntity.length;
-      }*/
+      }
     }
 
     changeTarget() {
