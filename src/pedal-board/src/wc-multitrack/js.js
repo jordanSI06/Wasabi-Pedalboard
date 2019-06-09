@@ -351,7 +351,7 @@
     regulateTime() {
       this.countStateRecord = 0;
       let time = this.checkMaxTime();
-      console.log(time);
+      //console.log(time);
       let addtime = 0;
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (this.trackEntity[i].stateRecord) { this.countStateRecord += 42; }

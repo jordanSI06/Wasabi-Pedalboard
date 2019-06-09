@@ -23,7 +23,8 @@ class Track {
     this.output.connect(this.dest); // associated to MediaRecorder
 
     this.shadowRoot = document.querySelector('#pedalboard').shadowRoot.querySelector('#wc-multitrack').shadowRoot.querySelector('#trackN' + this.id);
-    this.parentPlayButton = document.querySelector('#pedalboard').shadowRoot.querySelector('#wc-multitrack').shadowRoot.querySelector('#btn_play_img');
+    this.parentPlayImg = document.querySelector('#pedalboard').shadowRoot.querySelector('#wc-multitrack').shadowRoot.querySelector('#btn_play_img');
+    this.parentPlayButton = document.querySelector('#pedalboard').shadowRoot.querySelector('#wc-multitrack').shadowRoot.querySelector('#play');
 
     //HTML Element
     // Graphic Element
@@ -154,6 +155,7 @@ class Track {
         parent.titleTrack.addEventListener('click', parent.changeTitle.bind(parent));
         parent.deleteButton.addEventListener('click', parent.deleteTrack.bind(parent));
         parent.pannerInput.addEventListener('input', parent.changePanner.bind(parent));
+        parent.audioFileChooser.addEventListener('click', parent.eraseData.bind(parent));
         parent.audioFileChooser.addEventListener('change', parent.uploadAudio.bind(parent));
         window.addEventListener('resize', parent.resizeLoadingBar.bind(parent))
       });
@@ -227,7 +229,7 @@ class Track {
       this.bufferSourceNode.buffer = this.sample;
     }
     this.bufferSourceNode.onended = function () {
-      parent.parentPlayButton.setAttribute('icon', 'av:play-circle-filled');
+      parent.parentPlayImg.setAttribute('icon', 'av:play-circle-filled');
       parent.bufferSourceNode.disconnect();
       parent.recreateBuffer();
       parent.stateBegin = true;
@@ -360,6 +362,7 @@ class Track {
   }
 
   RenderWave(data) {
+    this.parentPlayButton.disabled=true;
     let context2 = this.canvasBar.getContext('2d');
     context2.globalAlpha = 0;
     context2.fillRect(0, 0, this.canvasBar.width, this.canvasBar.height);
@@ -397,6 +400,7 @@ class Track {
     context.lineTo(canvasWidth, canvasHalfHeight);
     context.stroke();
     if (this.bufferSourceNode) this.renderBar(context2.offsetLeft);
+    this.parentPlayButton.disabled=false;
   }
 
 
@@ -474,7 +478,7 @@ class Track {
         } else {
           this.startedAt = Date.now()
           this.bufferSourceNode.start();
-          this.parentPlayButton.setAttribute('icon', 'av:play-circle-filled');
+          this.parentPlayImg.setAttribute('icon', 'av:play-circle-filled');
         }
 
         this.bufferSourceNode.connect(this.panner);
@@ -547,6 +551,10 @@ class Track {
     return tmp;
   }
 
+  eraseData(){
+    if(this.audioFileChooser.files) this.audioFileChooser.files=undefined;
+  }
+  
   uploadAudio() {
     let parent = this;
     let file = new FileReader();
@@ -559,6 +567,7 @@ class Track {
       parent.fileName = name.substr(0,name.length-4);
       parent.buttonDlImg.setAttribute('style', 'fill: rgb(191, 255, 194);');
     }
+    this.audioFileChooser.value='';
   }
 
   stockAudioFile(file) {
