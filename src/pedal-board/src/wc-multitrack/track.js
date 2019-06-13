@@ -293,8 +293,6 @@ class Track {
       let parent = this;
       if (this.blob) {
         this.url = window.URL.createObjectURL(this.blob);
-      } else {
-        this.url = window.URL.createObjectURL(this.audioFileChooser.files[0]);
       }
       this.link = document.createElement('a');
       this.link.style.display = 'none';
@@ -567,6 +565,7 @@ class Track {
       parent.fileName = name.substr(0,name.length-4);
       parent.buttonDlImg.setAttribute('style', 'fill: rgb(191, 255, 194);');
     }
+    this.url = window.URL.createObjectURL(this.audioFileChooser.files[0]);
     this.audioFileChooser.value='';
   }
 
