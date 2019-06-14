@@ -2,15 +2,17 @@
   display: block;
   position:absolute;
 	background: rgb(85, 85, 85);
-  height: 45px;
+  height: 47.5px;
   width: 100%;
+  border:1px solid black;
 }
 
 #bar {
   display: block;
   position:absolute;
-  height: 45px;
+  height: 47.5px;
   width: 100%;
+  border:1px solid black;
 }
 
 button {
@@ -57,7 +59,7 @@ iron-icon{
   list-style: none;
   display: flex;
   align-content: flex-start;
-  margin-top:-1px;
+  margin-top:-2px;
   margin-bottom:0px;
   height:50px
 }
@@ -74,7 +76,7 @@ iron-icon{
 }
 
 #can {
-  border:2px solid rgb(135, 135, 135);
+ /* border:2px solid rgb(135, 135, 135);*/
   position: relative;
   height : 45px;
   width : 95%;

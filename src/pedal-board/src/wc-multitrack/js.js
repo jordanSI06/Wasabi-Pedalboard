@@ -54,6 +54,7 @@
       this.trackId = 0;
       this.trackHTML;
       this.trackEntity = [];
+      this.maxNumberOfTrack = 6;
 
       // Start/Pause manager time
       this.startedAt;
@@ -285,7 +286,7 @@
     }
 
     addTrack() {
-      if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < 6) {
+      if (this.shadowRoot.querySelectorAll("[id^=trackN]").length < this.maxNumberOfTrack) {
         //Create the div HTML element
         this.createDiv();
         //Select the div to clone the HTML content
@@ -391,6 +392,8 @@
         }
       }
     }
+
+
 
     // part need to be fixed...
     checkVolumeMax() {
