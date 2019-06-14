@@ -49,6 +49,7 @@
       this.stateLoop = false;
       this.stateNewBar = true;
       this.countStateRecord = 0;
+      this.statePlayOnRec=false;
       // Element value
       this.volume = 0.5;
       this.trackId = 0;
@@ -130,6 +131,7 @@
       //this.titleTrack = this.shadowRoot.querySelector('#title');
       this.addButton = this.shadowRoot.querySelector('#addTrack');
       this.deleteButton = this.shadowRoot.querySelector('#delete');
+      this.playOnRecButton = this.shadowRoot.querySelector('#playOnRec');
 
       // Buttons icons assigned with query selector
       this.buttonStopImg = this.shadowRoot.querySelector('#btn_stop_img');
@@ -137,6 +139,7 @@
       this.buttonLoopImg = this.shadowRoot.querySelector('#btn_loop_img');
       this.buttonMuteImg = this.shadowRoot.querySelector('#btn_mute_img');
       this.buttonDlImg = this.shadowRoot.querySelector('#btn_dl_img');
+      this.playOnRecImg = this.shadowRoot.querySelector('#btn_playOnRec_img');
 
       // Volume range slider assigned with query selector
       this.volumeRange = this.shadowRoot.querySelector('#volume');
@@ -161,6 +164,7 @@
           parent.addButton.addEventListener('mouseover', parent.addTrackButtonOver.bind(parent));
           parent.addButton.addEventListener('mouseout', parent.addTrackButtonOut.bind(parent));
           parent.deleteButton.addEventListener('click', parent.deleteTrackFromArray.bind(parent));
+          parent.playOnRecButton.addEventListener('click',parent.togglePlayOnRec.bind(parent));
           //console.log('recorder is ready');
         });
     }
@@ -181,6 +185,17 @@
     stockTrack() {
       this.trackHTML = this.shadowRoot.querySelector('#onetrack0');
       this.shadowRoot.querySelector('#onetrack0').remove();
+    }
+
+    togglePlayOnRec(){
+      if(!this.statePlayOnRec) {
+        this.playOnRecImg.setAttribute('icon','icons:radio-button-checked')
+        this.playOnRecImg.setAttribute('style','fill:red');
+      }else{
+        this.playOnRecImg.setAttribute('icon','icons:radio-button-unchecked')
+        this.playOnRecImg.setAttribute('style','fill:white');
+      }
+      this.statePlayOnRec=!this.statePlayOnRec;
     }
 
     setPlayTrack() {
@@ -318,9 +333,18 @@
       let canvas = this.shadowRoot.querySelector(dom + ' #bar');
       btnDelete.addEventListener('click', this.deleteTrackFromArray.bind(this, btnDelete));
       btnRecord.addEventListener('blur', this.regulateTime.bind(this, btnRecord));
+      btnRecord.addEventListener('mousedown', this.playFromBegin.bind(this, btnRecord));
       canvas.addEventListener('mousedown', this.getMouseX.bind(this));
       canvas.addEventListener('mousedown', this.timeSelector.bind(this, canvas));
       canvas.addEventListener('mouseup', this.changeTarget.bind(this, canvas));
+    }
+
+    playFromBegin(){
+      if(this.statePlayOnRec){
+        this.togglePlayOnRec();
+        this.setStopTrack();
+        this.setPlayTrack();
+      }
     }
 
     getDivParent(dom) {
