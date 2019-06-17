@@ -15,6 +15,14 @@
   border:1px solid black;
 }
 
+#selector {
+  display: block;
+  position:absolute;
+  height: 47.5px;
+  width: 100%;
+  border:1px solid black;
+}
+
 button {
   outline:0;
 }
@@ -30,6 +38,9 @@ li.flex-item {
   display:none;
 }
 
+button:disabled {
+  fill: rgb(100, 100, 100);
+}
 
 #buttonList{
   display: flex;

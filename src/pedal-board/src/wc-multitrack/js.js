@@ -48,6 +48,7 @@
       this.stateMute = false;
       this.stateLoop = false;
       this.stateNewBar = true;
+      this.stateTimeSelector = false;
       this.countStateRecord = 0;
       this.statePlayOnRec=false;
       // Element value
@@ -330,7 +331,7 @@
     eventListenerUpdate(dom) {
       let btnDelete = this.shadowRoot.querySelector(dom + ' #delete');
       let btnRecord = this.shadowRoot.querySelector(dom + ' #record');
-      let canvas = this.shadowRoot.querySelector(dom + ' #bar');
+      let canvas = this.shadowRoot.querySelector(dom + ' #selector');
       btnDelete.addEventListener('click', this.deleteTrackFromArray.bind(this, btnDelete));
       btnRecord.addEventListener('blur', this.regulateTime.bind(this, btnRecord));
       btnRecord.addEventListener('mousedown', this.playFromBegin.bind(this, btnRecord));
@@ -415,9 +416,24 @@
           this.trackEntity[i].renderBar(this.xcor);
         }
       }
+      this.stateTimeSelector=true;
+      this.setPartitionSelector();
     }
 
-
+setPartitionSelector(){
+  let parent = this;
+  document.onmousemove = event =>{
+    if(parent.stateTimeSelector){
+    for(let i=0;i<parent.trackEntity.length;i++){
+      parent.trackEntity[i].partitionSelector(event.clientX);
+    }
+    }
+  }
+  document.onmouseup = event => {
+    this.stateTimeSelector=false;
+    console.log(event.clientX);
+  }
+}
 
     // part need to be fixed...
     checkVolumeMax() {

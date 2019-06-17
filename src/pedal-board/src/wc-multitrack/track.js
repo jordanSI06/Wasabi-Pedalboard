@@ -56,6 +56,23 @@ class Track {
         ctx.fill();
       }
     };
+
+    this.partitionSelectorDisplay = {
+      x : 0,
+      color : 'yellow',
+      draw: function (ctx,xPos){
+        ctx.globalAlpha = 0.1;
+        ctx.fillStyle = this.color;
+        ctx.clearRect(0,0,2000,100);
+        ctx.beginPath();
+        ctx.fillRect(this.x,0,xPos - this.x,200);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fill();
+      }
+    };
+
+
     this.timestart = 0;
     this.biais = 0;
     this.raf;
@@ -73,6 +90,7 @@ class Track {
     this.statePause = false;
     this.stateMute = false;
     this.stateLoop = loopState;
+    this.stateSelector=false;;
     this.needResize = false;
     this.playbarExists = false;
     this.stateBegin = true;
@@ -135,6 +153,7 @@ class Track {
     this.canvas = this.shadowRoot.querySelector('canvas');
     this.canvasBar = this.shadowRoot.querySelector('#bar');
     this.canvasDiv = this.shadowRoot.querySelector('#can')
+    this.canvasSelector = this.shadowRoot.querySelector('#selector');
 
     // setting up individual ID for label and input type = file.
     this.shadowRoot.querySelector('#labelFile').setAttribute('for', 'audioFileChooser' + this.id);
@@ -405,6 +424,8 @@ class Track {
 
 
   renderBar(xcor) {
+    this.canvasSelector.getContext('2d').clearRect(0,0,2000,100);
+    this.stateSelector=true;
     let localState = false;
     if (this.bufferSourceNode) {
       this.playBar = this.canvasBar.getContext('2d');
@@ -413,13 +434,12 @@ class Track {
       this.playBar.globalAlpha = 1;
       this.playBar.lineWidth = 3;
       this.playBar.strokeStyle = 'red';
-      let canvasWidth = this.canvasDiv.clientWidth;
-      let pos = (xcor - this.canvasDiv.offsetLeft) / canvasWidth;
+      let pos = (xcor - this.canvasDiv.offsetLeft) /  this.canvasDiv.clientWidth;
       window.cancelAnimationFrame(this.raf)
       if (this.statePlay) {
         this.playingTrack();
         this.keepPlaying = true;
-        localState = true
+        localState = true;
       }
       this.pausedAt = this.bufferSourceNode.buffer.duration * pos * 1000;
       this.startedAt = Date.now() - this.pausedAt;
@@ -428,6 +448,16 @@ class Track {
       this.playBarDisplay.x = pos * 2000;
       this.stockCurrentTime = Date.now();
       this.playBarDisplay.draw(this.canvasBar.getContext('2d'));
+      this.partitionSelectorDisplay.x=pos*2000;
+    }
+  }
+
+
+  partitionSelector(xcor){
+    let canvas = this.canvasSelector.getContext('2d');
+    if(this.bufferSourceNode){
+        let pos = (xcor - this.canvasDiv.offsetLeft) /  this.canvasDiv.clientWidth;
+        this.partitionSelectorDisplay.draw(canvas,pos*2000);
     }
   }
 
@@ -493,6 +523,7 @@ class Track {
     }
     this.keepPlaying = false;
   }
+
 
   loopTrack() {
     if (this.bufferSourceNode) {
