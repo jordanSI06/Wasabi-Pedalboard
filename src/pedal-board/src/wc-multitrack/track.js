@@ -102,6 +102,8 @@ class Track {
     this.pannerValue = 0;
     this.trackId = 0;
     this.addTime = 0;
+    this.startSelector;
+    this.endSelector;
 
     // File element
     this.blob;
@@ -425,8 +427,6 @@ class Track {
 
   renderBar(xcor) {
     this.canvasSelector.getContext('2d').clearRect(0,0,2000,100);
-    this.stateSelector=true;
-    let localState = false;
     if (this.bufferSourceNode) {
       this.playBar = this.canvasBar.getContext('2d');
       this.playBar.globalAlpha = 0;
@@ -439,7 +439,6 @@ class Track {
       if (this.statePlay) {
         this.playingTrack();
         this.keepPlaying = true;
-        localState = true;
       }
       this.pausedAt = this.bufferSourceNode.buffer.duration * pos * 1000;
       this.startedAt = Date.now() - this.pausedAt;
@@ -458,6 +457,8 @@ class Track {
     if(this.bufferSourceNode){
         let pos = (xcor - this.canvasDiv.offsetLeft) /  this.canvasDiv.clientWidth;
         this.partitionSelectorDisplay.draw(canvas,pos*2000);
+        this.endSelector=Math.max(pos*2000,this.partitionSelectorDisplay.x);
+        this.startSelector=Math.min(pos*2000,this.partitionSelectorDisplay.x);
     }
   }
 
@@ -481,7 +482,7 @@ class Track {
         this.raf = window.requestAnimationFrame(() => this.draw()); // parent?
       }
     }
-  }
+}
 
 
   deleteTrack() {

@@ -62,6 +62,8 @@
       this.startedAt;
       this.pausedAt;
       this.timeEllapsed;
+      this.endSelector;
+      this.startSelector;
 
       // File element
       this.blob;
@@ -416,23 +418,39 @@
           this.trackEntity[i].renderBar(this.xcor);
         }
       }
-      this.stateTimeSelector=true;
       this.setPartitionSelector();
     }
 
 setPartitionSelector(){
-  let parent = this;
+  this.stateTimeSelector=false;
+  let localstate=true;
   document.onmousemove = event =>{
-    if(parent.stateTimeSelector){
-    for(let i=0;i<parent.trackEntity.length;i++){
-      parent.trackEntity[i].partitionSelector(event.clientX);
+    if(localstate){
+      this.stateTimeSelector=true;
+    for(let i=0;i<this.trackEntity.length;i++){
+      this.trackEntity[i].partitionSelector(event.clientX);
     }
     }
   }
   document.onmouseup = event => {
-    this.stateTimeSelector=false;
-    console.log(event.clientX);
+    if(localstate){
+      localstate=false;
+    for(let i=0;i<this.trackEntity.length;i++){
+      if(this.trackEntity[i].bufferSourceNode){
+       this.endSelector = this.trackEntity[i].endSelector/2000;
+       this.startSelector =  this.trackEntity[i].startSelector/2000;
+       if(this.endSelector>1) this.endSelector=1;
+       if(this.startSelector<0) this.startSelector=0;
+        break;
+      }
+    }
+    console.log("begining at: "+this.startSelector*100+" %");
+    console.log("end at: "+this.endSelector*100+" %");
+    for(let i=0;i<this.trackEntity.length;i++){
+      this.trackEntity[i].stateSelector = this.stateTimeSelector;
+    }
   }
+}
 }
 
     // part need to be fixed...
