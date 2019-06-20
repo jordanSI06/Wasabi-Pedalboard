@@ -207,6 +207,7 @@ class Track {
     if (!this.needResize) {
       if (this.stateRecord == false) {
         this.input.gain.value = 1;
+        // We change the state at this moment due to exception gesture.
         this.statePlay = false;
 
         this.stopSample();
@@ -383,7 +384,6 @@ class Track {
   RenderWave(data) {
     this.parentPlayButton.disabled=true;
     let context2 = this.canvasBar.getContext('2d');
-    context2.globalAlpha = 0;
     context2.fillRect(0, 0, this.canvasBar.width, this.canvasBar.height);
     let context = this.canvas.getContext('2d');
     let canvasWidth = this.canvas.width;
@@ -395,15 +395,9 @@ class Track {
     context.lineWidth = 1;
     context.strokeStyle = 'rgb(255, 255, 255)';
     context.beginPath();
-    let calcul;
-    if (this.bufferSourceNode.buffer.duration >= 60) {
-      calcul = Math.floor(((this.bufferLength / this.bufferSourceNode.buffer.sampleRate)));
-    } else {
-      calcul = 1;
-    }
-    let sliceWidth = canvasWidth * 1.0 / (this.bufferLength / calcul);
+    let sliceWidth = canvasWidth / this.bufferLength  ;
     let x = 0 - sliceWidth;
-    for (let i = 0; i < this.bufferLength; i += calcul) {
+    for (let i = 0; i < this.bufferLength; i++) {
       let v = 1 - this.data[i];
       let y = v * canvasHalfHeight;
 
@@ -428,13 +422,15 @@ class Track {
   renderBar(xcor) {
     this.canvasSelector.getContext('2d').clearRect(0,0,2000,100);
     if (this.bufferSourceNode) {
+      // creating 2d context for the second canvas
       this.playBar = this.canvasBar.getContext('2d');
-      this.playBar.globalAlpha = 0;
+      // clear canvas bar
       this.playBar.clearRect(0, 0, this.canvasBar.width, this.canvasBar.height);
-      this.playBar.globalAlpha = 1;
       this.playBar.lineWidth = 3;
       this.playBar.strokeStyle = 'red';
+      // pos is important to get the relative position of playBar.
       let pos = (xcor - this.canvasDiv.offsetLeft) /  this.canvasDiv.clientWidth;
+      // we cancel animation frale, but we restart it if statePlay is true.
       window.cancelAnimationFrame(this.raf)
       if (this.statePlay) {
         this.playingTrack();
@@ -495,23 +491,33 @@ class Track {
         if (this.pausedAt) {
           // if loop enabled, this will helps!
           if ((this.pausedAt) > (this.bufferSourceNode.buffer.duration * 1000)) {
+            // the line below calculate the real pausedAt time if the loop is enabled.
             this.pausedAt = this.pausedAt - (this.bufferSourceNode.buffer.duration * Math.floor(this.pausedAt / (this.bufferSourceNode.buffer.duration * 1000))) * 1000;
+            // startedAt update
             this.startedAt = Date.now() - this.pausedAt;
+            // time ellapsed reset there.
             this.timeEllapsed = Date.now();
           }
+          // time ellapsed is now calculated: the difference between old date.now and actual date.now.
           this.timeEllapsed = Date.now() - this.timeEllapsed;
+          // we add a startedAt the new time ellapsed calculated.
           this.startedAt += this.timeEllapsed;
+          // this line will help, because it happens sometimes to get a pausedAt inferior at 0. It will be updated at 0 in this case.
           if (this.pausedAt < 0) this.pausedAt = 0
+          // we start the buffer source node at the time it had been paused. We divide it by 1000 because the argument are in secondes. PausedAt is in millisec.
           this.bufferSourceNode.start(0, this.pausedAt / 1000);
+          // we setup pausedAt as undefined, then instructions above and below if(this.pausedAt) are not going to be executed.
           this.pausedAt = undefined;
         } else {
           this.startedAt = Date.now()
           this.bufferSourceNode.start();
+          // graphical update of play button. Parent play img is the button above tracks.
           this.parentPlayImg.setAttribute('icon', 'av:play-circle-filled');
         }
-
+        // connection to panner.
         this.bufferSourceNode.connect(this.panner);
       } else {
+        // these steps are necessary. Because we're working on audio nodes.
         this.bufferSourceNode.stop()
         this.recreateBuffer();
         this.pausedAt = Date.now() - this.startedAt;
@@ -527,6 +533,7 @@ class Track {
 
 
   loopTrack() {
+    // obvious code here. We just toggle the loop state of our bufferSourceNode.
     if (this.bufferSourceNode) {
       if (this.stateLoop == false) {
         this.bufferSourceNode.loop = true;
@@ -540,11 +547,16 @@ class Track {
   stopTrack() {
     if (this.bufferSourceNode) {
       if (!this.stateBegin || this.statePlay) this.bufferSourceNode.stop();
+      // we need there to set the pausedAt var at undefined because the track is stopped.
       this.pausedAt = undefined;
+      // graphical update of canvas.
       this.playBarDisplay.x = 0;
       this.playBarDisplay.oldx = 0;
+      // we cancel the playBar's animation.
       window.cancelAnimationFrame(this.raf);
+      // we redraw the bar at the begining of the track.
       this.playBarDisplay.draw(this.canvasBar.getContext('2d'));
+      // recreation of buffer.
       this.recreateBuffer();
     }
     else {
@@ -553,23 +565,26 @@ class Track {
   }
 
   addEmptyAudio() {
+    //if addTime is greater than zero, we execute the commands below. addTime is in SECONDS.
+         // console.log(this.addTime);
     if (this.addTime > 0) {
+      // the sample rate is different depending on user/music choosen.
       let length = this.addTime * this.bufferSourceNode.buffer.sampleRate;
+      // we're creating an empty buffer here.
       let arrayBuffer = this.ac.createBuffer(2, length, this.bufferSourceNode.buffer.sampleRate);
+      // we aapply the appendBuffer method that concatenate two buffer. The second argument will be the end of the buffer, and first one, obviously the begining.
       let buffer = this.appendBuffer(this.bufferSourceNode.buffer, arrayBuffer);
-      //this.bufferSourceNode = this.ac.createBufferSource();
-      //this.bufferSourceNode.buffer = buffer;
-      /*this.bufferSourceNode.onended = function () {
-        parent.recreateBuffer();
-      }*/
       if (this.stateLoop) {
+        // dont forget to update loop state of our new bufferSourceNode!
         this.bufferSourceNode.loop = true;
       }
       this.useSample(buffer);
+      // we reset addTime.
       this.addTime = 0;
     }
   }
 
+  // this method is verry usefull. It will concatenate two buffer into one new buffer. It will be usefull for custom records in a specific area.
   appendBuffer(buffer1, buffer2) {
     let numberOfChannels = Math.min(buffer1.numberOfChannels, buffer2.numberOfChannels);
     let tmp = this.ac.createBuffer(numberOfChannels, (buffer1.length + buffer2.length), buffer1.sampleRate);
@@ -581,13 +596,19 @@ class Track {
     return tmp;
   }
 
+  // will delete data. We need this, because if you manage to upload a file, and re upload the same file after a recording, the upload will not work properly.
   eraseData(){
     if(this.audioFileChooser.files) this.audioFileChooser.files=undefined;
   }
   
+
+
   uploadAudio() {
+    // for anonymous function.
     let parent = this;
+    // file is a FileReader object.
     let file = new FileReader();
+    // we can get the name of the audioFile here.
     let name = this.audioFileChooser.files[0].name;
     file.readAsArrayBuffer(this.audioFileChooser.files[0])
     file.onloadend = function (e) {
@@ -611,7 +632,7 @@ class Track {
     }).then(function () {
       parent.useSample(parent.bufferSourceNode.buffer);
       parent.blob = null
-      // focus and blur in order to get listener working fine!!
+      // focus and blur in order to get listener working fine on js.js methods!
       parent.recordButton.focus();
       parent.recordButton.blur();
     }

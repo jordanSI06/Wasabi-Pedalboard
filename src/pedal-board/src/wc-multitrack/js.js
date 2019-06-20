@@ -49,7 +49,7 @@
       this.stateLoop = false;
       this.stateNewBar = true;
       this.stateTimeSelector = false;
-      this.countStateRecord = 0;
+      this.countStateRecord = false;
       this.statePlayOnRec=false;
       // Element value
       this.volume = 0.5;
@@ -155,20 +155,16 @@
         .then(function (stream) {
           parent.shadowRoot.onload = parent.stockTrack();
           parent.stopButton.addEventListener('click', parent.setStopTrack.bind(parent));
-          parent.dlButton.addEventListener('click', parent.download.bind(parent));
+          // TO DO
+          //parent.dlButton.addEventListener('click', parent.download.bind(parent));
           parent.volumeRange.addEventListener('input', parent.changeVolume.bind(parent));
           parent.playButton.addEventListener('click', parent.setPlayTrack.bind(parent));
-          //parent.muteButton.addEventListener('click', parent.muteVolume.bind(parent));
-          //parent.recorder = new MediaRecorder(parent.dest.stream);
-          //parent.recorder.addEventListener('dataavailable', parent.onRecordingReady.bind(parent));
           parent.loopButton.addEventListener('click', parent.setLoopTrack.bind(parent));
-          //parent.titleTrack.addEventListener('click', parent.changeTilte.bind(parent));
           parent.addButton.addEventListener('click', parent.addTrack.bind(parent));
           parent.addButton.addEventListener('mouseover', parent.addTrackButtonOver.bind(parent));
           parent.addButton.addEventListener('mouseout', parent.addTrackButtonOut.bind(parent));
           parent.deleteButton.addEventListener('click', parent.deleteTrackFromArray.bind(parent));
           parent.playOnRecButton.addEventListener('click',parent.togglePlayOnRec.bind(parent));
-          //console.log('recorder is ready');
         });
     }
     // ----- METHODS: CUSTOM -----
@@ -202,6 +198,7 @@
     }
 
     setPlayTrack() {
+      // graphical updates ans stuffs. Call playingTrack from track.js
       if (this.buttonPlayImg.icon == 'av:play-circle-filled') this.statePlay = false;
       for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].playingTrack();
@@ -227,14 +224,17 @@
     }
 
     setStopTrack() {
+      // set stop for every existing  tracks.
       for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].stopTrack();
       }
+      // grahpical update of play button.
       this.buttonPlayImg.setAttribute('icon', 'av:play-circle-filled');
       this.statePlay = false;
     }
 
     setLoopTrack() {
+      // toggle stateLoop of every existing tracks.
       if (this.stateLoop == false) {
         for (let i = 0; i < this.trackEntity.length; i++) {
           this.trackEntity[i].loopTrack();
@@ -252,15 +252,8 @@
       this.stateLoop = !this.stateLoop;
     }
 
-    /*checkMaxTime(){
-      for (let i = 0; i < this.trackEntity.length; i++) {
-        if(this.trackEntity[i+1].bufferSourceNode.buffer.duration > this.trackEntity[i].bufferSourceNode.buffer.duration);{
-          this.maxTime=this.trackEntity[i+1].bufferSourceNode.buffer.duration;
-          this.trackEntity[i+1].bufferSourceNode.buffer.duration = this.maxTime;
-        }
-      }
-    }*/
-
+    /// TO DO ->
+    /* 
     download() {
       if (!this.stateRecord && this.bufferSourceNode) {
         let parent = this;
@@ -281,6 +274,7 @@
       }
 
     }
+*/
 
     changeVolume(e) {
       this.volume = e.target.value / 100;
@@ -330,6 +324,8 @@
       }
     }
 
+    // we're using even listener for the new DOM created. This is  the way we communicate between tracks and multitrack global functionnalities.
+
     eventListenerUpdate(dom) {
       let btnDelete = this.shadowRoot.querySelector(dom + ' #delete');
       let btnRecord = this.shadowRoot.querySelector(dom + ' #record');
@@ -342,6 +338,7 @@
       canvas.addEventListener('mouseup', this.changeTarget.bind(this, canvas));
     }
 
+    // this method help at the end of a record to stop the sound and set up at the begining.
     playFromBegin(){
       if(this.statePlayOnRec){
         this.togglePlayOnRec();
@@ -350,6 +347,8 @@
       }
     }
 
+
+    // we can get the div parent of a DOM element.
     getDivParent(dom) {
       let divSearch = dom.parentNode.id;
       dom = dom.parentNode;
@@ -366,6 +365,7 @@
       let element = this.getDivParent(dom);
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (element == this.trackEntity[i].shadowRoot) {
+          // we stop every tracks
           this.trackEntity[i].stopSample();
           this.input.disconnect(this.trackEntity[i].getInput());
           this.trackEntity[i].getOutput().disconnect(this.output);
@@ -377,20 +377,24 @@
     }
 
     regulateTime() {
-      this.countStateRecord = 0;
+      this.countStateRecord = false;
+      // check max time return the greatest duration between every buffer.
       let time = this.checkMaxTime();
       //console.log(time);
       let addtime = 0;
       for (let i = 0; i < this.trackEntity.length; i++) {
-        if (this.trackEntity[i].stateRecord) { this.countStateRecord += 42; }
+        if (this.trackEntity[i].stateRecord) { this.countStateRecord = true; }
       }
       for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].canvasBar.getContext('2d').clearRect(0, 0, 2000, 100)
         if (this.trackEntity[i].bufferSourceNode) {
-          if (this.countStateRecord == 0) {
+          if (this.countStateRecord == false) {
+            // the new time calculated is the difference between the local variable time and the buffersourcenode duration.
             addtime = time - this.trackEntity[i].bufferSourceNode.buffer.duration;
             if (addtime > 0) {
+              // we update addTime of every tracks. This variable will be used inside addEmptyAudio method.
               this.trackEntity[i].addTime = addtime;
+              // we're calling addEmptyAudio from track.js
               this.trackEntity[i].addEmptyAudio();
             }
             this.setStopTrack();
@@ -402,7 +406,9 @@
     }
 
     checkMaxTime() {
+      // we setup trackDurationMax to 0.
       let trackDurationMax = 0;
+      // we just check for every tracks which one has the longer duration.
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (this.trackEntity[i].bufferSourceNode && !this.trackEntity[i].stateRecord) {
           trackDurationMax = Math.max(this.trackEntity[i].bufferSourceNode.buffer.duration, trackDurationMax);
@@ -413,21 +419,32 @@
     }
 
     timeSelector(e) {
+      // e refers to mousedown here.
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (this.trackEntity[i].bufferSourceNode) {
+          // this xcor refer to x coordinate of mouse. 
           this.trackEntity[i].renderBar(this.xcor);
         }
       }
       this.setPartitionSelector();
     }
 
+    // TO DO
+    // this feature alloow us to select an area. We can see on console relative position of the begining and ending of the area selected. Press mous and release it wherever you want. 
+
+
 setPartitionSelector(){
   this.stateTimeSelector=false;
+  // a localState. If it is true, it will work. We're setting up an event listener on document. So the user can select an area even if the mouse is outside of the track.
+  // however, this localstate is important. It will not select an area if you had not mouseodown on the track first.
   let localstate=true;
+  // event linked do document
   document.onmousemove = event =>{
     if(localstate){
+      // stateTimeSelector will be used in the future to determined new features inside record, play, etc.
       this.stateTimeSelector=true;
     for(let i=0;i<this.trackEntity.length;i++){
+      // event.clientX to update the aread
       this.trackEntity[i].partitionSelector(event.clientX);
     }
     }
@@ -437,15 +454,18 @@ setPartitionSelector(){
       localstate=false;
     for(let i=0;i<this.trackEntity.length;i++){
       if(this.trackEntity[i].bufferSourceNode){
+        // 2000 represent the width of each canvas. We divide these values by 2000 to get relative positions of elements.
        this.endSelector = this.trackEntity[i].endSelector/2000;
        this.startSelector =  this.trackEntity[i].startSelector/2000;
        if(this.endSelector>1) this.endSelector=1;
        if(this.startSelector<0) this.startSelector=0;
+       // if there is at least one bufferSourceNode, we break.
         break;
       }
     }
-    console.log("begining at: "+this.startSelector*100+" %");
-    console.log("end at: "+this.endSelector*100+" %");
+    // check console when you select an area. I multiply each value by 10000 and divide it by 100 to round it as XX.YY% just to make it readable.
+    console.log("begining at: "+Math.floor(this.startSelector*10000)/100+" %");
+    console.log("end at: "+Math.floor(this.endSelector*10000)/100+" %");
     for(let i=0;i<this.trackEntity.length;i++){
       this.trackEntity[i].stateSelector = this.stateTimeSelector;
     }
@@ -454,13 +474,15 @@ setPartitionSelector(){
 }
 
     // part need to be fixed...
+    /*
     checkVolumeMax() {
       for (let i = 0; i < this.trackEntity.length; i++) {
         this.trackEntity[i].volume = this.trackEntity[i].volume / this.trackEntity.length;
         this.trackEntity[i].volumeMax = 100 / this.trackEntity.length;
       }
-    }
+    }*/
 
+    // change target allow us to use spacebar to play pause if we change the position of music.
     changeTarget() {
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (this.trackEntity[i].keepPlaying) {
