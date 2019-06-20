@@ -408,7 +408,7 @@
     checkMaxTime() {
       // we setup trackDurationMax to 0.
       let trackDurationMax = 0;
-      // we just check for every tracks which one has the longer duration.
+      // we just check which track has the longuest duration.
       for (let i = 0; i < this.trackEntity.length; i++) {
         if (this.trackEntity[i].bufferSourceNode && !this.trackEntity[i].stateRecord) {
           trackDurationMax = Math.max(this.trackEntity[i].bufferSourceNode.buffer.duration, trackDurationMax);

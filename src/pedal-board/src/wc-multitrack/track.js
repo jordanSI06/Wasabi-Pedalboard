@@ -436,6 +436,10 @@ class Track {
         this.playingTrack();
         this.keepPlaying = true;
       }
+      // for the time selector, we have to play around this.startSelector and this.endSelector.
+      // respectively, this.endSelector is by default the value 2000 in some specific cases. I mean, it's the end of the track.
+      // we should update graphically the selector gesture, and then add some back-end feature around the sound controll.
+      // in this way, everything will work perfectly.
       this.pausedAt = this.bufferSourceNode.buffer.duration * pos * 1000;
       this.startedAt = Date.now() - this.pausedAt;
       this.playbarCor = pos;
