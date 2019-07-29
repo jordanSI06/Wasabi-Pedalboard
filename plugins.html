@@ -128,7 +128,7 @@
   <script>window.onload = () => {
       let _mainPlugins = document.querySelector('#mainPlugins');
 
-      fetch('https://wasabi.i3s.unice.fr/WebAudioPluginBank/repository.json')
+      fetch('https://mainline.i3s.unice.fr/WebAudioPluginBank/repository.json')
         .then(res => res.json())
         .then(data => {
           Object.keys(data.plugs).map(
