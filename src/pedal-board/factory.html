@@ -3,17 +3,18 @@
   <div class="laPedale">
   </div>
 </template>
-<script>UseWebAudioControlsMidi = 1</script>
-<script src="https://mainline.i3s.unice.fr/WebAudioPluginBank/sdk/WebAudioSDK.js"></script>
 <script>
-
+  UseWebAudioControlsMidi = 1
+</script>
+<script src="https://wasabi.i3s.unice.fr/WebAudioPluginBank/sdk/WebAudioSDK.js"></script>
+<script>
   // Current document needs to be defined to get DOM access to imported HTML
   const _currentdoc = document.currentScript.ownerDocument;
   const pbplugintemplate = _currentdoc.querySelector(`template`);
   /**
    * This is a pedal factory. it creates a pedal === a PBPlugin using when the createPedal methode is called
    * 
-  */
+   */
   class factory {
     /**
      * The createPedal function create an audio modules with a GUI that can be used in the Pedalboard. It needs :
@@ -24,7 +25,7 @@
      * - Import a distant audioNode;
      * - Import and link its GUI;
      * - Wrap it in a PBPlugin
-    */
+     */
     createPedal(_tagName, _pluginName, _pluginUrl, id) {
       // Register the x-custom element with the browser and associate the class created
       customElements.define(_tagName, class extends PBPlugin(HTMLElement) {
@@ -44,12 +45,14 @@
 
         }
 
-        get is() { return this.nodeName.toLowerCase(); }
+        get is() {
+          return this.nodeName.toLowerCase();
+        }
 
         // observedAttributes : Specify observed attributes so that attributeChangedCallback will work
-        static get observedAttributes() { return ['params', 'dynamicparams']; }
-
-
+        static get observedAttributes() {
+          return ['params', 'dynamicparams'];
+        }
 
         // Called if one of the observed attribute changed.
         attributeChangedCallback(name, oldValue, newValue, nbNodeIn) {
@@ -64,12 +67,10 @@
               console.log('thisNODE', this.node);
 
               if (this.node.setState) this.node.setState(this.paramsLoaded);
-            }
-            catch (err) {
+            } catch (err) {
               console.log(err);
             }
-          }
-          else if (name === "dynamicparams") {
+          } else if (name === "dynamicparams") {
             console.log(`name: ${name}`);
             console.log(`newValue:`, newValue);
             if (newValue == "numberOfInputs") {
@@ -97,7 +98,9 @@
         connectedCallback() {
           //  console.log(`Custom element ${this.is} added to page.`);
           // Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
-          const shadowRoot = this.attachShadow({ mode: `open` });
+          const shadowRoot = this.attachShadow({
+            mode: `open`
+          });
           const instance = pbplugintemplate.content.cloneNode(true);
           shadowRoot.appendChild(instance);
 
@@ -110,15 +113,20 @@
           return new Promise((resolve) => {
             if (_pluginName == "WasabiMixer") {
               try {
-                let saver = document.querySelector("#ul_container").querySelector("#li_1").querySelector("pedal-board").shadowRoot.querySelector("#div_app").querySelector("header").querySelector("#header_settings").querySelector("wc-save");
-                let optionForMixer = saver.allbanks.find(item => item._id == saver.bankSelected).presets.find(item => item._id == saver.presetSelected).plugs.find(item => item.id == this.pedalId).settings.nbcanaux;
-                resolve({ "numberOfInputs": optionForMixer });
+                let saver = document.querySelector("#ul_container").querySelector("#li_1").querySelector(
+                    "pedal-board").shadowRoot.querySelector("#div_app").querySelector("header")
+                  .querySelector("#header_settings").querySelector("wc-save");
+                let optionForMixer = saver.allbanks.find(item => item._id == saver.bankSelected).presets
+                  .find(item => item._id == saver.presetSelected).plugs.find(item => item.id == this
+                    .pedalId).settings.nbcanaux;
+                resolve({
+                  "numberOfInputs": optionForMixer
+                });
               } catch (error) {
                 console.log(error);
                 resolve({});
               }
-            }
-            else resolve({});
+            } else resolve({});
           });
         }
 
@@ -133,7 +141,8 @@
               this.loadPlugin(this.plugin)
             } catch (error) {
               console.log(error)
-              console.warn("WAP plugin implementation changes : replace your module definition by window.mymodule");
+              console.warn(
+                "WAP plugin implementation changes : replace your module definition by window.mymodule");
               this.plugin = new WAPlugin[_pluginName](GlobalContext.context, _pluginUrl);
               this.loadPlugin(this.plugin)
             }
@@ -213,7 +222,6 @@
                 console.log(error);
               }
 
-
               // Currently we manage only one output by node so we automatically connect the node output to the default PBPlugin soundnodeout
               node.connect(pedal.soundNodeOut);
             });
@@ -223,6 +231,4 @@
       });
     };
   }
-
-
 </script>
