@@ -1326,7 +1326,7 @@ class PedalBoard extends HTMLElement {
       type: e.dataTransfer.getData("pedalId"),
       position: {
         x: (e.clientX - 3) / this.zoom,
-        y: (event.clientY - 10) / this.zoom
+        y: (e.clientY - 10) / this.zoom
       },
       settings: {}
     };
